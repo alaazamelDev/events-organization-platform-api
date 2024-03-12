@@ -19,7 +19,7 @@ import { DBConfigService } from '../../../config/database/postgresql/config.serv
         password: dbConfigService.password,
         database: dbConfigService.database,
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: true,
       }),
       inject: [DBConfigService],
     } as TypeOrmModuleAsyncOptions),
