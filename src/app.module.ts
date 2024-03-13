@@ -5,6 +5,8 @@ import { PostgresSQLServerDatabaseProviderModule } from './providers/database/po
 import { LoggerConfigModule } from './config/logger/sentryio/config.module';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { HealthController } from './api/health/health.controller';
+import { UserRoleModule } from './api/userRole/user_role.module';
+import { UserModule } from "./api/user/user.module";
 
 @Module({
   imports: [
@@ -13,8 +15,9 @@ import { HealthController } from './api/health/health.controller';
     PostgresSQLServerDatabaseProviderModule,
     LoggerConfigModule,
     SwaggerConfigModule,
+    UserRoleModule,
+    UserModule,
   ],
   controllers: [HealthController],
-  providers: [],
 })
 export class AppModule {}

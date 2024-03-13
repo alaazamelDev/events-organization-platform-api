@@ -275,7 +275,7 @@ src/models
     ├── serializers
     │   └── user.serializer.ts
     ├── users.controller.ts
-    ├── users.module.ts
+    ├── user.module.ts
     ├── users.repository.ts
     └── users.service.ts
 ```
