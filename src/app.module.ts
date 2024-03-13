@@ -5,8 +5,16 @@ import { PostgresSQLServerDatabaseProviderModule } from './providers/database/po
 import { LoggerConfigModule } from './config/logger/sentryio/config.module';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { HealthController } from './api/health/health.controller';
-import { UserRoleModule } from './api/userRole/user_role.module';
-import { UserModule } from "./api/user/user.module";
+import {
+  AddressModule,
+  AdminModule,
+  AttendeeModule,
+  CityModule,
+  JobModule,
+  StateModule,
+  UserModule,
+  UserRoleModule,
+} from './api';
 
 @Module({
   imports: [
@@ -17,6 +25,12 @@ import { UserModule } from "./api/user/user.module";
     SwaggerConfigModule,
     UserRoleModule,
     UserModule,
+    AddressModule,
+    AdminModule,
+    AttendeeModule,
+    CityModule,
+    JobModule,
+    StateModule,
   ],
   controllers: [HealthController],
 })
