@@ -8,6 +8,7 @@ import { AppConfigService } from './config/app/config.service';
 import { LoggerConfigService } from './config/logger/sentryio/config.service';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { SwaggerConfigService } from './config/openapi/swagger/config.service';
+import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -25,6 +26,7 @@ async function bootstrap(): Promise<void> {
   );
 
   app.use(helmet());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   Sentry.init({
     dsn: sentryConfig.dns,
@@ -40,6 +42,7 @@ async function bootstrap(): Promise<void> {
 
   await app.listen(appConfig.port);
 }
+
 bootstrap()
   .then(() => {
     console.log('Done');

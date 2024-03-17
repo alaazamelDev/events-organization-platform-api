@@ -23,11 +23,11 @@ export class User extends BaseEntity {
     name: 'password',
     type: 'varchar',
   })
-  @BeforeInsert()
-  async setPassword(password: string) {
-    const salt = await genSalt();
-    this.password = await hash(password || this.password, salt);
-  }
+  // @BeforeInsert()
+  // async setPassword(password: string) {
+  //   const salt = await genSalt();
+  //   this.password = await hash(password || this.password, salt);
+  // }
   password!: string;
 
   @ManyToOne(() => UserRole, (role) => role.users, {
