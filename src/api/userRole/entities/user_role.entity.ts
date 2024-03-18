@@ -5,6 +5,10 @@ import { Exclude } from 'class-transformer';
 
 @Entity('user_roles')
 export class UserRole extends BaseEntity {
+  static ADMIN: number = 1;
+  static EMPLOYEE: number = 2;
+  static ATTENDEE: number = 3;
+
   @Column({
     name: 'role_name',
     type: 'varchar',

@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { UserRoleService } from './services/user_role.service';
 
-@Controller('user-roles')
+@Controller('services-roles')
 export class UserRoleController {
   private readonly userRoleService: UserRoleService;
 

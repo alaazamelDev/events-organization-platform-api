@@ -13,20 +13,40 @@ import { ContactModule } from './api/contact/contact.module';
 import { PermissionsModule } from './api/permission/permissions.module';
 import { IsUniqueConstraint } from './common/validators/is_unique_constraint';
 import { IsExistConstraint } from './common/validators/is_exist_constraint';
+import { AuthModule } from './auth/auth.module';
+import {
+  AddressModule,
+  AdminModule,
+  AttendeeModule,
+  CityModule,
+  JobModule,
+  StateModule,
+  UserModule,
+  UserRoleModule,
+} from './api';
+import { JwtConfigModule } from './config/secrets/jwt/config.module';
 
 @Module({
   imports: [
     AppConfigModule,
     DBConfigModule,
+    JwtConfigModule,
     PostgresSQLServerDatabaseProviderModule,
     LoggerConfigModule,
     SwaggerConfigModule,
     UserRoleModule,
     UserModule,
+    AddressModule,
+    AdminModule,
+    AttendeeModule,
+    CityModule,
+    JobModule,
+    StateModule,
     OrganizationModule,
     EmployeeModule,
     ContactModule,
     PermissionsModule,
+    AuthModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

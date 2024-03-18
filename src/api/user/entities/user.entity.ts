@@ -37,4 +37,11 @@ export class User extends BaseEntity {
   })
   @JoinColumn({ name: 'user_role_id' })
   userRole!: UserRole;
+
+  @Column({
+    name: 'refresh_token',
+    nullable: true,
+    type: 'varchar',
+  })
+  refreshToken?: string;
 }
