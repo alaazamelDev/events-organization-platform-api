@@ -14,7 +14,7 @@ export class DBConfigService {
   }
 
   get user(): string {
-    return this.configService.get<string>('db.services') ?? 'postgres';
+    return this.configService.get<string>('db.user') ?? 'postgres';
   }
 
   get password(): string {
