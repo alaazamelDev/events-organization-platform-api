@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
 import { EmployeePermission } from './entities/employee_permission.entity';
 import { User } from '../user/entities/user.entity';
+import { Employee_permissionsService } from './employee_permissions.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Employee, EmployeePermission, User])],
   controllers: [EmployeeController],
-  providers: [EmployeeService],
+  providers: [EmployeeService, Employee_permissionsService],
 })
 export class EmployeeModule {}

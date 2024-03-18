@@ -1,28 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Employee } from "./entities/employee.entity";
-import { User } from "../user/entities/user.entity";
-import { DataSource, Repository } from "typeorm";
-import { UserRole } from "../userRole/entities/user_role.entity";
-import { Organization } from "../organization/entities/organization.entity";
-import { Permission } from "../permission/entities/permission.entity";
-import { EmployeePermission } from "./entities/employee_permission.entity";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Employee } from './entities/employee.entity';
+import { User } from '../user/entities/user.entity';
+import { DataSource, Repository } from 'typeorm';
+import { UserRole } from '../userRole/entities/user_role.entity';
+import { Organization } from '../organization/entities/organization.entity';
+import { Permission } from '../permission/entities/permission.entity';
+import { EmployeePermission } from './entities/employee_permission.entity';
+import { AllEmployeesSerializer } from '../../common/serializers/all_employees.serializer';
 
 @Injectable()
 export class EmployeeService {
-
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
-    private readonly dataSource: DataSource
-  ) {
-  }
-  async create(createEmployeeDto: CreateEmployeeDto) {
+    private readonly dataSource: DataSource,
+  ) {}
 
+  async create(createEmployeeDto: CreateEmployeeDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -31,10 +30,10 @@ export class EmployeeService {
       const user = this.userRepo.create({
         username: createEmployeeDto.username,
         email: createEmployeeDto.email,
-        password: createEmployeeDto.password
+        password: createEmployeeDto.password,
       });
 
-      user.userRole = {id: 2} as UserRole;
+      user.userRole = { id: 2 } as UserRole;
 
       await queryRunner.manager.save(user);
 
@@ -44,15 +43,15 @@ export class EmployeeService {
         birth_date: createEmployeeDto.birth_date,
         phone_number: createEmployeeDto.phone_number,
         user: user,
-        organization: {id: createEmployeeDto.organization_id} as Organization
+        organization: { id: createEmployeeDto.organization_id } as Organization,
       });
 
       await queryRunner.manager.save(employee);
 
-      const permissions = createEmployeeDto.permissions.map(p => {
+      const permissions = createEmployeeDto.permissions.map((p) => {
         const employeePermission = new EmployeePermission();
         employeePermission.employee = employee;
-        employeePermission.permission = {id: p} as Permission;
+        employeePermission.permission = { id: p } as Permission;
 
         return employeePermission;
       });
@@ -68,19 +67,46 @@ export class EmployeeService {
     }
   }
 
-  findAll() {
-    return `This action returns all employee`;
+  async findAll() {
+    const employees = await this.employeeRepository.find({
+      relations: { permissions: true, user: true },
+    });
+    return employees.map((employee) => new AllEmployeesSerializer(employee));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} employee`;
+  async findOne(id: number) {
+    return await this.employeeRepository.findOneOrFail({
+      where: { id },
+      relations: { user: true, permissions: true, organization: true },
+    });
   }
 
-  update(id: number, _updateEmployeeDto: UpdateEmployeeDto) {
-    return `This action updates a #${id} employee`;
+  async update(id: number, _updateEmployeeDto: UpdateEmployeeDto) {
+    const employee = await this.employeeRepository.findOneOrFail({
+      where: { id },
+      relations: { user: true },
+    });
+
+    const user = await this.userRepo.findOneOrFail({
+      where: { id: employee.user.id },
+    });
+
+    Object.assign(user, _updateEmployeeDto);
+    Object.assign(employee, _updateEmployeeDto);
+
+    await this.employeeRepository.save(employee);
+    await this.userRepo.save(user);
+
+    return employee;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} employee`;
+  async remove(id: number) {
+    const employee = this.employeeRepository.findOneOrFail({
+      where: { id },
+    });
+
+    await this.employeeRepository.softDelete(id);
+
+    return employee;
   }
 }

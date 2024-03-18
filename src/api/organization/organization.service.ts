@@ -124,7 +124,7 @@ export class OrganizationService {
 
     try {
       const organization = await this.organizationRepository.findOneOrFail({
-        where: { id: configureOrganizationDto.org_id },
+        where: { id: configureOrganizationDto.organization_id },
       });
 
       organization.description = configureOrganizationDto.description;
@@ -151,10 +151,6 @@ export class OrganizationService {
       await queryRunner.release();
       throw e;
     }
-  }
-
-  async configureOrganizationInitialization() {
-    return await this.contactRepository.find();
   }
 
   async getOrganizationEmployees(id: number) {

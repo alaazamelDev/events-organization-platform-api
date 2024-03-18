@@ -6,11 +6,13 @@ import { LoggerConfigModule } from './config/logger/sentryio/config.module';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { HealthController } from './api/health/health.controller';
 import { UserRoleModule } from './api/userRole/user_role.module';
-import { UserModule } from "./api/user/user.module";
+import { UserModule } from './api/user/user.module';
 import { OrganizationModule } from './api/organization/organization.module';
 import { EmployeeModule } from './api/employee/employee.module';
 import { ContactModule } from './api/contact/contact.module';
 import { PermissionsModule } from './api/permission/permissions.module';
+import { IsUniqueConstraint } from './common/validators/is_unique_constraint';
+import { IsExistConstraint } from './common/validators/is_exist_constraint';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { PermissionsModule } from './api/permission/permissions.module';
     ContactModule,
     PermissionsModule,
   ],
+  providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
 })
 export class AppModule {}

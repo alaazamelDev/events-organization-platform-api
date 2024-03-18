@@ -3,7 +3,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { ContactOrganization } from './contact_organization.entity';
 import { Employee } from '../../employee/entities/employee.entity';
 
-@Entity()
+@Entity({ name: 'organizations' })
 export class Organization extends BaseEntity {
   @Column()
   name: string;

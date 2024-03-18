@@ -9,6 +9,7 @@ import { LoggerConfigService } from './config/logger/sentryio/config.service';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { SwaggerConfigService } from './config/openapi/swagger/config.service';
 import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
+import { useContainer } from 'class-validator';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,7 @@ async function bootstrap(): Promise<void> {
 
   app.use(helmet());
   app.useGlobalInterceptors(new ResponseInterceptor());
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   Sentry.init({
     dsn: sentryConfig.dns,
