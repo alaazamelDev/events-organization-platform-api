@@ -5,6 +5,11 @@ import { PostgresSQLServerDatabaseProviderModule } from './providers/database/po
 import { LoggerConfigModule } from './config/logger/sentryio/config.module';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { HealthController } from './api/health/health.controller';
+import { OrganizationModule } from './api/organization/organization.module';
+import { EmployeeModule } from './api/employee/employee.module';
+import { ContactModule } from './api/contact/contact.module';
+import { PermissionsModule } from './api/permission/permissions.module';
+import { AuthModule } from './auth/auth.module';
 import {
   AddressModule,
   AdminModule,
@@ -15,11 +20,13 @@ import {
   UserModule,
   UserRoleModule,
 } from './api';
+import { JwtConfigModule } from './config/secrets/jwt/config.module';
 
 @Module({
   imports: [
     AppConfigModule,
     DBConfigModule,
+    JwtConfigModule,
     PostgresSQLServerDatabaseProviderModule,
     LoggerConfigModule,
     SwaggerConfigModule,
@@ -31,6 +38,11 @@ import {
     CityModule,
     JobModule,
     StateModule,
+    OrganizationModule,
+    EmployeeModule,
+    ContactModule,
+    PermissionsModule,
+    AuthModule,
   ],
   controllers: [HealthController],
 })

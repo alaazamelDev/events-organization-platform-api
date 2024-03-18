@@ -11,16 +11,18 @@ import { DBConfigService } from '../../../config/database/postgresql/config.serv
       useFactory: async (
         dbConfigService: DBConfigService,
         // eslint-disable-next-line @typescript-eslint/require-await
-      ) => ({
-        type: 'postgres' as DatabaseType,
-        host: dbConfigService.host,
-        port: dbConfigService.port,
-        username: dbConfigService.user,
-        password: dbConfigService.password,
-        database: dbConfigService.database,
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      ) => {
+        return {
+          type: 'postgres' as DatabaseType,
+          host: dbConfigService.host,
+          port: dbConfigService.port,
+          username: dbConfigService.user,
+          password: dbConfigService.password,
+          database: dbConfigService.database,
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
       inject: [DBConfigService],
     } as TypeOrmModuleAsyncOptions),
   ],
