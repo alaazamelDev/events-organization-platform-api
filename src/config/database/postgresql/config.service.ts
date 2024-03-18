@@ -6,15 +6,15 @@ export class DBConfigService {
   constructor(private configService: ConfigService) {}
 
   get host(): string {
-    return this.configService.get<string>('db.host') ?? '';
+    return this.configService.get<string>('db.host') ?? 'localhost';
   }
 
   get database(): string {
-    return this.configService.get<string>('db.name') ?? '';
+    return this.configService.get<string>('db.name') ?? 'postgres';
   }
 
   get user(): string {
-    return this.configService.get<string>('db.user') ?? '';
+    return this.configService.get<string>('db.services') ?? 'postgres';
   }
 
   get password(): string {

@@ -1,7 +1,6 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserRole } from '../../userRole/entities/user_role.entity';
-import { genSalt, hash } from 'bcrypt';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -23,11 +22,6 @@ export class User extends BaseEntity {
     name: 'password',
     type: 'varchar',
   })
-  // @BeforeInsert()
-  // async setPassword(password: string) {
-  //   const salt = await genSalt();
-  //   this.password = await hash(password || this.password, salt);
-  // }
   password!: string;
 
   @ManyToOne(() => UserRole, (role) => role.users, {
@@ -41,4 +35,11 @@ export class User extends BaseEntity {
   })
   @JoinColumn({ name: 'user_role_id' })
   userRole!: UserRole;
+
+  @Column({
+    name: 'refresh_token',
+    nullable: true,
+    type: 'varchar',
+  })
+  refreshToken?: string;
 }

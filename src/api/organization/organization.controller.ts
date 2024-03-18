@@ -1,10 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
-import { ConfigureOrganizationsDto } from "./dto/configure-organizations.dto";
-import { DeleteContactInfoDto } from "./dto/delete-contact-info.dto";
-import { AddContactInfoDto } from "./dto/add-contact-info.dto";
+import { ConfigureOrganizationsDto } from './dto/configure-organizations.dto';
+import { DeleteContactInfoDto } from './dto/delete-contact-info.dto';
+import { AddContactInfoDto } from './dto/add-contact-info.dto';
 
 @Controller('organization')
 export class OrganizationController {
@@ -21,8 +29,12 @@ export class OrganizationController {
   }
 
   @Post('configure')
-  configureOrganization(@Body() configureOrganization: ConfigureOrganizationsDto) {
-    return this.organizationService.configureOrganization(configureOrganization);
+  configureOrganization(
+    @Body() configureOrganization: ConfigureOrganizationsDto,
+  ) {
+    return this.organizationService.configureOrganization(
+      configureOrganization,
+    );
   }
 
   @Get()
@@ -41,7 +53,10 @@ export class OrganizationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateOrganizationDto: UpdateOrganizationDto,
+  ) {
     return this.organizationService.update(+id, updateOrganizationDto);
   }
 
@@ -51,12 +66,21 @@ export class OrganizationController {
   }
 
   @Delete('contact/:id')
-  deleteContactInfo(@Param('id') id: string, @Body() deleteContactInfoDto: DeleteContactInfoDto) {
-    return this.organizationService.deleteContactInfo(+id, deleteContactInfoDto);
+  deleteContactInfo(
+    @Param('id') id: string,
+    @Body() deleteContactInfoDto: DeleteContactInfoDto,
+  ) {
+    return this.organizationService.deleteContactInfo(
+      +id,
+      deleteContactInfoDto,
+    );
   }
 
   @Post(':id')
-  addContactInfo(@Param('id') id: string, @Body() addContactInfoDto: AddContactInfoDto) {
+  addContactInfo(
+    @Param('id') id: string,
+    @Body() addContactInfoDto: AddContactInfoDto,
+  ) {
     return this.organizationService.addContactInfo(+id, addContactInfoDto);
   }
 }
