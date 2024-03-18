@@ -9,7 +9,7 @@ import { UserRole } from '../userRole/entities/user_role.entity';
 import { Organization } from '../organization/entities/organization.entity';
 import { Permission } from '../permission/entities/permission.entity';
 import { EmployeePermission } from './entities/employee_permission.entity';
-import { AllEmployeesSerializer } from '../../common/serializers/all_employees.serializer';
+import { AllEmployeesSerializer } from './seializers/all_employees.serializer';
 
 @Injectable()
 export class EmployeeService {

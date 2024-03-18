@@ -1,5 +1,5 @@
-import { Employee } from '../../api/employee/entities/employee.entity';
-import { EmployeePermission } from '../../api/employee/entities/employee_permission.entity';
+import { Employee } from '../entities/employee.entity';
+import { EmployeePermission } from '../entities/employee_permission.entity';
 import { Exclude, Expose } from 'class-transformer';
 
 export class AllEmployeesSerializer extends Employee {
