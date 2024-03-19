@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -120,6 +120,8 @@ export class OrganizationService {
 
   async configureOrganization(
     configureOrganizationDto: ConfigureOrganizationsDto,
+    main_picture: string,
+    cover_picture: string,
   ) {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -133,6 +135,8 @@ export class OrganizationService {
 
       organization.description = configureOrganizationDto.description;
       organization.bio = configureOrganizationDto.bio;
+      organization.main_picture = main_picture;
+      organization.cover_picture = cover_picture;
 
       const contacts = configureOrganizationDto.contact_info.map((c) => {
         const contactOrganization = new ContactOrganization();
@@ -230,5 +234,49 @@ export class OrganizationService {
       deleteOrganizationAddressDto.address_id,
     );
     console.log(id);
+  }
+
+  async updateOrganizationCoverPicture(
+    id: number,
+    fileName: string | undefined,
+  ) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id },
+    });
+
+    if (fileName) {
+      organization.cover_picture = fileName;
+
+      await this.organizationRepository.save(organization);
+
+      return organization;
+    } else {
+      throw new HttpException(
+        'could not update the cover picture',
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
+  }
+
+  async updateOrganizationMainPicture(
+    id: number,
+    fileName: string | undefined,
+  ) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id },
+    });
+
+    if (fileName) {
+      organization.main_picture = fileName;
+
+      await this.organizationRepository.save(organization);
+
+      return organization;
+    } else {
+      throw new HttpException(
+        'could not update the main picture',
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
   }
 }
