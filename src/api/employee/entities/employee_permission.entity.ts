@@ -1,7 +1,15 @@
-import { PrimaryGeneratedColumn, ManyToOne, Entity, Column, JoinColumn } from "typeorm";
-import { Employee } from "./employee.entity";
-import { Permission } from "../../permission/entities/permission.entity";
+import {
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Entity,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
+import { Employee } from './employee.entity';
+import { Permission } from '../../permission/entities/permission.entity';
+
 @Entity()
+@Unique(['employee', 'permission'])
 export class EmployeePermission {
   @PrimaryGeneratedColumn({
     name: 'id',
@@ -10,12 +18,13 @@ export class EmployeePermission {
   })
   id: number;
 
-  @ManyToOne(() => Employee,
-    (employee) => employee.permissions, {onDelete: 'CASCADE'})
-  @JoinColumn({name: 'employee_id'})
+  @ManyToOne(() => Employee, (employee) => employee.permissions, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'employee_id' })
   employee: Employee;
 
   @ManyToOne(() => Permission, (permission) => permission)
-  @JoinColumn({name: 'permission_id'})
+  @JoinColumn({ name: 'permission_id' })
   permission: Permission;
 }

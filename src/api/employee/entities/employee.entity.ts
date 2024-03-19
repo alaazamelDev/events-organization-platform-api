@@ -1,11 +1,19 @@
-import { BaseEntity } from "../../../common/entities/base.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, JoinTable, OneToMany } from "typeorm";
-import { User } from "../../user/entities/user.entity";
-import { Organization } from "../../organization/entities/organization.entity";
-import { EmployeePermission } from "./employee_permission.entity";
-@Entity()
-export class Employee extends BaseEntity {
+import { BaseEntity } from '../../../common/entities/base.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  JoinTable,
+  OneToMany,
+} from 'typeorm';
+import { User } from '../../user/entities/user.entity';
+import { Organization } from '../../organization/entities/organization.entity';
+import { EmployeePermission } from './employee_permission.entity';
 
+@Entity({ name: 'employees' })
+export class Employee extends BaseEntity {
   @Column()
   first_name: string;
 
@@ -15,21 +23,28 @@ export class Employee extends BaseEntity {
   @Column()
   phone_number: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   profile_picture: string;
 
   @Column()
   birth_date: Date;
 
-  @ManyToOne(() => Organization,
-    (organization) => organization.employees)
-  @JoinColumn({name: 'organization_id'})
+  @ManyToOne(() => Organization, (organization) => organization.employees)
+  @JoinColumn({ name: 'organization_id' })
   organization: Organization;
 
   @OneToOne(() => User)
-  @JoinColumn({name: 'user_id'})
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany(() => EmployeePermission, employeePermission => employeePermission.employee)
+  @OneToMany(
+    () => EmployeePermission,
+    (employeePermission) => employeePermission.employee,
+  )
   permissions: EmployeePermission[];
+
+  // constructor(partial: Partial<Employee>) {
+  //   super();
+  //   Object.assign(this, partial);
+  // }
 }

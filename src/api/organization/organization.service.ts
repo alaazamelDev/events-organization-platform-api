@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +14,10 @@ import { ConfigureOrganizationsDto } from './dto/configure-organizations.dto';
 import { ContactOrganization } from './entities/contact_organization.entity';
 import { DeleteContactInfoDto } from './dto/delete-contact-info.dto';
 import { AddContactInfoDto } from './dto/add-contact-info.dto';
+import { AddressOrganization } from './entities/address_organization.entity';
+import { Address } from '../address/entities/address.entity';
+import { AddOrganizationAddressDto } from './dto/add-organization-address.dto';
+import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.dto';
 
 @Injectable()
 export class OrganizationService {
@@ -26,10 +30,10 @@ export class OrganizationService {
     private readonly employeeRepository: Repository<Employee>,
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(Contact)
-    private readonly contactRepository: Repository<Contact>,
     @InjectRepository(ContactOrganization)
     private readonly contactOrganizationRepository: Repository<ContactOrganization>,
+    @InjectRepository(AddressOrganization)
+    private readonly addressOrganizationRepository: Repository<AddressOrganization>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -116,6 +120,8 @@ export class OrganizationService {
 
   async configureOrganization(
     configureOrganizationDto: ConfigureOrganizationsDto,
+    main_picture: string,
+    cover_picture: string,
   ) {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -124,11 +130,13 @@ export class OrganizationService {
 
     try {
       const organization = await this.organizationRepository.findOneOrFail({
-        where: { id: configureOrganizationDto.org_id },
+        where: { id: configureOrganizationDto.organization_id },
       });
 
       organization.description = configureOrganizationDto.description;
       organization.bio = configureOrganizationDto.bio;
+      organization.main_picture = main_picture;
+      organization.cover_picture = cover_picture;
 
       const contacts = configureOrganizationDto.contact_info.map((c) => {
         const contactOrganization = new ContactOrganization();
@@ -140,8 +148,18 @@ export class OrganizationService {
         return contactOrganization;
       });
 
+      const addresses = configureOrganizationDto.addresses.map((a) => {
+        const addressOrganization = new AddressOrganization();
+
+        addressOrganization.organization = organization;
+        addressOrganization.address = { id: a.address_id } as Address;
+
+        return addressOrganization;
+      });
+
       await queryRunner.manager.save(organization);
       await queryRunner.manager.save(contacts);
+      await queryRunner.manager.save(addresses);
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
@@ -151,10 +169,6 @@ export class OrganizationService {
       await queryRunner.release();
       throw e;
     }
-  }
-
-  async configureOrganizationInitialization() {
-    return await this.contactRepository.find();
   }
 
   async getOrganizationEmployees(id: number) {
@@ -192,5 +206,77 @@ export class OrganizationService {
     await this.contactOrganizationRepository.save(contactOrganization);
 
     return contactOrganization;
+  }
+
+  async addOrganizationAddress(
+    id: number,
+    addAddressDto: AddOrganizationAddressDto,
+  ) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    const addressOrganization = this.addressOrganizationRepository.create({
+      address: { id: addAddressDto.address_id } as Address,
+      organization: organization,
+    });
+
+    await this.addressOrganizationRepository.save(addressOrganization);
+
+    return addressOrganization;
+  }
+
+  async deleteOrganizationAddress(
+    id: number,
+    deleteOrganizationAddressDto: DeleteOrganizationAddressDto,
+  ) {
+    const address = await this.addressOrganizationRepository.delete(
+      deleteOrganizationAddressDto.address_id,
+    );
+    console.log(id);
+  }
+
+  async updateOrganizationCoverPicture(
+    id: number,
+    fileName: string | undefined,
+  ) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id },
+    });
+
+    if (fileName) {
+      organization.cover_picture = fileName;
+
+      await this.organizationRepository.save(organization);
+
+      return organization;
+    } else {
+      throw new HttpException(
+        'could not update the cover picture',
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
+  }
+
+  async updateOrganizationMainPicture(
+    id: number,
+    fileName: string | undefined,
+  ) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id },
+    });
+
+    if (fileName) {
+      organization.main_picture = fileName;
+
+      await this.organizationRepository.save(organization);
+
+      return organization;
+    } else {
+      throw new HttpException(
+        'could not update the main picture',
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
   }
 }

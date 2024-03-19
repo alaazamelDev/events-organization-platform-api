@@ -1,4 +1,15 @@
-import { PartialType } from '@nestjs/swagger';
-import { ConfigureOrganizationsDto } from "./configure-organizations.dto";
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateOrganizationDto extends PartialType(ConfigureOrganizationsDto) {}
+export class UpdateOrganizationDto {
+  @IsString()
+  @IsOptional()
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  bio: string;
+
+  @IsString()
+  @IsOptional()
+  description: string;
+}

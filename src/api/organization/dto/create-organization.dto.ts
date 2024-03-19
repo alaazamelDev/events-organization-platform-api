@@ -1,4 +1,5 @@
 import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsUnique } from '../../../common/decorators/is_unique.decorator';
 
 export class CreateOrganizationDto {
   @IsString()
@@ -20,9 +21,11 @@ export class CreateOrganizationDto {
   profile_picture: string;
 
   @IsString()
+  @IsUnique({ tableName: 'users', column: 'username' })
   username: string;
 
   @IsString()
+  @IsUnique({ tableName: 'users', column: 'email' })
   email: string;
 
   @IsString()

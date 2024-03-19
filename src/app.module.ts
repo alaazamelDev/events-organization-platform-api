@@ -9,6 +9,8 @@ import { OrganizationModule } from './api/organization/organization.module';
 import { EmployeeModule } from './api/employee/employee.module';
 import { ContactModule } from './api/contact/contact.module';
 import { PermissionsModule } from './api/permission/permissions.module';
+import { IsUniqueConstraint } from './common/validators/is_unique_constraint';
+import { IsExistConstraint } from './common/validators/is_exist_constraint';
 import { AuthModule } from './auth/auth.module';
 import {
   AddressModule,
@@ -64,6 +66,7 @@ import { MulterConfigService } from './config/files/multer/config.service';
       inject: [MulterConfigService],
     }),
   ],
+  providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
   providers: [],
 })

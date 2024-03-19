@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserRole } from '../../userRole/entities/user_role.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -22,6 +23,7 @@ export class User extends BaseEntity {
     name: 'password',
     type: 'varchar',
   })
+  @Exclude()
   password!: string;
 
   @ManyToOne(() => UserRole, (role) => role.users, {
