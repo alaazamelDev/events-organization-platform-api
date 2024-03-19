@@ -1,11 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { AddContactInfoDto } from './add-contact-info.dto';
 import { IsExist } from '../../../common/decorators/is_exist.decorator';
-
-type CONTACTINFO = {
-  id: number;
-  content: string;
-};
+import { AddOrganizationAddressDto } from './add-organization-address.dto';
 
 export class ConfigureOrganizationsDto {
   @IsNotEmpty()
@@ -19,5 +15,8 @@ export class ConfigureOrganizationsDto {
   description: string;
 
   @IsNotEmpty()
-  contact_info: [AddContactInfoDto];
+  contact_info: AddContactInfoDto[];
+
+  @IsNotEmpty()
+  addresses: AddOrganizationAddressDto[];
 }

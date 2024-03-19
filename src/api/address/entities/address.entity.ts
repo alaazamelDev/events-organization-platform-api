@@ -1,7 +1,8 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { City } from '../../city/entities/city.entity';
 import { State } from '../../state/entities/state.entity';
+import { AddressOrganization } from '../../organization/entities/address_organization.entity';
 
 @Entity('addresses')
 export class Address extends BaseEntity {
@@ -30,4 +31,10 @@ export class Address extends BaseEntity {
   })
   @JoinColumn({ name: 'state_id' })
   state: State;
+
+  @OneToMany(
+    () => AddressOrganization,
+    (addressOrganization) => addressOrganization.address,
+  )
+  organizations: AddressOrganization[];
 }

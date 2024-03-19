@@ -5,8 +5,6 @@ import { PostgresSQLServerDatabaseProviderModule } from './providers/database/po
 import { LoggerConfigModule } from './config/logger/sentryio/config.module';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { HealthController } from './api/health/health.controller';
-import { UserRoleModule } from './api/userRole/user_role.module';
-import { UserModule } from './api/user/user.module';
 import { OrganizationModule } from './api/organization/organization.module';
 import { EmployeeModule } from './api/employee/employee.module';
 import { ContactModule } from './api/contact/contact.module';
@@ -30,7 +28,7 @@ import { JwtConfigModule } from './config/secrets/jwt/config.module';
   imports: [
     AppConfigModule,
     DBConfigModule,
-    JwtConfigModule,
+    // JwtConfigModule,
     PostgresSQLServerDatabaseProviderModule,
     LoggerConfigModule,
     SwaggerConfigModule,
@@ -38,7 +36,7 @@ import { JwtConfigModule } from './config/secrets/jwt/config.module';
     UserModule,
     AddressModule,
     AdminModule,
-    AttendeeModule,
+    // AttendeeModule,
     CityModule,
     JobModule,
     StateModule,
@@ -46,7 +44,7 @@ import { JwtConfigModule } from './config/secrets/jwt/config.module';
     EmployeeModule,
     ContactModule,
     PermissionsModule,
-    AuthModule,
+    // AuthModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

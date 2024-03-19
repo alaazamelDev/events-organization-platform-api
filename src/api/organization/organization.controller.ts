@@ -13,6 +13,8 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { ConfigureOrganizationsDto } from './dto/configure-organizations.dto';
 import { DeleteContactInfoDto } from './dto/delete-contact-info.dto';
 import { AddContactInfoDto } from './dto/add-contact-info.dto';
+import { AddOrganizationAddressDto } from './dto/add-organization-address.dto';
+import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.dto';
 
 @Controller('organization')
 export class OrganizationController {
@@ -71,11 +73,33 @@ export class OrganizationController {
     );
   }
 
-  @Post(':id')
+  @Post('contact/:id')
   addContactInfo(
     @Param('id') id: string,
     @Body() addContactInfoDto: AddContactInfoDto,
   ) {
     return this.organizationService.addContactInfo(+id, addContactInfoDto);
+  }
+
+  @Post('address/:id')
+  addOrganizationAddress(
+    @Param('id') id: string,
+    @Body() addOrganizationAddressDto: AddOrganizationAddressDto,
+  ) {
+    return this.organizationService.addOrganizationAddress(
+      +id,
+      addOrganizationAddressDto,
+    );
+  }
+
+  @Delete('address/:id')
+  deleteOrganizationAddress(
+    @Param('id') id: string,
+    @Body() deleteOrganizationAddressDto: DeleteOrganizationAddressDto,
+  ) {
+    return this.organizationService.deleteOrganizationAddress(
+      +id,
+      deleteOrganizationAddressDto,
+    );
   }
 }
