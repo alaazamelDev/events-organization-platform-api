@@ -31,7 +31,10 @@ async function bootstrap(): Promise<void> {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // TODO, modify later
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  });
 
   Sentry.init({
     dsn: sentryConfig.dns,
