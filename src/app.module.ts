@@ -21,6 +21,9 @@ import {
   UserRoleModule,
 } from './api';
 import { JwtConfigModule } from './config/secrets/jwt/config.module';
+import { MulterConfigModule } from './config/files/multer/config.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { MulterConfigService } from './config/files/multer/config.service';
 
 @Module({
   imports: [
@@ -43,7 +46,25 @@ import { JwtConfigModule } from './config/secrets/jwt/config.module';
     ContactModule,
     PermissionsModule,
     AuthModule,
+    MulterConfigModule,
+    MulterModule.registerAsync({
+      imports: [MulterConfigModule],
+      useFactory: async (multerConfigService: MulterConfigService) => ({
+        dest: multerConfigService.dest,
+        limits: { fileSize: multerConfigService.fileSizeLimit },
+        fileFilter: (_req, file, cb) => {
+          if (multerConfigService.allowedMimeTypes) {
+            if (!multerConfigService.allowedMimeTypes.includes(file.mimetype)) {
+              return cb(new Error('Invalid file type'), false);
+            }
+          }
+          cb(null, true);
+        },
+      }),
+      inject: [MulterConfigService],
+    }),
   ],
   controllers: [HealthController],
+  providers: [],
 })
 export class AppModule {}
