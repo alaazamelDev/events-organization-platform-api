@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class RegisterAttendeeDto {
   @IsString()
@@ -8,6 +16,12 @@ export class RegisterAttendeeDto {
   @IsString()
   @MinLength(3)
   last_name: string;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  @Transform(({ value }) => new Date(value), { toClassOnly: true })
+  birth_date: Date;
 
   @IsString()
   @IsNotEmpty()

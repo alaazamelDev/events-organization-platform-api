@@ -17,6 +17,9 @@ export class MulterConfigService {
   }
 
   get fileSizeLimit(): number {
-    return this.configService.get<number>('files.file_size_limit') ?? 2097152;
+    return (
+      this.configService.get<number>('files.file_size_limit') ??
+      2 * Math.pow(1024, 2)
+    ); // 1MB;
   }
 }

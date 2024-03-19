@@ -48,6 +48,8 @@ export class AttendeeService {
       const attendeeData = {
         firstName: payload.first_name,
         lastName: payload.last_name,
+        birthDate: payload.birth_date,
+        profilePictureUrl: payload.profile_img ?? undefined,
       };
 
       const attendee = this.attendeeRepository.create(attendeeData);

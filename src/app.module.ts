@@ -24,6 +24,11 @@ import { JwtConfigModule } from './config/secrets/jwt/config.module';
 import { MulterConfigModule } from './config/files/multer/config.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { MulterConfigService } from './config/files/multer/config.service';
+import {
+  ServeStaticModule,
+  ServeStaticModuleOptions,
+} from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -47,6 +52,16 @@ import { MulterConfigService } from './config/files/multer/config.service';
     PermissionsModule,
     AuthModule,
     MulterConfigModule,
+    ServeStaticModule.forRootAsync({
+      imports: [MulterConfigModule],
+      useFactory: async (multerConfigService: MulterConfigService) =>
+        [
+          {
+            rootPath: join(__dirname, '..', multerConfigService.dest),
+          },
+        ] as ServeStaticModuleOptions[],
+      inject: [MulterConfigService],
+    }),
     MulterModule.registerAsync({
       imports: [MulterConfigModule],
       useFactory: async (multerConfigService: MulterConfigService) => ({
