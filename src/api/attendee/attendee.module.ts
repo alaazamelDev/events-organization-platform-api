@@ -13,13 +13,20 @@ import { UserService } from '../user/services/user.service';
 import { AttendeeController } from './attendee.controller';
 import { User } from '../user/entities/user.entity';
 import { AuthService } from '../../auth/services/auth.service';
+import { MulterConfigModule } from '../../config/files/multer/config.module';
+import { MulterConfigService } from '../../config/files/multer/config.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Attendee, User]), UserModule],
+  imports: [
+    TypeOrmModule.forFeature([Attendee, User]),
+    UserModule,
+    MulterConfigModule,
+  ],
   providers: [
     UserService,
     AttendeeService,
     AuthService,
+    MulterConfigService,
     {
       provide: getRepositoryToken(Attendee),
       inject: [getDataSourceToken()],
