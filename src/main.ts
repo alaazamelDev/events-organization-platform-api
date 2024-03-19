@@ -30,6 +30,9 @@ async function bootstrap(): Promise<void> {
   app.useGlobalInterceptors(new ResponseInterceptor());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
+  // TODO, modify later
+  app.enableCors();
+
   Sentry.init({
     dsn: sentryConfig.dns,
     enabled: sentryConfig.enable,
