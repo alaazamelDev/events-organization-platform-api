@@ -68,6 +68,5 @@ import { MulterConfigService } from './config/files/multer/config.service';
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
-  providers: [],
 })
 export class AppModule {}
