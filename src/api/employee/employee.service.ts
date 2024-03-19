@@ -21,7 +21,7 @@ export class EmployeeService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createEmployeeDto: CreateEmployeeDto) {
+  async create(createEmployeeDto: CreateEmployeeDto, imageName: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -44,6 +44,7 @@ export class EmployeeService {
         phone_number: createEmployeeDto.phone_number,
         user: user,
         organization: { id: createEmployeeDto.organization_id } as Organization,
+        profile_picture: imageName,
       });
 
       await queryRunner.manager.save(employee);
