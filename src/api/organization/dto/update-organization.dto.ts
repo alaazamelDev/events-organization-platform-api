@@ -1,15 +1,15 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateOrganizationDto {
-  @IsString()
   @IsOptional()
+  @IsString()
   name: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   bio: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   description: string;
 }
