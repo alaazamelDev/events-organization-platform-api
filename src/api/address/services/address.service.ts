@@ -13,6 +13,11 @@ export class AddressService {
   findAll() {
     return this.addressRepository.find({
       relations: { city: true, state: true },
+      select: {
+        id: true,
+        state: { id: true, stateName: true },
+        city: { id: true, cityName: true },
+      },
     });
   }
 }

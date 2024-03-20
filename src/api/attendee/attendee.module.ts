@@ -18,12 +18,28 @@ import { MulterConfigService } from '../../config/files/multer/config.service';
 import { AttendeeContact } from './entities/attendee-contact.entity';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { AppConfigService } from '../../config/app/config.service';
+import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
+import { ConfigurationListsModule } from '../configurationLists/configuration-lists.module';
+import { Job } from '../job/entities/job.entity';
+import { Contact } from '../contact/entities/contact.entity';
+import { Address } from '../address/entities/address.entity';
+import { JobService } from '../job/job.service';
+import { ContactService } from '../contact/contact.service';
+import { AddressService } from '../address/services/address.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Attendee, User, AttendeeContact]),
+    TypeOrmModule.forFeature([
+      Attendee,
+      User,
+      AttendeeContact,
+      Job,
+      Contact,
+      Address,
+    ]),
     UserModule,
     MulterConfigModule,
+    ConfigurationListsModule,
   ],
   providers: [
     UserService,
@@ -32,6 +48,10 @@ import { AppConfigService } from '../../config/app/config.service';
     MulterConfigService,
     FileUtilityService,
     AppConfigService,
+    JobService,
+    ContactService,
+    AddressService,
+    ConfigurationListsService,
     {
       provide: getRepositoryToken(Attendee),
       inject: [getDataSourceToken()],
