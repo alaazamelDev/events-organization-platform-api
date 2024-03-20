@@ -32,6 +32,7 @@ import {
 } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FileUtilityModule } from './config/files/utility/file-utility.module';
+import { ConfigurationListsModule } from './api/configurationLists/configuration-lists.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { FileUtilityModule } from './config/files/utility/file-utility.module';
       inject: [MulterConfigService],
     }),
     FileUtilityModule,
+    ConfigurationListsModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

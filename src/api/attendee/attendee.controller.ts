@@ -21,10 +21,12 @@ import { RefreshTokenGuard } from '../../auth/guards/refresh-token.guard';
 import { LocalFileInterceptor } from '../../common/interceptors/local-file.interceptor';
 import { UpdateAttendeeProfileDto } from './dto/update-attendee-profile.dto';
 import { ATTENDEE_PROFILES_STORAGE_PATH } from '../../common/constants/constants';
+import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
 
 @Controller('attendee')
 export class AttendeeController {
   constructor(
+    private readonly configurationListsService: ConfigurationListsService,
     private readonly attendeeService: AttendeeService,
     private readonly authService: AuthService,
   ) {}
@@ -56,6 +58,11 @@ export class AttendeeController {
       ...payload,
       profile_img: imagePath,
     });
+  }
+
+  @Get('lists')
+  async loadConfigurationLists() {
+    return this.configurationListsService.getAttendeeLists();
   }
 
   @Get('profile/:id')
