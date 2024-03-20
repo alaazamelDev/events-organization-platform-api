@@ -21,7 +21,7 @@ export class RegisterAttendeeDto {
   @IsOptional()
   @Type(() => Date)
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  birth_date: Date;
+  birth_date?: Date;
 
   @IsString()
   @IsNotEmpty()

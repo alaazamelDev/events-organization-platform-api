@@ -1,0 +1,30 @@
+import { Attendee } from '../entities/attendee.entity';
+import * as moment from 'moment';
+import { DEFAULT_DATE_FORMAT } from '../../../common/constants/constants';
+import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
+import { JobSerializer } from '../../job/serializers/job.serializer';
+import { AddressSerializer } from '../../address/serializers/address.serializer';
+import { AttendeeContactSerializer } from './attendee-contact.serializer';
+
+export class AttendeeDetailsSerializer {
+  static serialize(
+    attendee: Attendee,
+    fileUtilityService?: FileUtilityService,
+  ) {
+    return {
+      id: attendee.id,
+      first_name: attendee.firstName,
+      last_name: attendee.lastName,
+      full_name: `${attendee.firstName} ${attendee.lastName}`,
+      join_date: moment(attendee.createdAt).format(DEFAULT_DATE_FORMAT),
+      profile_img: fileUtilityService?.getFileUrl(attendee.profilePictureUrl),
+      cover_img: fileUtilityService?.getFileUrl(attendee.coverPictureUrl),
+      bio: attendee.bio,
+      job: attendee.job ? JobSerializer.serialize(attendee.job) : null,
+      address: attendee.address
+        ? AddressSerializer.serialize(attendee.address)
+        : null,
+      contacts: AttendeeContactSerializer.serializeList(attendee.contacts),
+    };
+  }
+}

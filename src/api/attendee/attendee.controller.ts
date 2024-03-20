@@ -2,8 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
+  Param,
   ParseFilePipeBuilder,
+  ParseIntPipe,
   Post,
   Req,
   UploadedFile,
@@ -16,6 +19,8 @@ import { AuthService } from '../../auth/services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshTokenGuard } from '../../auth/guards/refresh-token.guard';
 import { LocalFileInterceptor } from '../../common/interceptors/local-file.interceptor';
+import { UpdateAttendeeProfileDto } from './dto/update-attendee-profile.dto';
+import { ATTENDEE_PROFILES_STORAGE_PATH } from '../../common/constants/constants';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -28,7 +33,7 @@ export class AttendeeController {
   @UseInterceptors(
     LocalFileInterceptor({
       fieldName: 'profile_img',
-      path: '/attendee_profiles',
+      path: ATTENDEE_PROFILES_STORAGE_PATH,
     }),
   )
   async registerAttendee(
@@ -37,7 +42,7 @@ export class AttendeeController {
       new ParseFilePipeBuilder()
         .addMaxSizeValidator({
           maxSize: 2 * Math.pow(2, 20),
-          message: 'file size should be less than or equal to 2MB',
+          message: 'File size should be less than or equal to 2MB',
         }) // 2MB MAX
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -46,11 +51,28 @@ export class AttendeeController {
     )
     profileImg: Express.Multer.File,
   ) {
-    const imagePath = `/attendee_profiles/${profileImg.filename}`;
+    const imagePath = `${ATTENDEE_PROFILES_STORAGE_PATH}/${profileImg.filename}`;
     return this.attendeeService.createAttendee({
       ...payload,
       profile_img: imagePath,
     });
+  }
+
+  @Get('profile/:id')
+  async getAttendeeProfileDetails(@Param('id') id: number) {
+    return this.attendeeService.getAttendeeDetails(id);
+  }
+
+  @Post('/update-profile/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateAttendeeProfile(
+    @Param('id', new ParseIntPipe())
+    attendeeId: number,
+    @Body()
+    payload: UpdateAttendeeProfileDto,
+  ) {
+    payload.id = attendeeId;
+    return this.attendeeService.updateAttendeeProfile(payload);
   }
 
   @Post('/login')
