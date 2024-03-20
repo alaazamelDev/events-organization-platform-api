@@ -1,6 +1,16 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { User } from '../../user/entities/user.entity';
+import { Address } from '../../address/entities/address.entity';
+import { Job } from '../../job/entities/job.entity';
+import { AttendeeContact } from './attendee-contact.entity';
 
 @Entity('attendees')
 export class Attendee extends BaseEntity {
@@ -57,4 +67,18 @@ export class Attendee extends BaseEntity {
     nullable: true,
   })
   coverPictureUrl?: string;
+
+  @OneToMany(
+    () => AttendeeContact,
+    (attendeeContact) => attendeeContact.attendee,
+  )
+  contacts: AttendeeContact[];
+
+  @ManyToOne(() => Address, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'address_id', referencedColumnName: 'id' })
+  address?: Address;
+
+  @ManyToOne(() => Job, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'job_id', referencedColumnName: 'id' })
+  job?: Job;
 }

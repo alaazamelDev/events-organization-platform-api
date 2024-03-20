@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Attendee } from '../entities/attendee.entity';
 import { UserService } from '../../user/services/user.service';
 import { hash } from 'bcrypt';
@@ -8,12 +8,16 @@ import { IAttendeeRepository } from '../interfaces/attendee_repo.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRole } from '../../userRole/entities/user_role.entity';
 import { AuthService } from '../../../auth/services/auth.service';
+import { UpdateAttendeeProfileDto } from '../dto/update-attendee-profile.dto';
+import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
+import { AttendeeDetailsSerializer } from '../serializers/attendee-details.serializer';
 
 @Injectable()
 export class AttendeeService {
   constructor(
     @InjectRepository(Attendee)
     private readonly attendeeRepository: IAttendeeRepository,
+    private readonly fileUtilityService: FileUtilityService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly dataSource: DataSource,
@@ -86,5 +90,48 @@ export class AttendeeService {
       await queryRunner.release();
       throw e;
     }
+  }
+
+  async updateAttendeeProfile(payload: UpdateAttendeeProfileDto) {
+    const attendee = await this.attendeeRepository.findOneBy({
+      id: payload.id!,
+    });
+
+    if (!attendee) {
+      throw new NotFoundException(
+        `Attendee with ID=${payload.id} was not found!`,
+      );
+    }
+
+    await this.attendeeRepository.update(
+      payload.id!,
+      UpdateAttendeeProfileDto.toModel(payload),
+    );
+
+    const updatedAttendee = await this.attendeeRepository.findOne({
+      relations: { address: true, contacts: true, job: true },
+      where: { id: payload.id },
+    });
+    return AttendeeDetailsSerializer.serialize(
+      updatedAttendee!,
+      this.fileUtilityService,
+    );
+  }
+
+  async getAttendeeDetails(attendeeId: number) {
+    const attendee = await this.attendeeRepository.findOne({
+      relations: { address: true, contacts: true, job: true },
+      where: { id: attendeeId },
+    });
+
+    if (!attendee) {
+      throw new NotFoundException(
+        `Attendee with ID=${attendeeId} was not found!`,
+      );
+    }
+    return AttendeeDetailsSerializer.serialize(
+      attendee,
+      this.fileUtilityService,
+    );
   }
 }
