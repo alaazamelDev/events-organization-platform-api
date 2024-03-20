@@ -26,7 +26,7 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  app.use(helmet());
+  app.use(helmet({ crossOriginResourcePolicy: false }));
   app.useGlobalInterceptors(new ResponseInterceptor());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
