@@ -8,6 +8,7 @@ import { Address } from './entities/address.entity';
 import { DataSource } from 'typeorm';
 import { addressRepository } from './repositories/address.repository';
 import { AddressService } from './services/address.service';
+import { AddressController } from './address.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Address])],
@@ -22,5 +23,6 @@ import { AddressService } from './services/address.service';
       },
     },
   ],
+  controllers: [AddressController],
 })
 export class AddressModule {}
