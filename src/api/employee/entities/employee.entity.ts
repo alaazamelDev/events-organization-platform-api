@@ -23,8 +23,8 @@ export class Employee extends BaseEntity {
   @Column()
   phone_number: string;
 
-  @Column({ nullable: true })
-  profile_picture: string;
+  @Column({ nullable: true, type: 'text' })
+  profile_picture!: string | null;
 
   @Column()
   birth_date: Date;

@@ -111,4 +111,9 @@ export class EmployeeController {
       ),
     );
   }
+
+  @Delete('profilePicture/:id')
+  deleteProfilePicture(@Param('id') id: string) {
+    return this.employeeService.removeProfilePicture(+id);
+  }
 }

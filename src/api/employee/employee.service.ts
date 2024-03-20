@@ -102,11 +102,23 @@ export class EmployeeService {
   }
 
   async remove(id: number) {
-    const employee = this.employeeRepository.findOneOrFail({
+    const employee = await this.employeeRepository.findOneOrFail({
       where: { id },
     });
 
     await this.employeeRepository.softDelete(id);
+
+    return employee;
+  }
+
+  async removeProfilePicture(id: number) {
+    const employee = await this.employeeRepository.findOneOrFail({
+      where: { id },
+    });
+
+    employee.profile_picture = null;
+
+    await this.employeeRepository.save(employee);
 
     return employee;
   }

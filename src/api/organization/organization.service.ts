@@ -18,6 +18,7 @@ import { AddressOrganization } from './entities/address_organization.entity';
 import { Address } from '../address/entities/address.entity';
 import { AddOrganizationAddressDto } from './dto/add-organization-address.dto';
 import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.dto';
+import { AllOrganizationsAdminSerializer } from './serializers/all_organizations_admin.serializer';
 
 @Injectable()
 export class OrganizationService {
@@ -93,12 +94,22 @@ export class OrganizationService {
   }
 
   async findAll() {
-    return await this.organizationRepository.find();
+    const organizations = await this.organizationRepository.find({
+      relations: {
+        employees: true,
+      },
+    });
+
+    return organizations.map((org) => new AllOrganizationsAdminSerializer(org));
   }
 
   async findOne(id: number) {
     return await this.organizationRepository.findOneOrFail({
       where: { id: id },
+      relations: {
+        addresses: { address: true },
+        contacts: { contact: true },
+      },
     });
   }
 
@@ -278,5 +289,29 @@ export class OrganizationService {
         HttpStatus.NOT_MODIFIED,
       );
     }
+  }
+
+  async removeOrganizationMainPicture(id: number) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    organization.main_picture = null;
+
+    await this.organizationRepository.save(organization);
+
+    return organization;
+  }
+
+  async removeOrganizationCoverPicture(id: number) {
+    const organization = await this.organizationRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    organization.cover_picture = null;
+
+    await this.organizationRepository.save(organization);
+
+    return organization;
   }
 }

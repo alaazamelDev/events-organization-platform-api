@@ -10,6 +10,7 @@ import {
   UploadedFiles,
   Res,
   UploadedFile,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -77,6 +78,7 @@ export class OrganizationController {
   }
 
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   findAll() {
     return this.organizationService.findAll();
   }
@@ -227,5 +229,15 @@ export class OrganizationController {
       +id,
       file.filename,
     );
+  }
+
+  @Delete('coverPicture/:id')
+  removeCoverPicture(@Param('id') id: string) {
+    return this.organizationService.removeOrganizationCoverPicture(+id);
+  }
+
+  @Delete('mainPicture/:id')
+  removeMainPicture(@Param('id') id: string) {
+    return this.organizationService.removeOrganizationMainPicture(+id);
   }
 }

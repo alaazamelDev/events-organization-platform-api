@@ -15,11 +15,11 @@ export class Organization extends BaseEntity {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ nullable: true })
-  main_picture: string;
+  @Column({ nullable: true, type: 'text' })
+  main_picture!: string | null;
 
-  @Column({ nullable: true })
-  cover_picture: string;
+  @Column({ nullable: true, type: 'text' })
+  cover_picture!: string | null;
 
   @OneToMany(
     () => ContactOrganization,
