@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Attendee } from '../entities/attendee.entity';
 import { UserService } from '../../user/services/user.service';
 import { hash } from 'bcrypt';
@@ -22,6 +26,20 @@ export class AttendeeService {
     private readonly authService: AuthService,
     private readonly dataSource: DataSource,
   ) {}
+
+  async getAttendeeByUserId(userId: number): Promise<Attendee> {
+    const attendee = await this.attendeeRepository.findOneBy({
+      user: { id: userId },
+    });
+
+    if (!attendee) {
+      throw new BadRequestException(
+        'The given userId does not represent an attendee!',
+      );
+    }
+
+    return attendee;
+  }
 
   async createAttendee(payload: any): Promise<any | null> {
     // we should run a transaction and create user & attendee

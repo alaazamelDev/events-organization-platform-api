@@ -17,6 +17,10 @@ export class AttendeeDetailsSerializer {
       last_name: attendee.lastName,
       full_name: `${attendee.firstName} ${attendee.lastName}`,
       join_date: moment(attendee.createdAt).format(DEFAULT_DATE_FORMAT),
+      phone_number: attendee.phoneNumber,
+      birth_date: attendee.birthDate
+        ? moment(attendee.birthDate).format(DEFAULT_DATE_FORMAT)
+        : null,
       profile_img: fileUtilityService?.getFileUrl(attendee.profilePictureUrl),
       cover_img: fileUtilityService?.getFileUrl(attendee.coverPictureUrl),
       bio: attendee.bio,

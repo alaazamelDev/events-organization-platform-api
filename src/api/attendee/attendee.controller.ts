@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Param,
   ParseFilePipeBuilder,
-  ParseIntPipe,
   Post,
   Req,
   UploadedFile,
@@ -22,6 +21,7 @@ import { LocalFileInterceptor } from '../../common/interceptors/local-file.inter
 import { UpdateAttendeeProfileDto } from './dto/update-attendee-profile.dto';
 import { ATTENDEE_PROFILES_STORAGE_PATH } from '../../common/constants/constants';
 import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
+import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -70,15 +70,16 @@ export class AttendeeController {
     return this.attendeeService.getAttendeeDetails(id);
   }
 
-  @Post('/update-profile/:id')
+  @Post('/update-profile')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenGuard)
   async updateAttendeeProfile(
-    @Param('id', new ParseIntPipe())
-    attendeeId: number,
-    @Body()
-    payload: UpdateAttendeeProfileDto,
+    @Body() payload: UpdateAttendeeProfileDto,
+    @Req() req: any,
   ) {
-    payload.id = attendeeId;
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+    payload.id = attendee.id;
     return this.attendeeService.updateAttendeeProfile(payload);
   }
 
@@ -94,5 +95,13 @@ export class AttendeeController {
     const userId = req.user['sub'];
     const refreshToken = req.user['refreshToken'];
     return this.authService.refreshTokens(userId, refreshToken);
+  }
+
+  @Get('my-profile')
+  @UseGuards(AccessTokenGuard)
+  async getMyProfileDetails(@Req() req: any) {
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+    return this.attendeeService.getAttendeeDetails(attendee.id);
   }
 }
