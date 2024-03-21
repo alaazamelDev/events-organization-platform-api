@@ -28,6 +28,7 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   password: string;
 
+  // TODO, update the validation rule to take array of AddPermissionDTO
   @IsNotEmpty()
   permissions: [number];
 }
