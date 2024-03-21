@@ -33,6 +33,7 @@ import {
 import { join } from 'path';
 import { FileUtilityModule } from './config/files/utility/file-utility.module';
 import { ConfigurationListsModule } from './api/configurationLists/configuration-lists.module';
+import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { ConfigurationListsModule } from './api/configurationLists/configuration
     }),
     FileUtilityModule,
     ConfigurationListsModule,
+    DynamicFormsModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

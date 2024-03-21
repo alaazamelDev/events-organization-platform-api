@@ -3,6 +3,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { ContactOrganization } from './contact_organization.entity';
 import { Employee } from '../../employee/entities/employee.entity';
 import { AddressOrganization } from './address_organization.entity';
+import { Form } from '../../dynamic-forms/entities/form.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization extends BaseEntity {
@@ -35,4 +36,7 @@ export class Organization extends BaseEntity {
     (addressOrganization) => addressOrganization.organization,
   )
   addresses: AddressOrganization[];
+
+  @OneToMany(() => Form, (form) => form.organization)
+  forms: Form[];
 }

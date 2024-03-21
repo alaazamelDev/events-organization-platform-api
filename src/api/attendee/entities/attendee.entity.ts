@@ -11,6 +11,7 @@ import { User } from '../../user/entities/user.entity';
 import { Address } from '../../address/entities/address.entity';
 import { Job } from '../../job/entities/job.entity';
 import { AttendeeContact } from './attendee-contact.entity';
+import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 
 @Entity('attendees')
 export class Attendee extends BaseEntity {
@@ -81,4 +82,7 @@ export class Attendee extends BaseEntity {
   @ManyToOne(() => Job, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'job_id', referencedColumnName: 'id' })
   job?: Job;
+
+  @OneToMany(() => FilledForm, (filledForm) => filledForm.attendee)
+  filledForms: FilledForm[];
 }
