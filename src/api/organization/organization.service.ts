@@ -199,11 +199,14 @@ export class OrganizationService {
     id: number,
     deleteContactInfoDto: DeleteContactInfoDto,
   ) {
-    const contact = await this.contactOrganizationRepository.delete(
-      deleteContactInfoDto.contact_id,
-    );
-    console.log(id);
-    console.log(contact);
+    const contact = await this.contactOrganizationRepository.findOneOrFail({
+      where: {
+        organization: { id: id },
+        contact: { id: deleteContactInfoDto.contact_id },
+      },
+    });
+
+    await this.contactOrganizationRepository.delete(contact);
   }
 
   async addContactInfo(id: number, addContactInfoDto: AddContactInfoDto) {
@@ -244,10 +247,14 @@ export class OrganizationService {
     id: number,
     deleteOrganizationAddressDto: DeleteOrganizationAddressDto,
   ) {
-    const address = await this.addressOrganizationRepository.delete(
-      deleteOrganizationAddressDto.address_id,
-    );
-    console.log(id);
+    const address = await this.addressOrganizationRepository.findOneOrFail({
+      where: {
+        organization: { id: id },
+        address: { id: deleteOrganizationAddressDto.address_id },
+      },
+    });
+
+    await this.addressOrganizationRepository.delete(address);
   }
 
   async updateOrganizationCoverPicture(
