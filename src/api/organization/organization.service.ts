@@ -19,6 +19,7 @@ import { Address } from '../address/entities/address.entity';
 import { AddOrganizationAddressDto } from './dto/add-organization-address.dto';
 import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.dto';
 import { AllOrganizationsAdminSerializer } from './serializers/all_organizations_admin.serializer';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class OrganizationService {
@@ -50,10 +51,12 @@ export class OrganizationService {
 
       await queryRunner.manager.save(organization);
 
+      const hashedPassword = await hash(createOrganizationDto.password, 10);
+
       const user = this.userRepository.create({
         username: createOrganizationDto.username,
         email: createOrganizationDto.email,
-        password: createOrganizationDto.password,
+        password: hashedPassword,
       });
 
       user.userRole = { id: 2 } as UserRole;

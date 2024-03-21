@@ -10,6 +10,7 @@ import { Organization } from '../organization/entities/organization.entity';
 import { Permission } from '../permission/entities/permission.entity';
 import { EmployeePermission } from './entities/employee_permission.entity';
 import { AllEmployeesSerializer } from './seializers/all_employees.serializer';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
@@ -27,10 +28,11 @@ export class EmployeeService {
 
     await queryRunner.startTransaction();
     try {
+      const hashedPassword = await hash(createEmployeeDto.password, 10);
       const user = this.userRepo.create({
         username: createEmployeeDto.username,
         email: createEmployeeDto.email,
-        password: createEmployeeDto.password,
+        password: hashedPassword,
       });
 
       user.userRole = { id: 2 } as UserRole;
