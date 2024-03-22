@@ -17,6 +17,9 @@ const envFilePath: string = getEnvironmentPath(ENVIRONMENT_PATH);
         FILE_UPLOAD_DEST: Joi.string(),
         ALLOWED_MIME_TYPES: Joi.string(),
         FILE_SIZE_LIMIT: Joi.number().default(2097152),
+        ATTENDEE_PROFILES_STORAGE_PATH: Joi.string().default(
+          'uploads/attendee_profiles',
+        ),
       }),
     }),
   ],

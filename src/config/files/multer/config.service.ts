@@ -22,4 +22,11 @@ export class MulterConfigService {
       2 * Math.pow(1024, 2)
     ); // 1MB;
   }
+
+  get attendeeProfilesStoragePath(): string {
+    return (
+      this.configService.get<string>('files.attendee_profiles_storage_path') ??
+      'uploads/attendee_profiles'
+    );
+  }
 }

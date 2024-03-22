@@ -15,6 +15,11 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { UpdateAttendeeProfileDto } from '../dto/update-attendee-profile.dto';
 import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
 import { AttendeeDetailsSerializer } from '../serializers/attendee-details.serializer';
+import { RegisterAttendeeDto } from '../dto/register-attendee.dto';
+import { Job } from '../../job/entities/job.entity';
+import { Address } from '../../address/entities/address.entity';
+import { AttendeeContact } from '../entities/attendee-contact.entity';
+import { Contact } from '../../contact/entities/contact.entity';
 
 @Injectable()
 export class AttendeeService {
@@ -41,7 +46,7 @@ export class AttendeeService {
     return attendee;
   }
 
-  async createAttendee(payload: any): Promise<any | null> {
+  async createAttendee(payload: RegisterAttendeeDto): Promise<any | null> {
     // we should run a transaction and create user & attendee
     // entities respectively.
 
@@ -71,7 +76,14 @@ export class AttendeeService {
         firstName: payload.first_name,
         lastName: payload.last_name,
         birthDate: payload.birth_date,
+        phoneNumber: payload.phone_number,
+        bio: payload.bio,
+        job: payload.job_id ? ({ id: payload.job_id } as Job) : undefined,
+        address: payload.address_id
+          ? ({ id: payload.address_id } as Address)
+          : undefined,
         profilePictureUrl: payload.profile_img ?? undefined,
+        coverPictureUrl: payload.cover_img ?? undefined,
       };
 
       const attendee = this.attendeeRepository.create(attendeeData);
@@ -81,6 +93,25 @@ export class AttendeeService {
 
       // save entity
       await queryRunner.manager.save(attendee);
+
+      // save contacts
+      if (payload.contacts?.length > 0) {
+        for (const attendeeContact of payload.contacts
+          .map<AttendeeContact>(
+            (contact) =>
+              ({
+                contact: { id: contact.contact_id } as Contact,
+                attendee: { id: attendee.id } as Attendee,
+                content: contact.contact_link,
+              }) as AttendeeContact,
+          )
+          .map((contact) => {
+            return queryRunner.manager.create(AttendeeContact, contact);
+          })) {
+          // save the created entities
+          await queryRunner.manager.save(AttendeeContact, attendeeContact);
+        }
+      }
 
       // generate access token for the attendee.
       const accessToken = await this.authService.createAccessToken(user);
