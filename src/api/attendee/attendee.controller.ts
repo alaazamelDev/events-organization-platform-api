@@ -8,6 +8,7 @@ import {
   ParseFilePipeBuilder,
   Post,
   Req,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -26,6 +27,9 @@ import {
   ATTENDEE_PROFILES_STORAGE_PATH,
   DEFAULT_UPLOADS_DEST,
 } from '../../common/constants/constants';
+import { LocalFileInterceptor } from '../../common/interceptors/local-file.interceptor';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -87,9 +91,9 @@ export class AttendeeController {
     return this.attendeeService.getAttendeeDetails(id);
   }
 
-  @Post('/update-profile')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AccessTokenGuard)
+  @Post('/update-profile')
   async updateAttendeeProfile(
     @Body() payload: UpdateAttendeeProfileDto,
     @Req() req: any,
@@ -98,6 +102,93 @@ export class AttendeeController {
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
     payload.id = attendee.id;
     return this.attendeeService.updateAttendeeProfile(payload);
+  }
+
+  @UseInterceptors(
+    LocalFileInterceptor({
+      path: ATTENDEE_PROFILES_STORAGE_PATH,
+      fieldName: 'profile_img',
+    }),
+  )
+  @UseGuards(AccessTokenGuard)
+  @Post('/update-profile/profile-image')
+  async updateAttendeeProfilePicture(
+    @Req() req: any,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({
+          maxSize: 2 * Math.pow(2, 20),
+          message: 'File Size cannot be greater than 2MB',
+        })
+        .build({ fileIsRequired: true }),
+    )
+    profileImg: Express.Multer.File,
+  ) {
+    // remove the old one.
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+
+    // if there is an old file, delete it.
+    if (attendee.profilePictureUrl) {
+      // get the file name from the link
+      const splitFileName: string[] = attendee.profilePictureUrl.split('/');
+      const fileName: string = splitFileName.at(splitFileName.length - 1)!;
+
+      // delete the old file
+      this.deleteAttendeeFile(fileName);
+    }
+
+    // update the attendee record with new file path.
+    const updatedData = {
+      id: attendee.id,
+      profile_img: `${ATTENDEE_PROFILES_STORAGE_PATH}/${profileImg.filename}`,
+    };
+
+    return this.attendeeService.updateAttendeeProfile(updatedData);
+  }
+
+  @UseInterceptors(
+    LocalFileInterceptor({
+      path: ATTENDEE_PROFILES_STORAGE_PATH,
+      fieldName: 'cover_img',
+    }),
+  )
+  @UseGuards(AccessTokenGuard)
+  @Post('/update-profile/cover-image')
+  async updateAttendeeCoverPicture(
+    @Req() req: any,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({
+          maxSize: 2 * Math.pow(2, 20),
+          message: 'File Size cannot be greater than 2MB',
+        })
+        .build({ fileIsRequired: true }),
+    )
+    coverImg: Express.Multer.File,
+  ) {
+    // remove the old one.
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+
+    // if there is an old file, delete it.
+    if (attendee.coverPictureUrl) {
+      // get the file name from the link
+      const splitFileName: string[] = attendee.coverPictureUrl.split('/');
+      const fileName: string = splitFileName.at(splitFileName.length - 1)!;
+
+      // delete the old file
+      this.deleteAttendeeFile(fileName);
+    }
+
+    // update the attendee record with new file path.
+    const updatedData = {
+      id: attendee.id,
+      cover_img: `${ATTENDEE_PROFILES_STORAGE_PATH}/${coverImg.filename}`,
+    };
+
+    console.log(updatedData);
+    return this.attendeeService.updateAttendeeProfile(updatedData);
   }
 
   @Post('/login')
@@ -120,5 +211,27 @@ export class AttendeeController {
     const userId = req.user.sub;
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
     return this.attendeeService.getAttendeeDetails(attendee.id);
+  }
+
+  private deleteAttendeeFile(fileName: string): boolean {
+    const filePath = path.join(
+      DEFAULT_UPLOADS_DEST,
+      ATTENDEE_PROFILES_STORAGE_PATH,
+      fileName,
+    );
+
+    // Check if the file exists before attempting to delete
+    if (fs.existsSync(filePath)) {
+      try {
+        // Delete the file
+        fs.unlinkSync(filePath);
+        return true;
+      } catch (error) {
+        console.error('Error deleting file:', error);
+      }
+    } else {
+      console.log('File does not exist:', filePath);
+    }
+    return false;
   }
 }
