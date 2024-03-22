@@ -151,11 +151,49 @@ export class AttendeeService {
         `Attendee with ID=${payload.id} was not found!`,
       );
     }
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    await this.attendeeRepository.update(
-      payload.id!,
-      UpdateAttendeeProfileDto.toModel(payload),
-    );
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      // Update the main entity.
+      await queryRunner.manager.update(
+        Attendee,
+        payload.id!,
+        UpdateAttendeeProfileDto.toModel(payload),
+      );
+
+      // update contacts.
+      if (payload.contacts?.length > 0) {
+        // delete all attendee contacts.
+        await queryRunner.manager.delete(AttendeeContact, {
+          attendee: { id: payload.id },
+        });
+
+        const contacts = payload.contacts
+          .map((contact) => {
+            return {
+              attendee: { id: payload.id },
+              contact: { id: contact.contact_id },
+              content: contact.contact_link,
+            } as AttendeeContact;
+          })
+          .map((contact) => {
+            return queryRunner.manager.create(AttendeeContact, contact);
+          });
+
+        // insert the new attendee_contact records.
+        await queryRunner.manager.save<AttendeeContact>(contacts);
+      }
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw e;
+    }
 
     const updatedAttendee = await this.attendeeRepository.findOne({
       relations: { address: true, contacts: true, job: true },

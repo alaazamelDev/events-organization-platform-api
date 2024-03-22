@@ -1,7 +1,6 @@
 import {
   IsDefined,
   IsEmail,
-  IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
@@ -13,6 +12,7 @@ import { IsDateFormat } from '../../../common/decorators/is-date-format.decorato
 import { REGION } from '../../../common/constants/constants';
 import { IsUnique } from '../../../common/decorators/is_unique.decorator';
 import { Type } from 'class-transformer';
+import { AttendeeContactDto } from './attendee-contact.dto';
 
 export class RegisterAttendeeDto {
   @IsDefined({ message: 'This field is required' })
@@ -60,8 +60,6 @@ export class RegisterAttendeeDto {
   @IsPhoneNumber(REGION)
   phone_number?: string;
 
-  // TODO: CHECK THE PICTURES
-  // Still need to consider the contacts.
   @IsOptional()
   @Type(() => AttendeeContactDto)
   @ValidateNested({ each: true })
@@ -70,14 +68,4 @@ export class RegisterAttendeeDto {
   // ADDITIONAL DATA FIELDS
   profile_img?: string;
   cover_img?: string;
-}
-
-class AttendeeContactDto {
-  @IsDefined()
-  @IsExist({ tableName: 'contacts', column: 'id' })
-  contact_id: number;
-
-  @IsString()
-  @IsDefined()
-  contact_link: string;
 }

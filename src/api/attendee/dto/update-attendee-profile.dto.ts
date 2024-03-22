@@ -1,4 +1,9 @@
-import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { IsExist } from '../../../common/decorators/is_exist.decorator';
 import {
   DEFAULT_DATE_FORMAT,
@@ -9,6 +14,8 @@ import { IsDateFormat } from '../../../common/decorators/is-date-format.decorato
 import { Job } from '../../job/entities/job.entity';
 import { Address } from '../../address/entities/address.entity';
 import * as moment from 'moment';
+import { AttendeeContactDto } from './attendee-contact.dto';
+import { Type } from 'class-transformer';
 
 export class UpdateAttendeeProfileDto {
   id?: number;
@@ -32,6 +39,11 @@ export class UpdateAttendeeProfileDto {
   @IsOptional()
   @IsPhoneNumber(REGION)
   phone_number?: string;
+
+  @IsOptional()
+  @Type(() => AttendeeContactDto)
+  @ValidateNested({ each: true })
+  contacts: AttendeeContactDto[];
 
   static toModel(dto: UpdateAttendeeProfileDto) {
     return {
