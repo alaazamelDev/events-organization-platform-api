@@ -1,9 +1,8 @@
 import { Injectable, mixin, NestInterceptor, Type } from '@nestjs/common';
 import { MulterConfigService } from '../../config/files/multer/config.service';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
-import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { extname } from 'path';
+import { diskStorageGenerator } from '../../config/files/disk-storage.generator';
 
 interface LocalFileInterceptorOptions {
   fieldName: string;
@@ -23,16 +22,7 @@ export function LocalFileInterceptor(
       const destination = `${filesDestination}${options.path}`;
 
       const multerOptions: MulterOptions = {
-        storage: diskStorage({
-          destination,
-          filename: function (_req, file, cb) {
-            const originalFilename = file.originalname; // Get original filename
-            const ext = extname(originalFilename); // Extract extension
-            const uniqueSuffix =
-              Date.now() + '-' + Math.round(Math.random() * 1e9);
-            cb(null, file.fieldname + '-' + `${uniqueSuffix}${ext}`);
-          },
-        }),
+        storage: diskStorageGenerator(destination),
       };
 
       this.fileInterceptor = new (FileInterceptor(
