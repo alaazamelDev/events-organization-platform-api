@@ -1,7 +1,7 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { FieldType } from './field-type.entity';
-import { Option } from './option.entity';
+import { FieldOption } from './field-option.entity';
 import { Form } from './form.entity';
 import { FilledFormField } from './filled-form-field.entity';
 
@@ -23,10 +23,11 @@ export class FormField extends BaseEntity {
   @JoinColumn({ name: 'type_id' })
   fieldType: FieldType;
 
-  @OneToMany(() => Option, (option) => option.formField)
-  options: Option[];
+  @OneToMany(() => FieldOption, (option) => option.formField)
+  options: FieldOption[];
 
   @ManyToOne(() => Form, (form) => form.fields)
+  @JoinColumn({ name: 'form_id' })
   form: Form;
 
   @OneToMany(

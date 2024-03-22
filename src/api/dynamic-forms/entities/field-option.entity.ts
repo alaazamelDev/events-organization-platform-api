@@ -3,8 +3,8 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { FormField } from './ form-field.entity';
 import { FilledFormField } from './filled-form-field.entity';
 
-@Entity({ name: 'options' })
-export class Option extends BaseEntity {
+@Entity({ name: 'field_options' })
+export class FieldOption extends BaseEntity {
   @Column()
   name: string;
 

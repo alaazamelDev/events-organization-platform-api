@@ -2,7 +2,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { FilledForm } from './filled-form.entity';
 import { FormField } from './ form-field.entity';
-import { Option } from './option.entity';
+import { FieldOption } from './field-option.entity';
 
 @Entity({ name: 'filled_form_fields' })
 export class FilledFormField extends BaseEntity {
@@ -17,7 +17,7 @@ export class FilledFormField extends BaseEntity {
   @JoinColumn({ name: 'form_field_id' })
   formField: FormField;
 
-  @ManyToOne(() => Option)
+  @ManyToOne(() => FieldOption)
   @JoinColumn({ name: 'option_id' })
-  option: Option;
+  option: FieldOption;
 }
