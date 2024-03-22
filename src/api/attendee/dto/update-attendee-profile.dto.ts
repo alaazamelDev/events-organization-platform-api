@@ -43,7 +43,10 @@ export class UpdateAttendeeProfileDto {
   @IsOptional()
   @Type(() => AttendeeContactDto)
   @ValidateNested({ each: true })
-  contacts: AttendeeContactDto[];
+  contacts?: AttendeeContactDto[];
+
+  profile_img?: string;
+  cover_img?: string;
 
   static toModel(dto: UpdateAttendeeProfileDto) {
     return {
@@ -56,6 +59,8 @@ export class UpdateAttendeeProfileDto {
           )
         : undefined,
       phoneNumber: dto.phone_number ?? undefined,
+      profilePictureUrl: dto.profile_img ?? undefined,
+      coverPictureUrl: dto.cover_img ?? undefined,
     };
   }
 }

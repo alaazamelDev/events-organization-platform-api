@@ -165,13 +165,13 @@ export class AttendeeService {
       );
 
       // update contacts.
-      if (payload.contacts?.length > 0) {
+      if (payload.contacts && payload.contacts.length > 0) {
         // delete all attendee contacts.
         await queryRunner.manager.delete(AttendeeContact, {
           attendee: { id: payload.id },
         });
 
-        const contacts = payload.contacts
+        const contacts = (payload.contacts ?? [])
           .map((contact) => {
             return {
               attendee: { id: payload.id },
