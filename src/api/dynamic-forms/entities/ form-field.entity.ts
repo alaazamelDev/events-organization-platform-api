@@ -19,6 +19,9 @@ export class FormField extends BaseEntity {
   @Column()
   position: number;
 
+  @Column({ name: 'type_id' })
+  fieldTypeId: number;
+
   @ManyToOne(() => FieldType, (fieldType) => fieldType.fields)
   @JoinColumn({ name: 'type_id' })
   fieldType: FieldType;

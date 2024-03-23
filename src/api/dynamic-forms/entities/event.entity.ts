@@ -3,7 +3,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Form } from './form.entity';
 import { FilledForm } from './filled-form.entity';
 
-@Entity()
+@Entity({ name: 'events' })
 export class Event extends BaseEntity {
   @Column()
   name: string;

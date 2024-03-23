@@ -9,6 +9,10 @@ import { FieldType } from './entities/field-type.entity';
 import { FieldOption } from './entities/field-option.entity';
 import { FilledForm } from './entities/filled-form.entity';
 import { FilledFormField } from './entities/filled-form-field.entity';
+import { IsFieldBelongsToForm } from './validators/is_field_belongs_to_form_constraint';
+import { IsFieldOptionRequiredConstraint } from './validators/is_field_option_required_constraint';
+import { IsOptionBelongsToTheFieldConstraint } from './validators/is_option_belongs_to_the_field_constraint';
+import { AreRequiredFieldsProvidedConstraint } from './validators/are_required_fields_provided_constraint';
 
 @Module({
   imports: [
@@ -23,6 +27,12 @@ import { FilledFormField } from './entities/filled-form-field.entity';
     ]),
   ],
   controllers: [DynamicFormsController],
-  providers: [DynamicFormsService],
+  providers: [
+    DynamicFormsService,
+    IsFieldBelongsToForm,
+    IsFieldOptionRequiredConstraint,
+    IsOptionBelongsToTheFieldConstraint,
+    AreRequiredFieldsProvidedConstraint,
+  ],
 })
 export class DynamicFormsModule {}

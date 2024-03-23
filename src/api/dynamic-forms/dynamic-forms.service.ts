@@ -6,9 +6,18 @@ import { FormField } from './entities/ form-field.entity';
 import { FieldOption } from './entities/field-option.entity';
 import { FieldType } from './entities/field-type.entity';
 import { CreateFormDto } from './dto/create-form.dto';
-import { date } from 'joi';
 import { Organization } from '../organization/entities/organization.entity';
+import { UpdateFormDto } from './dto/update-form.dto';
+import { UpdateFormFieldDto } from './dto/update-form-field.dto';
+import { CreateFormFieldDto } from './dto/create-form-field.dto';
+import { FillFormDto } from './dto/fill-form.dto';
+import { FilledForm } from './entities/filled-form.entity';
+import { Attendee } from '../attendee/entities/attendee.entity';
+import { Event } from './entities/event.entity';
+import { FilledFormField } from './entities/filled-form-field.entity';
+import { GetFilledFormDto } from './dto/get-filled-form.dto';
 
+// TODO, replace the fake Event entity with the real one
 @Injectable()
 export class DynamicFormsService {
   constructor(
@@ -21,11 +30,14 @@ export class DynamicFormsService {
     private readonly fieldOptionRepository: Repository<FieldOption>,
     @InjectRepository(FieldType)
     private readonly fieldTypeRepository: Repository<FieldType>,
+    @InjectRepository(FilledForm)
+    private readonly filledFormRepository: Repository<FilledForm>,
+    @InjectRepository(FilledFormField)
+    private readonly filledFormFieldRepository: Repository<FilledFormField>,
   ) {}
 
   async createForm(createFormDto: CreateFormDto) {
     const queryRunner = this.dataSource.createQueryRunner();
-
     await queryRunner.connect();
 
     await queryRunner.startTransaction();
@@ -78,5 +90,157 @@ export class DynamicFormsService {
 
       throw e;
     }
+  }
+
+  async updateForm(id: number, updateFormDto: UpdateFormDto) {
+    const form = await this.formRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    Object.assign(form, updateFormDto);
+
+    await this.formRepository.save(form, { reload: true });
+
+    return form;
+  }
+
+  async getOrganizationForms(id: number) {
+    return await this.formRepository.find({
+      where: { organization: { id: id } },
+    });
+  }
+
+  async getForm(id: number) {
+    return await this.formRepository.findOneOrFail({
+      where: { id: id },
+      relations: {
+        fields: { options: true, fieldType: true },
+      },
+    });
+  }
+
+  async deleteForm(id: number) {
+    return await this.formRepository.softDelete({ id });
+  }
+
+  async updateFormField(id: number, updateFormFieldDto: UpdateFormFieldDto) {
+    const field = await this.formFieldRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    Object.assign(field, updateFormFieldDto);
+
+    await this.formFieldRepository.save(field, { reload: true });
+
+    return field;
+  }
+
+  async addField(id: number, createFormFieldDto: CreateFormFieldDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const field = this.formFieldRepository.create({
+        name: createFormFieldDto.name,
+        label: createFormFieldDto.label,
+        position: createFormFieldDto.position,
+        required: createFormFieldDto.required,
+        fieldType: { id: createFormFieldDto.type_id } as FieldType,
+        form: { id: id } as Form,
+      });
+
+      await queryRunner.manager.save(field, { reload: true });
+
+      if (createFormFieldDto.options) {
+        const options = await Promise.all(
+          createFormFieldDto.options.map(async (op) => {
+            const option = this.fieldOptionRepository.create({
+              name: op.name,
+              formField: field,
+            });
+
+            await queryRunner.manager.save(option);
+
+            return new FieldOption({ id: option.id, name: option.name });
+          }),
+        );
+
+        field.options = options;
+      }
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return field;
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
+      throw e;
+    }
+  }
+
+  async deleteField(id: number) {
+    return await this.formFieldRepository.softDelete({ id });
+  }
+
+  async fillForm(fillFormDto: FillFormDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+    try {
+      const filledForm = this.filledFormRepository.create({
+        attendee: { id: fillFormDto.attendee_id } as Attendee,
+        form: { id: fillFormDto.form_id } as Form,
+        event: { id: fillFormDto.event_id } as Event,
+      });
+
+      await queryRunner.manager.save(filledForm, { reload: true });
+
+      await Promise.all(
+        fillFormDto.fields.map(async (field) => {
+          const optionValue = await this.getOptionValue(field.option_id);
+          const filledField = this.filledFormFieldRepository.create({
+            value: optionValue ? optionValue : field.value,
+            formField: { id: field.field_id } as FormField,
+            filledForm: filledForm,
+            option: field.option_id ? { id: field.option_id } : null,
+          });
+
+          await queryRunner.manager.save(filledField);
+        }),
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
+      throw e;
+    }
+  }
+
+  async getOptionValue(id: number) {
+    if (id === undefined) return null;
+    const option = await this.fieldOptionRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    if (option) return option.name;
+    else return null;
+  }
+
+  async getAttendeeFilledForm(getFilledFormDto: GetFilledFormDto) {
+    return await this.filledFormRepository.findOneOrFail({
+      where: {
+        attendee: { id: getFilledFormDto.attendee_id } as Attendee,
+        event: { id: getFilledFormDto.event_id } as Event,
+      },
+      relations: {
+        filledFormFields: { formField: { options: true }, option: true },
+      },
+    });
   }
 }

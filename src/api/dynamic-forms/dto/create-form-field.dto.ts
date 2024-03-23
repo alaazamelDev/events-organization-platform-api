@@ -1,4 +1,6 @@
 import {
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsInt,
   IsNotEmpty,
@@ -34,8 +36,9 @@ export class CreateFormFieldDto {
   type_id: number;
 
   @ValidateIf((body) => [FIELD_TYPE.RADIO_BUTTON].includes(body.type_id))
-  @IsNotEmpty()
+  @IsArray()
   @Type(() => CreateFormFieldOptionDto)
   @ValidateNested({ each: true })
+  @ArrayMinSize(2)
   options: CreateFormFieldOptionDto[];
 }

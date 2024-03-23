@@ -19,5 +19,5 @@ export class FilledFormField extends BaseEntity {
 
   @ManyToOne(() => FieldOption)
   @JoinColumn({ name: 'option_id' })
-  option: FieldOption;
+  option: FieldOption | null;
 }
