@@ -13,6 +13,7 @@ import { IsFieldBelongsToForm } from './validators/is_field_belongs_to_form_cons
 import { IsFieldOptionRequiredConstraint } from './validators/is_field_option_required_constraint';
 import { IsOptionBelongsToTheFieldConstraint } from './validators/is_option_belongs_to_the_field_constraint';
 import { AreRequiredFieldsProvidedConstraint } from './validators/are_required_fields_provided_constraint';
+import { IsFieldValueCorrectConstraint } from './validators/is_field_value_correct_constraint';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AreRequiredFieldsProvidedConstraint } from './validators/are_required_f
     IsFieldOptionRequiredConstraint,
     IsOptionBelongsToTheFieldConstraint,
     AreRequiredFieldsProvidedConstraint,
+    IsFieldValueCorrectConstraint,
   ],
 })
 export class DynamicFormsModule {}

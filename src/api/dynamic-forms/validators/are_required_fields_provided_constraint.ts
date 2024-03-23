@@ -23,7 +23,6 @@ export class AreRequiredFieldsProvidedConstraint
       .createQueryBuilder('form')
       .leftJoinAndSelect('form.fields', 'field')
       .where('form.id = :id', { id: object.form_id })
-      .andWhere('field.required = :req', { req: true })
       .getOneOrFail();
 
     const fieldIds = object.fields.map((field) => {
@@ -32,7 +31,7 @@ export class AreRequiredFieldsProvidedConstraint
 
     let result = true;
     form.fields.map((field) => {
-      if (!fieldIds.includes(+field.id)) {
+      if (field.required && !fieldIds.includes(+field.id)) {
         result = false;
       }
     });

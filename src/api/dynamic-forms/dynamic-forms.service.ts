@@ -213,23 +213,13 @@ export class DynamicFormsService {
         }),
       );
 
-      await queryRunner.commitTransaction();
+      // await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
 
       throw e;
     }
-  }
-
-  async getOptionValue(id: number) {
-    if (id === undefined) return null;
-    const option = await this.fieldOptionRepository.findOneOrFail({
-      where: { id: id },
-    });
-
-    if (option) return option.name;
-    else return null;
   }
 
   async getAttendeeFilledForm(getFilledFormDto: GetFilledFormDto) {
@@ -242,5 +232,22 @@ export class DynamicFormsService {
         filledFormFields: { formField: { options: true }, option: true },
       },
     });
+  }
+
+  async getEventFilledForms(id: number) {
+    return await this.filledFormRepository.find({
+      where: { event: { id: id } as Event },
+      relations: { filledFormFields: { formField: { fieldType: true } } },
+    });
+  }
+
+  private async getOptionValue(id: number) {
+    if (id === undefined) return null;
+    const option = await this.fieldOptionRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    if (option) return option.name;
+    else return null;
   }
 }

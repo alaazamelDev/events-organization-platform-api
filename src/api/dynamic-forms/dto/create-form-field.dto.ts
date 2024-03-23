@@ -19,6 +19,8 @@ export enum FIELD_TYPE {
   RADIO_BUTTON = 4,
 }
 
+export const fieldTypesWithOptions = [FIELD_TYPE.RADIO_BUTTON];
+
 export class CreateFormFieldDto {
   @IsString()
   name: string;

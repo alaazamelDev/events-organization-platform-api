@@ -75,4 +75,9 @@ export class DynamicFormsController {
   getAttendeeFilledForm(@Body() getFilledFormDto: GetFilledFormDto) {
     return this.dynamicFormsService.getAttendeeFilledForm(getFilledFormDto);
   }
+
+  @Get('event/:id')
+  getEventFilledForms(@Param('id') id: string) {
+    return this.dynamicFormsService.getEventFilledForms(+id);
+  }
 }
