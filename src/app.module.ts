@@ -33,6 +33,9 @@ import {
 import { join } from 'path';
 import { FileUtilityModule } from './config/files/utility/file-utility.module';
 import { ConfigurationListsModule } from './api/configurationLists/configuration-lists.module';
+import { TagModule } from './api/tag/tag.module';
+import { ApprovalStatusModule } from './api/approval-status/approval-status.module';
+import { TagService } from './api/tag/tag.service';
 
 @Module({
   imports: [
@@ -84,6 +87,8 @@ import { ConfigurationListsModule } from './api/configurationLists/configuration
     }),
     FileUtilityModule,
     ConfigurationListsModule,
+    TagModule,
+    ApprovalStatusModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

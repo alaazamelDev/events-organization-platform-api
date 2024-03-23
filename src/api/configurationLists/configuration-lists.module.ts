@@ -7,14 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from '../job/entities/job.entity';
 import { Contact } from '../contact/entities/contact.entity';
 import { Address } from '../address/entities/address.entity';
+import { TagService } from '../tag/tag.service';
+import { Tag } from '../tag/entities/tag.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Job, Contact, Address])],
+  imports: [TypeOrmModule.forFeature([Job, Contact, Address, Tag])],
   providers: [
     ConfigurationListsService,
     JobService,
     ContactService,
     AddressService,
+    TagService,
   ],
 })
 export class ConfigurationListsModule {}
