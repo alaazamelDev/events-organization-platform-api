@@ -35,7 +35,7 @@ import { FileUtilityModule } from './config/files/utility/file-utility.module';
 import { ConfigurationListsModule } from './api/configurationLists/configuration-lists.module';
 import { TagModule } from './api/tag/tag.module';
 import { ApprovalStatusModule } from './api/approval-status/approval-status.module';
-import { TagService } from './api/tag/tag.service';
+import { EventModule } from './api/event/event.module';
 
 @Module({
   imports: [
@@ -89,6 +89,7 @@ import { TagService } from './api/tag/tag.service';
     ConfigurationListsModule,
     TagModule,
     ApprovalStatusModule,
+    EventModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
