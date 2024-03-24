@@ -8,6 +8,7 @@ import { EventDay } from './event-day.entity';
 import { EventPhoto } from './event-photo.entity';
 import { EventAttachment } from './event-attachment.entity';
 import { EventApprovalStatus } from './event-approval-status.entity';
+import { EventAgeGroup } from './event-age-group.entity';
 
 @Entity('events')
 export class Event extends BaseEntity {
@@ -84,6 +85,11 @@ export class Event extends BaseEntity {
     eager: true,
   })
   tags: EventTag[];
+
+  @OneToMany(() => EventAgeGroup, (ageGroups) => ageGroups.event, {
+    eager: true,
+  })
+  targetedAgrGroups: EventAgeGroup[];
 
   @OneToMany(() => EventDay, (days) => days.event, {
     eager: true,

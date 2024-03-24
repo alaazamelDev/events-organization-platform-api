@@ -36,6 +36,7 @@ import { ConfigurationListsModule } from './api/configurationLists/configuration
 import { TagModule } from './api/tag/tag.module';
 import { ApprovalStatusModule } from './api/approval-status/approval-status.module';
 import { EventModule } from './api/event/event.module';
+import { AgeGroupModule } from './api/age-group/age-group.module';
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { EventModule } from './api/event/event.module';
     TagModule,
     ApprovalStatusModule,
     EventModule,
+    AgeGroupModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

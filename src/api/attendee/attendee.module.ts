@@ -28,6 +28,8 @@ import { ContactService } from '../contact/contact.service';
 import { AddressService } from '../address/services/address.service';
 import { TagService } from '../tag/tag.service';
 import { Tag } from '../tag/entities/tag.entity';
+import { AgeGroup } from '../age-group/entities/age-group.entity';
+import { AgeGroupService } from '../age-group/age-group.service';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { Tag } from '../tag/entities/tag.entity';
       Contact,
       Address,
       Tag,
+      AgeGroup,
     ]),
     UserModule,
     MulterConfigModule,
@@ -55,6 +58,7 @@ import { Tag } from '../tag/entities/tag.entity';
     ContactService,
     AddressService,
     TagService,
+    AgeGroupService,
     ConfigurationListsService,
     {
       provide: getRepositoryToken(Attendee),

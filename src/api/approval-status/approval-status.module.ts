@@ -6,5 +6,6 @@ import { ApprovalStatus } from './entities/approval-status.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([ApprovalStatus])],
   providers: [ApprovalStatusService],
+  exports: [ApprovalStatusService],
 })
 export class ApprovalStatusModule {}
