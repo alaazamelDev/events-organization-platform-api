@@ -1,12 +1,14 @@
 import { IsInt, IsNotEmpty } from 'class-validator';
+import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 
 export class QueryFormConditionDto {
   @IsInt()
   field_id: number;
 
   @IsNotEmpty()
-  value: string;
+  value: string | number;
 
   @IsNotEmpty()
-  operator: string;
+  @IsExist({ tableName: 'operators', column: 'id' })
+  operator_id: number;
 }

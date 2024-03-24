@@ -4,7 +4,7 @@ import { DynamicFormsController } from './dynamic-forms.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { Form } from './entities/form.entity';
-import { FormField } from './entities/ form-field.entity';
+import { FormField } from './entities/form-field.entity';
 import { FieldType } from './entities/field-type.entity';
 import { FieldOption } from './entities/field-option.entity';
 import { FilledForm } from './entities/filled-form.entity';
@@ -15,6 +15,8 @@ import { IsOptionBelongsToTheFieldConstraint } from './validators/is_option_belo
 import { AreRequiredFieldsProvidedConstraint } from './validators/are_required_fields_provided_constraint';
 import { IsFieldValueCorrectConstraint } from './validators/is_field_value_correct_constraint';
 import { DynamicFormsQueryService } from './dynamic-forms-query.service';
+import { QueryOperator } from './entities/query-operator';
+import { FieldTypeOperators } from './entities/field-type.operators';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { DynamicFormsQueryService } from './dynamic-forms-query.service';
       FieldOption,
       FilledForm,
       FilledFormField,
+      QueryOperator,
+      FieldTypeOperators,
     ]),
   ],
   controllers: [DynamicFormsController],

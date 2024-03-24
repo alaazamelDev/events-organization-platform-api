@@ -4,7 +4,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
-import { FormField } from '../entities/ form-field.entity';
+import { FormField } from '../entities/form-field.entity';
 import { FillFormFieldDto } from '../dto/fill-form-field.dto';
 import {
   FIELD_TYPE,

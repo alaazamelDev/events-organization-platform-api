@@ -5,7 +5,7 @@ import {
 } from 'class-validator';
 import { FillFormDto } from '../dto/fill-form.dto';
 import { EntityManager } from 'typeorm';
-import { FormField } from '../entities/ form-field.entity';
+import { FormField } from '../entities/form-field.entity';
 
 @ValidatorConstraint({ name: 'fieldBelongToForm', async: true })
 export class IsFieldBelongsToForm implements ValidatorConstraintInterface {

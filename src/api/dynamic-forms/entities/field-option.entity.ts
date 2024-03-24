@@ -1,6 +1,6 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { FormField } from './ form-field.entity';
+import { FormField } from './form-field.entity';
 import { FilledFormField } from './filled-form-field.entity';
 
 @Entity({ name: 'field_options' })
