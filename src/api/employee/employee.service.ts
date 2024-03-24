@@ -71,10 +71,9 @@ export class EmployeeService {
   }
 
   async findAll() {
-    const employees = await this.employeeRepository.find({
+    return await this.employeeRepository.find({
       relations: { permissions: true, user: true },
     });
-    return employees.map((employee) => new AllEmployeesSerializer(employee));
   }
 
   async findOne(id: number) {
