@@ -26,6 +26,8 @@ import { Address } from '../address/entities/address.entity';
 import { JobService } from '../job/job.service';
 import { ContactService } from '../contact/contact.service';
 import { AddressService } from '../address/services/address.service';
+import { TagService } from '../tag/tag.service';
+import { Tag } from '../tag/entities/tag.entity';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { AddressService } from '../address/services/address.service';
       Job,
       Contact,
       Address,
+      Tag,
     ]),
     UserModule,
     MulterConfigModule,
@@ -51,6 +54,7 @@ import { AddressService } from '../address/services/address.service';
     JobService,
     ContactService,
     AddressService,
+    TagService,
     ConfigurationListsService,
     {
       provide: getRepositoryToken(Attendee),
