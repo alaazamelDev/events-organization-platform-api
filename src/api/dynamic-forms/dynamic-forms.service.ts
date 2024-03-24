@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { Brackets, DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Form } from './entities/form.entity';
 import { FormField } from './entities/ form-field.entity';
@@ -239,6 +239,56 @@ export class DynamicFormsService {
       where: { event: { id: id } as Event },
       relations: { filledFormFields: { formField: { fieldType: true } } },
     });
+  }
+
+  payload = {
+    event_id: 1,
+    groups: [
+      {
+        conditions: [
+          {
+            field_id: 15,
+            value: 10,
+            operator: '=',
+          },
+          {
+            field_id: 15,
+            value: 20,
+            operator: '<',
+          },
+        ],
+      },
+      {
+        conditions: [
+          {
+            field_id: 16,
+            value: 10,
+            operator: '=',
+          },
+          {
+            field_id: 16,
+            value: 20,
+            operator: '<',
+          },
+        ],
+      },
+    ],
+  };
+
+  async queryForms() {
+    // const query = this.dataSource
+    //   .getRepository(FilledFormField)
+    //   .createQueryBuilder()
+    //   .select('DISTINCT(filled_form_id)')
+    //   .where((qb) => {
+    //     const subQueries = [];
+    //
+    //     this.payload.groups.map((group) => {
+    //       group.conditions.map((condition) => {
+    //         const sub = qb.subQuery();
+    //       });
+    //     });
+    //   });
   }
 
   private async getOptionValue(id: number) {

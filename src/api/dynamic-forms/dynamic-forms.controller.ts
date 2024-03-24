@@ -19,6 +19,11 @@ import { GetFilledFormDto } from './dto/get-filled-form.dto';
 export class DynamicFormsController {
   constructor(private readonly dynamicFormsService: DynamicFormsService) {}
 
+  @Get('test')
+  queryForms() {
+    return this.dynamicFormsService.queryForms();
+  }
+
   @Post()
   createForm(@Body() createFormDto: CreateFormDto) {
     return this.dynamicFormsService.createForm(createFormDto);
