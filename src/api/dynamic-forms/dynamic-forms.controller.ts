@@ -14,14 +14,19 @@ import { UpdateFormFieldDto } from './dto/update-form-field.dto';
 import { CreateFormFieldDto } from './dto/create-form-field.dto';
 import { FillFormDto } from './dto/fill-form.dto';
 import { GetFilledFormDto } from './dto/get-filled-form.dto';
+import { DynamicFormsQueryService } from './dynamic-forms-query.service';
 
 @Controller('forms')
 export class DynamicFormsController {
-  constructor(private readonly dynamicFormsService: DynamicFormsService) {}
+  constructor(
+    private readonly dynamicFormsService: DynamicFormsService,
+    private readonly dynamicFormsQueryService: DynamicFormsQueryService,
+  ) {}
 
   @Get('test')
   queryForms() {
-    return this.dynamicFormsService.queryForms();
+    return this.dynamicFormsQueryService.queryFilledForms();
+    // return this.dynamicFormsService.queryForms();
   }
 
   @Post()

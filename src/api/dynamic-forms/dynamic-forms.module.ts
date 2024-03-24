@@ -14,6 +14,7 @@ import { IsFieldOptionRequiredConstraint } from './validators/is_field_option_re
 import { IsOptionBelongsToTheFieldConstraint } from './validators/is_option_belongs_to_the_field_constraint';
 import { AreRequiredFieldsProvidedConstraint } from './validators/are_required_fields_provided_constraint';
 import { IsFieldValueCorrectConstraint } from './validators/is_field_value_correct_constraint';
+import { DynamicFormsQueryService } from './dynamic-forms-query.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { IsFieldValueCorrectConstraint } from './validators/is_field_value_corre
   controllers: [DynamicFormsController],
   providers: [
     DynamicFormsService,
+    DynamicFormsQueryService,
     IsFieldBelongsToForm,
     IsFieldOptionRequiredConstraint,
     IsOptionBelongsToTheFieldConstraint,

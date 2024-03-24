@@ -241,55 +241,70 @@ export class DynamicFormsService {
     });
   }
 
-  payload = {
-    event_id: 1,
-    groups: [
-      {
-        conditions: [
-          {
-            field_id: 15,
-            value: 10,
-            operator: '=',
-          },
-          {
-            field_id: 15,
-            value: 20,
-            operator: '<',
-          },
-        ],
-      },
-      {
-        conditions: [
-          {
-            field_id: 16,
-            value: 10,
-            operator: '=',
-          },
-          {
-            field_id: 16,
-            value: 20,
-            operator: '<',
-          },
-        ],
-      },
-    ],
-  };
+  // payload = {
+  //   event_id: 1,
+  //   groups: [
+  //     {
+  //       conditions: [
+  //         {
+  //           field_id: 15,
+  //           value: '10',
+  //           operator: '>=',
+  //         },
+  //         {
+  //           field_id: 13,
+  //           value: '16',
+  //           operator: '>=',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       conditions: [
+  //         {
+  //           field_id: 13,
+  //           value: '155',
+  //           operator: '>=',
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // };
 
-  async queryForms() {
-    // const query = this.dataSource
-    //   .getRepository(FilledFormField)
-    //   .createQueryBuilder()
-    //   .select('DISTINCT(filled_form_id)')
-    //   .where((qb) => {
-    //     const subQueries = [];
-    //
-    //     this.payload.groups.map((group) => {
-    //       group.conditions.map((condition) => {
-    //         const sub = qb.subQuery();
-    //       });
-    //     });
-    //   });
-  }
+  // async queryForms() {
+  //   let query = this.dataSource
+  //     .getRepository(FilledFormField)
+  //     .createQueryBuilder('f')
+  //     .select('DISTINCT(f.filled_form_id)');
+  //
+  //   let whereClause = '';
+  //   this.payload.groups.forEach((group, index) => {
+  //     let groupConditions = '';
+  //
+  //     group.conditions.forEach((condition, conIndex) => {
+  //       if (conIndex !== 0) {
+  //         groupConditions += 'AND';
+  //       }
+  //
+  //       groupConditions += `(f.filled_form_id IN
+  //         (SELECT f1.filled_form_id
+  //         FROM filled_form_fields f1
+  //         WHERE f1.form_field_id = ${condition.field_id}
+  //         AND f1.value ${condition.operator} '${condition.value}'))`;
+  //     });
+  //
+  //     if (index !== 0) {
+  //       whereClause += 'OR';
+  //     }
+  //     whereClause += `(${groupConditions})`;
+  //   });
+  //
+  //   if (whereClause !== '') {
+  //     query = query.where(whereClause);
+  //   }
+  //
+  //   const result = await query.getRawMany();
+  //   console.log(result);
+  // }
 
   private async getOptionValue(id: number) {
     if (id === undefined) return null;
