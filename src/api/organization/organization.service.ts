@@ -99,7 +99,7 @@ export class OrganizationService {
   async findAll() {
     const organizations = await this.organizationRepository.find({
       relations: {
-        employees: true,
+        employees: { user: true },
       },
     });
 
@@ -112,6 +112,7 @@ export class OrganizationService {
       relations: {
         addresses: { address: true },
         contacts: { contact: true },
+        employees: { user: true },
       },
     });
   }

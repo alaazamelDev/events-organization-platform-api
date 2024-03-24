@@ -7,9 +7,6 @@ export class AllOrganizationsAdminSerializer extends Organization {
   deletedAt: Date;
 
   @Exclude()
-  main_picture: string;
-
-  @Exclude()
   description: string;
 
   @Exclude()
