@@ -8,6 +8,7 @@ import { EventPhoto } from './entities/event-photo.entity';
 import { EventDay } from './entities/event-day.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
+import { EventAgeGroup } from './entities/event-age-group.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EventApprovalStatus } from './entities/event-approval-status.entity';
       EventDay,
       EventTag,
       EventPhoto,
+      EventAgeGroup,
       EventAttachment,
       EventApprovalStatus,
     ]),
