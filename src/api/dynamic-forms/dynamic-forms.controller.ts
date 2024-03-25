@@ -15,6 +15,7 @@ import { CreateFormFieldDto } from './dto/create-form-field.dto';
 import { FillFormDto } from './dto/fill-form.dto';
 import { GetFilledFormDto } from './dto/get-filled-form.dto';
 import { DynamicFormsQueryService } from './dynamic-forms-query.service';
+import { QueryFormDto } from './dto/query-form/query-form.dto';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -24,9 +25,8 @@ export class DynamicFormsController {
   ) {}
 
   @Get('test')
-  queryForms() {
-    return this.dynamicFormsQueryService.queryFilledForms();
-    // return this.dynamicFormsService.queryForms();
+  queryForms(@Body() queryFormDto: QueryFormDto) {
+    return this.dynamicFormsQueryService.queryFilledForms(queryFormDto);
   }
 
   @Post()

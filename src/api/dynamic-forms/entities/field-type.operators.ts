@@ -1,4 +1,10 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { FieldType } from './field-type.entity';
 import { QueryOperator } from './query-operator';
 
@@ -21,4 +27,10 @@ export class FieldTypeOperators {
   )
   @JoinColumn({ name: 'query_operator_id' })
   query_operator: QueryOperator;
+
+  @Column({ name: 'field_type_id' })
+  field_type_id: number;
+
+  @Column({ name: 'query_operator_id' })
+  query_operator_id: number;
 }

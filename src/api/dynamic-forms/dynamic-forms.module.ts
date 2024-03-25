@@ -17,6 +17,7 @@ import { IsFieldValueCorrectConstraint } from './validators/is_field_value_corre
 import { DynamicFormsQueryService } from './dynamic-forms-query.service';
 import { QueryOperator } from './entities/query-operator';
 import { FieldTypeOperators } from './entities/field-type.operators';
+import { IsQueryOperatorSuitsTheFieldConstraint } from './validators/is_query_operator_suits_the_field_constraint';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { FieldTypeOperators } from './entities/field-type.operators';
     IsOptionBelongsToTheFieldConstraint,
     AreRequiredFieldsProvidedConstraint,
     IsFieldValueCorrectConstraint,
+    IsQueryOperatorSuitsTheFieldConstraint,
   ],
 })
 export class DynamicFormsModule {}

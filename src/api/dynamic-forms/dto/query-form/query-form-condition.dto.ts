@@ -1,8 +1,10 @@
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { IsInt, IsNotEmpty, Validate } from 'class-validator';
 import { IsExist } from '../../../../common/decorators/is_exist.decorator';
+import { IsQueryOperatorSuitsTheFieldConstraint } from '../../validators/is_query_operator_suits_the_field_constraint';
 
 export class QueryFormConditionDto {
   @IsInt()
+  @IsExist({ tableName: 'form_fields', column: 'id' })
   field_id: number;
 
   @IsNotEmpty()
@@ -10,5 +12,6 @@ export class QueryFormConditionDto {
 
   @IsNotEmpty()
   @IsExist({ tableName: 'operators', column: 'id' })
+  @Validate(IsQueryOperatorSuitsTheFieldConstraint)
   operator_id: number;
 }
