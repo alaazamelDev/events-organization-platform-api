@@ -15,9 +15,6 @@ import {
 } from '@nestjs/common';
 import { AttendeeService } from './services/attendee.service';
 import { RegisterAttendeeDto } from './dto/register-attendee.dto';
-import { AuthService } from '../../auth/services/auth.service';
-import { AuthGuard } from '@nestjs/passport';
-import { RefreshTokenGuard } from '../../auth/guards/refresh-token.guard';
 import { UpdateAttendeeProfileDto } from './dto/update-attendee-profile.dto';
 import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
@@ -36,7 +33,6 @@ export class AttendeeController {
   constructor(
     private readonly configurationListsService: ConfigurationListsService,
     private readonly attendeeService: AttendeeService,
-    private readonly authService: AuthService,
   ) {}
 
   @Post('/register')
@@ -189,20 +185,6 @@ export class AttendeeController {
 
     console.log(updatedData);
     return this.attendeeService.updateAttendeeProfile(updatedData);
-  }
-
-  @Post('/login')
-  @UseGuards(AuthGuard('local'))
-  async loginAttendee(@Req() request: any) {
-    return this.authService.login(request.user);
-  }
-
-  @Get('/refresh-token')
-  @UseGuards(RefreshTokenGuard)
-  async refreshAttendeeToken(@Req() req: any) {
-    const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
   }
 
   @Get('my-profile')

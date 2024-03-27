@@ -9,6 +9,12 @@ import { EventDay } from './entities/event-day.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
 import { EventAgeGroup } from './entities/event-age-group.entity';
+import { EventDaySlot } from './entities/event-day-slot.entity';
+import { EmployeeModule } from '../employee/employee.module';
+import { Employee } from '../employee/entities/employee.entity';
+import { EmployeeService } from '../employee/employee.service';
+import { User } from '../user/entities/user.entity';
+import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
 
 @Module({
   imports: [
@@ -17,12 +23,17 @@ import { EventAgeGroup } from './entities/event-age-group.entity';
       EventDay,
       EventTag,
       EventPhoto,
+      EventDaySlot,
       EventAgeGroup,
       EventAttachment,
       EventApprovalStatus,
+      Employee,
+      User,
     ]),
+    EmployeeModule,
+    FileUtilityModule,
   ],
-  providers: [EventService],
+  providers: [EventService, EmployeeService],
   controllers: [EventController],
 })
 export class EventModule {}

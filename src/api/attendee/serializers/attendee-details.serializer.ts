@@ -24,10 +24,8 @@ export class AttendeeDetailsSerializer {
       profile_img: fileUtilityService?.getFileUrl(attendee.profilePictureUrl),
       cover_img: fileUtilityService?.getFileUrl(attendee.coverPictureUrl),
       bio: attendee.bio,
-      job: attendee.job ? JobSerializer.serialize(attendee.job) : null,
-      address: attendee.address
-        ? AddressSerializer.serialize(attendee.address)
-        : null,
+      job: JobSerializer.serialize(attendee.job),
+      address: AddressSerializer.serialize(attendee.address),
       contacts: AttendeeContactSerializer.serializeList(attendee.contacts),
     };
   }

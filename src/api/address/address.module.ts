@@ -23,6 +23,7 @@ import { AddressController } from './address.controller';
       },
     },
   ],
+  exports: [AddressService],
   controllers: [AddressController],
 })
 export class AddressModule {}
