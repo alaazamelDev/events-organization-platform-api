@@ -22,6 +22,13 @@ export class EmployeeService {
     private readonly dataSource: DataSource,
   ) {}
 
+  async findByUserId(userId: number): Promise<Employee | null> {
+    return await this.employeeRepository.findOne({
+      relations: { organization: true },
+      where: { user: { id: userId } },
+    });
+  }
+
   async create(createEmployeeDto: CreateEmployeeDto, imageName: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

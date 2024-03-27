@@ -11,5 +11,6 @@ import { Employee_permissionsService } from './employee_permissions.service';
   imports: [TypeOrmModule.forFeature([Employee, EmployeePermission, User])],
   controllers: [EmployeeController],
   providers: [EmployeeService, Employee_permissionsService],
+  exports: [EmployeeService],
 })
 export class EmployeeModule {}

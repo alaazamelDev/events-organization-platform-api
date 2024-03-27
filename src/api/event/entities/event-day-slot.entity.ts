@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { EventDay } from './event-day.entity';
 import { SlotStatus } from '../../slot-status/entities/slot-status.entity';
 import * as moment from 'moment';
+import { DEFAULT_DB_DATETIME_FORMAT } from '../../../common/constants/constants';
 
 @Entity('event_day_slots')
 export class EventDaySlot extends BaseEntity {
@@ -34,7 +35,7 @@ export class EventDaySlot extends BaseEntity {
       },
       to(value: Date): any {
         // Format value when writing to the database
-        return moment(value).format(); // You can apply any formatting here
+        return moment(value).format(DEFAULT_DB_DATETIME_FORMAT);
       },
     },
   })
@@ -49,8 +50,7 @@ export class EventDaySlot extends BaseEntity {
         return moment(value).toDate();
       },
       to(value: Date): any {
-        // Format value when writing to the database
-        return moment(value).format(); // You can apply any formatting here
+        return moment(value).format(DEFAULT_DB_DATETIME_FORMAT);
       },
     },
   })

@@ -29,15 +29,35 @@ export class EventApprovalStatus extends BaseEntity {
 
   @Column({
     name: 'from_date',
-    type: 'date',
+    type: 'timestamptz',
     nullable: true,
+    transformer: {
+      to: (value: Date) => {
+        if (!value) return null;
+        return value.toISOString(); // Convert Date to ISO string
+      },
+      from: (value: string | null) => {
+        if (!value) return null;
+        return new Date(value); // Convert ISO string back to Date
+      },
+    },
   })
   fromDate?: Date;
 
   @Column({
     name: 'to_date',
-    type: 'date',
+    type: 'timestamptz',
     nullable: true,
+    transformer: {
+      to: (value: Date) => {
+        if (!value) return null;
+        return value.toISOString(); // Convert Date to ISO string
+      },
+      from: (value: string | null) => {
+        if (!value) return null;
+        return new Date(value); // Convert ISO string back to Date
+      },
+    },
   })
   toDate?: Date;
 

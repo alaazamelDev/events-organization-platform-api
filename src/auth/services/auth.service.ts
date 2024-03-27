@@ -79,7 +79,7 @@ export class AuthService {
       username: user.username,
       sub: user.id,
     };
-    return this.jwtService.sign(payload, { expiresIn: '30m' });
+    return this.jwtService.sign(payload);
   }
 
   public async createRefreshToken(user: User) {
