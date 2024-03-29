@@ -38,6 +38,7 @@ import { ApprovalStatusModule } from './api/approval-status/approval-status.modu
 import { EventModule } from './api/event/event.module';
 import { AgeGroupModule } from './api/age-group/age-group.module';
 import { SlotStatusModule } from './api/slot-status/slot-status.module';
+import { AttendEventModule } from './api/attend-event/attend-event.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { SlotStatusModule } from './api/slot-status/slot-status.module';
     EventModule,
     AgeGroupModule,
     SlotStatusModule,
+    AttendEventModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

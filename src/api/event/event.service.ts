@@ -69,6 +69,7 @@ export class EventService {
         coverPictureUrl: `${EVENT_FILES}/${payload.cover_picture[0].filename}`,
         description: payload.description,
         capacity: payload.capacity ?? undefined,
+        directRegister: payload.direct_register,
         registrationStartDate: payload.registration_start_date
           ? moment(payload.registration_start_date).format(
               DEFAULT_DB_DATE_FORMAT,

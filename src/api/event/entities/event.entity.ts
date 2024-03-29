@@ -68,6 +68,13 @@ export class Event extends BaseEntity {
   eventType!: EventType;
 
   @Column({
+    name: 'direct_register',
+    type: 'boolean',
+    default: true,
+  })
+  directRegister: boolean;
+
+  @Column({
     name: 'registration_start_date',
     type: 'timestamptz',
   })
