@@ -1,7 +1,7 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { FormField } from './form-field.entity';
-import { FieldTypeOperators } from './field-type.operators';
+import { FieldTypeOperatorsEntity } from './field-type-operators.entity';
 
 @Entity({ name: 'field_types' })
 export class FieldType extends BaseEntity {
@@ -12,8 +12,8 @@ export class FieldType extends BaseEntity {
   fields: FormField[];
 
   @OneToMany(
-    () => FieldTypeOperators,
+    () => FieldTypeOperatorsEntity,
     (fieldTypeOperators) => fieldTypeOperators.field_type,
   )
-  fieldTypeOperators: FieldTypeOperators[];
+  fieldTypeOperators: FieldTypeOperatorsEntity[];
 }

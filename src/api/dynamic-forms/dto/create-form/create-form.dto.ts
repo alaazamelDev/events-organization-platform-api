@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { CreateFormFieldDto } from './create-form-field.dto';
 import { Type } from 'class-transformer';
-import { IsExist } from '../../../common/decorators/is_exist.decorator';
+import { IsExist } from '../../../../common/decorators/is_exist.decorator';
+import { CreateFormGroupDto } from './create-form-group.dto';
 
 export class CreateFormDto {
   @IsString()
@@ -15,7 +15,7 @@ export class CreateFormDto {
   organization_id: number;
 
   @IsNotEmpty()
-  @Type(() => CreateFormFieldDto)
+  @Type(() => CreateFormGroupDto)
   @ValidateNested({ each: true })
-  fields: CreateFormFieldDto[];
+  groups: CreateFormGroupDto[];
 }

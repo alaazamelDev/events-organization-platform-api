@@ -7,14 +7,14 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { DynamicFormsService } from './dynamic-forms.service';
-import { CreateFormDto } from './dto/create-form.dto';
-import { UpdateFormDto } from './dto/update-form.dto';
-import { UpdateFormFieldDto } from './dto/update-form-field.dto';
-import { CreateFormFieldDto } from './dto/create-form-field.dto';
-import { FillFormDto } from './dto/fill-form.dto';
+import { DynamicFormsService } from './services/dynamic-forms.service';
+import { CreateFormDto } from './dto/create-form/create-form.dto';
+import { UpdateFormDto } from './dto/update-form/update-form.dto';
+import { UpdateFormFieldDto } from './dto/update-form/update-form-field.dto';
+import { CreateFormFieldDto } from './dto/create-form/create-form-field.dto';
+import { FillFormDto } from './dto/fill-form/fill-form.dto';
 import { GetFilledFormDto } from './dto/get-filled-form.dto';
-import { DynamicFormsQueryService } from './dynamic-forms-query.service';
+import { DynamicFormsQueryService } from './services/dynamic-forms-query.service';
 import { QueryFormDto } from './dto/query-form/query-form.dto';
 
 @Controller('forms')

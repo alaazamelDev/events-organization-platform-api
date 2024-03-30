@@ -3,7 +3,7 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { FillFormDto } from '../dto/fill-form.dto';
+import { FillFormDto } from '../dto/fill-form/fill-form.dto';
 import { EntityManager } from 'typeorm';
 import { FormField } from '../entities/form-field.entity';
 

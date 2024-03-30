@@ -5,11 +5,8 @@ import {
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
 import { FormField } from '../entities/form-field.entity';
-import { FillFormFieldDto } from '../dto/fill-form-field.dto';
-import {
-  FIELD_TYPE,
-  fieldTypesWithOptions,
-} from '../dto/create-form-field.dto';
+import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
+import { fieldTypesWithOptions } from '../dto/create-form/create-form-field.dto';
 
 @ValidatorConstraint({ name: 'fieldOptionRequired', async: true })
 export class IsFieldOptionRequiredConstraint

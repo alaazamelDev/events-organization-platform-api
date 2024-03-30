@@ -3,11 +3,9 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { FillFormDto } from '../dto/fill-form.dto';
+import { FillFormDto } from '../dto/fill-form/fill-form.dto';
 import { EntityManager } from 'typeorm';
-import { FormField } from '../entities/form-field.entity';
-import { FillFormFieldDto } from '../dto/fill-form-field.dto';
-import { FIELD_TYPE } from '../dto/create-form-field.dto';
+import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import { Form } from '../entities/form.entity';
 
 @ValidatorConstraint({ name: 'requiredFieldsProvided', async: true })
@@ -40,7 +38,6 @@ export class AreRequiredFieldsProvidedConstraint
   }
 
   defaultMessage(_args: ValidationArguments) {
-    const object = _args.object as FillFormFieldDto;
     return `the provided fields does not cover all the required fields`;
   }
 }

@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { FieldTypeOperators } from './field-type.operators';
+import { FieldTypeOperatorsEntity } from './field-type-operators.entity';
 
 @Entity({ name: 'operators' })
 export class QueryOperator extends BaseEntity {
@@ -11,8 +11,8 @@ export class QueryOperator extends BaseEntity {
   value: string;
 
   @OneToMany(
-    () => FieldTypeOperators,
+    () => FieldTypeOperatorsEntity,
     (fieldTypeOperators) => fieldTypeOperators.query_operator,
   )
-  fieldTypeOperators: FieldTypeOperators[];
+  fieldTypeOperators: FieldTypeOperatorsEntity[];
 }

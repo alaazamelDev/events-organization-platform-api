@@ -4,6 +4,7 @@ import { FieldType } from './field-type.entity';
 import { FieldOption } from './field-option.entity';
 import { Form } from './form.entity';
 import { FilledFormField } from './filled-form-field.entity';
+import { FormGroup } from './form-group.entity';
 
 @Entity({ name: 'form_fields' })
 export class FormField extends BaseEntity {
@@ -32,6 +33,10 @@ export class FormField extends BaseEntity {
   @ManyToOne(() => Form, (form) => form.fields)
   @JoinColumn({ name: 'form_id' })
   form: Form;
+
+  @ManyToOne(() => FormGroup, (formGroup) => formGroup.fields)
+  @JoinColumn({ name: 'group_id' })
+  group: FormGroup;
 
   @OneToMany(
     () => FilledFormField,

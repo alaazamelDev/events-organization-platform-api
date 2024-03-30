@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { FilledFormField } from './entities/filled-form-field.entity';
-import { QueryFormDto } from './dto/query-form/query-form.dto';
-import { QueryFormConditionDto } from './dto/query-form/query-form-condition.dto';
-import { QueryOperator } from './entities/query-operator';
+import { FilledFormField } from '../entities/filled-form-field.entity';
+import { QueryFormDto } from '../dto/query-form/query-form.dto';
+import { QueryFormConditionDto } from '../dto/query-form/query-form-condition.dto';
+import { QueryOperator } from '../entities/query-operator';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilledForm } from './entities/filled-form.entity';
+import { FilledForm } from '../entities/filled-form.entity';
 
 @Injectable()
 export class DynamicFormsQueryService {

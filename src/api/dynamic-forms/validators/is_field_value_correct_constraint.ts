@@ -3,14 +3,13 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { FillFormDto } from '../dto/fill-form.dto';
 import { EntityManager } from 'typeorm';
 import { FormField } from '../entities/form-field.entity';
-import { FillFormFieldDto } from '../dto/fill-form-field.dto';
+import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import {
   FIELD_TYPE,
   fieldTypesWithOptions,
-} from '../dto/create-form-field.dto';
+} from '../dto/create-form/create-form-field.dto';
 import * as moment from 'moment';
 
 @ValidatorConstraint({ name: 'fieldValueCorrect', async: true })

@@ -4,6 +4,7 @@ import { Organization } from '../../organization/entities/organization.entity';
 import { Event } from './event.entity';
 import { FormField } from './form-field.entity';
 import { FilledForm } from './filled-form.entity';
+import { FormGroup } from './form-group.entity';
 
 @Entity({ name: 'forms' })
 export class Form extends BaseEntity {
@@ -22,6 +23,9 @@ export class Form extends BaseEntity {
 
   @OneToMany(() => FormField, (formField) => formField.form)
   fields: FormField[];
+
+  @OneToMany(() => FormGroup, (formGroup) => formGroup.form)
+  groups: FormGroup[];
 
   @OneToMany(() => FilledForm, (filledForm) => filledForm.form)
   filledForms: FilledForm[];

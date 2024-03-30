@@ -1,9 +1,9 @@
 import { IsArray, IsInt, Validate, ValidateNested } from 'class-validator';
-import { IsExist } from '../../../common/decorators/is_exist.decorator';
+import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { FillFormFieldDto } from './fill-form-field.dto';
 import { Type } from 'class-transformer';
-import { IsFieldBelongsToForm } from '../validators/is_field_belongs_to_form_constraint';
-import { AreRequiredFieldsProvidedConstraint } from '../validators/are_required_fields_provided_constraint';
+import { IsFieldBelongsToForm } from '../../validators/is_field_belongs_to_form_constraint';
+import { AreRequiredFieldsProvidedConstraint } from '../../validators/are_required_fields_provided_constraint';
 
 export class FillFormDto {
   @IsInt()

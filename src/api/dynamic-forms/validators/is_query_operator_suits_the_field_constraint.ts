@@ -4,9 +4,9 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
-import { FillFormFieldDto } from '../dto/fill-form-field.dto';
+import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import { QueryFormConditionDto } from '../dto/query-form/query-form-condition.dto';
-import { FieldTypeOperators } from '../entities/field-type.operators';
+import { FieldTypeOperatorsEntity } from '../entities/field-type-operators.entity';
 import { FormField } from '../entities/form-field.entity';
 
 @ValidatorConstraint({ name: 'queryOperatorSuitsTheField', async: true })
@@ -25,7 +25,7 @@ export class IsQueryOperatorSuitsTheFieldConstraint
       .getOneOrFail();
 
     const field_operators = await this.entityManager
-      .getRepository(FieldTypeOperators)
+      .getRepository(FieldTypeOperatorsEntity)
       .createQueryBuilder()
       .where('field_type_id = :id', { id: fieldTypeId })
       .getMany();

@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { Brackets, DataSource, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Form } from './entities/form.entity';
-import { FormField } from './entities/form-field.entity';
-import { FieldOption } from './entities/field-option.entity';
-import { FieldType } from './entities/field-type.entity';
-import { CreateFormDto } from './dto/create-form.dto';
-import { Organization } from '../organization/entities/organization.entity';
-import { UpdateFormDto } from './dto/update-form.dto';
-import { UpdateFormFieldDto } from './dto/update-form-field.dto';
-import { CreateFormFieldDto } from './dto/create-form-field.dto';
-import { FillFormDto } from './dto/fill-form.dto';
-import { FilledForm } from './entities/filled-form.entity';
-import { Attendee } from '../attendee/entities/attendee.entity';
-import { Event } from './entities/event.entity';
-import { FilledFormField } from './entities/filled-form-field.entity';
-import { GetFilledFormDto } from './dto/get-filled-form.dto';
+import { Form } from '../entities/form.entity';
+import { FormField } from '../entities/form-field.entity';
+import { FieldOption } from '../entities/field-option.entity';
+import { FieldType } from '../entities/field-type.entity';
+import { CreateFormDto } from '../dto/create-form/create-form.dto';
+import { Organization } from '../../organization/entities/organization.entity';
+import { UpdateFormDto } from '../dto/update-form/update-form.dto';
+import { UpdateFormFieldDto } from '../dto/update-form/update-form-field.dto';
+import { CreateFormFieldDto } from '../dto/create-form/create-form-field.dto';
+import { FillFormDto } from '../dto/fill-form/fill-form.dto';
+import { FilledForm } from '../entities/filled-form.entity';
+import { Attendee } from '../../attendee/entities/attendee.entity';
+import { Event } from '../entities/event.entity';
+import { FilledFormField } from '../entities/filled-form-field.entity';
+import { GetFilledFormDto } from '../dto/get-filled-form.dto';
+import { FormGroup } from '../entities/form-group.entity';
 
-// TODO, replace the fake Event entity with the real one
+// TODO, replace the stub Event entity with the real one
 @Injectable()
 export class DynamicFormsService {
   constructor(
@@ -28,12 +29,12 @@ export class DynamicFormsService {
     private readonly formFieldRepository: Repository<FormField>,
     @InjectRepository(FieldOption)
     private readonly fieldOptionRepository: Repository<FieldOption>,
-    @InjectRepository(FieldType)
-    private readonly fieldTypeRepository: Repository<FieldType>,
     @InjectRepository(FilledForm)
     private readonly filledFormRepository: Repository<FilledForm>,
     @InjectRepository(FilledFormField)
     private readonly filledFormFieldRepository: Repository<FilledFormField>,
+    @InjectRepository(FormGroup)
+    private readonly formGroup: Repository<FormGroup>,
   ) {}
 
   async createForm(createFormDto: CreateFormDto) {
@@ -52,35 +53,45 @@ export class DynamicFormsService {
       await queryRunner.manager.save(form, { reload: true });
 
       await Promise.all(
-        createFormDto.fields.map(async (field) => {
-          const createdField = this.formFieldRepository.create({
-            name: field.name,
-            label: field.label,
-            fieldType: { id: field.type_id } as FieldType,
-            position: field.position,
-            required: field.required,
+        createFormDto.groups.map(async (group) => {
+          const createdGroup = this.formGroup.create({
+            name: group.name,
+            position: group.position,
             form: form,
           });
 
-          await queryRunner.manager.save(createdField, { reload: true });
+          await queryRunner.manager.save(createdGroup, { reload: true });
 
-          if (field.options) {
-            await Promise.all(
-              field.options.map(async (op) => {
-                const option = this.fieldOptionRepository.create({
-                  name: op.name,
-                  formField: createdField,
-                });
+          group.fields.map(async (field) => {
+            const createdField = this.formFieldRepository.create({
+              name: field.name,
+              label: field.label,
+              fieldType: { id: field.type_id } as FieldType,
+              position: field.position,
+              required: field.required,
+              // form: form,
+              group: createdGroup,
+            });
 
-                await queryRunner.manager.save(option, { reload: true });
-              }),
-            );
-          }
+            await queryRunner.manager.save(createdField, { reload: true });
+
+            if (field.options) {
+              await Promise.all(
+                field.options.map(async (op) => {
+                  const option = this.fieldOptionRepository.create({
+                    name: op.name,
+                    formField: createdField,
+                  });
+
+                  await queryRunner.manager.save(option, { reload: true });
+                }),
+              );
+            }
+          });
         }),
       );
 
       await queryRunner.commitTransaction();
-      await queryRunner.release();
 
       return form;
     } catch (e) {
@@ -114,7 +125,8 @@ export class DynamicFormsService {
     return await this.formRepository.findOneOrFail({
       where: { id: id },
       relations: {
-        fields: { options: true, fieldType: true },
+        groups: { fields: { options: true, fieldType: true } },
+        // fields: { options: true, fieldType: true },
       },
     });
   }

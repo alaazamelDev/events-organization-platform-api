@@ -9,7 +9,7 @@ import { FieldType } from './field-type.entity';
 import { QueryOperator } from './query-operator';
 
 @Entity({ name: 'field_type_operators' })
-export class FieldTypeOperators {
+export class FieldTypeOperatorsEntity {
   @PrimaryGeneratedColumn({
     name: 'id',
     type: 'bigint',

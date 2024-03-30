@@ -3,12 +3,11 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
-  IsNotEmpty,
   IsString,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { IsExist } from '../../../common/decorators/is_exist.decorator';
+import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { CreateFormFieldOptionDto } from './create-form-field-option.dto';
 import { Type } from 'class-transformer';
 

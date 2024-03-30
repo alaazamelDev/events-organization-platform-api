@@ -4,7 +4,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
-import { FillFormFieldDto } from '../dto/fill-form-field.dto';
+import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import { FieldOption } from '../entities/field-option.entity';
 
 @ValidatorConstraint({ name: 'optionBelongsToTheField', async: true })
