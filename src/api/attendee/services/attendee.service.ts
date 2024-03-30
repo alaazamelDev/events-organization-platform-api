@@ -7,7 +7,7 @@ import { Attendee } from '../entities/attendee.entity';
 import { UserService } from '../../user/services/user.service';
 import { hash } from 'bcrypt';
 import { User } from '../../user/entities/user.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { IAttendeeRepository } from '../interfaces/attendee_repo.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRole } from '../../userRole/entities/user_role.entity';
@@ -20,6 +20,7 @@ import { Job } from '../../job/entities/job.entity';
 import { Address } from '../../address/entities/address.entity';
 import { AttendeeContact } from '../entities/attendee-contact.entity';
 import { Contact } from '../../contact/entities/contact.entity';
+import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 
 @Injectable()
 export class AttendeeService {
@@ -30,6 +31,8 @@ export class AttendeeService {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly dataSource: DataSource,
+    @InjectRepository(AttendeeEvent)
+    private readonly attendeeEventRepository: Repository<AttendeeEvent>,
   ) {}
 
   async getAttendeeByUserId(userId: number): Promise<Attendee> {
@@ -220,5 +223,22 @@ export class AttendeeService {
       attendee,
       this.fileUtilityService,
     );
+  }
+
+  async getAttendeeEvents(id: number) {
+    const attendee = await this.attendeeRepository.findOneOrFail({
+      where: {
+        user: { id: id } as User,
+      },
+    });
+
+    return await this.attendeeEventRepository.find({
+      where: {
+        attendee: { id: +attendee.id } as Attendee,
+      },
+      relations: {
+        event: true,
+      },
+    });
   }
 }

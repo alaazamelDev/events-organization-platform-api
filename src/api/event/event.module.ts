@@ -15,6 +15,7 @@ import { Employee } from '../employee/entities/employee.entity';
 import { EmployeeService } from '../employee/employee.service';
 import { User } from '../user/entities/user.entity';
 import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
+import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FileUtilityModule } from '../../config/files/utility/file-utility.modul
       EventApprovalStatus,
       Employee,
       User,
+      AttendeeEvent,
     ]),
     EmployeeModule,
     FileUtilityModule,
