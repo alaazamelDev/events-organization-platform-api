@@ -1,9 +1,10 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { EmployeeService } from '../employee/employee.service';
 import { Employee } from '../employee/entities/employee.entity';
 import { Event } from './entities/event.entity';
@@ -27,6 +28,7 @@ import { SlotStatus } from '../slot-status/entities/slot-status.entity';
 import { EventDaySlot } from './entities/event-day-slot.entity';
 import { ApprovalStatus } from '../approval-status/entities/approval-status.entity';
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Injectable()
 export class EventService {
@@ -36,6 +38,10 @@ export class EventService {
   constructor(employeeService: EmployeeService, dataSource: DataSource) {
     this.dataSource = dataSource;
     this.employeeService = employeeService;
+  }
+
+  async findEvent(id: number): Promise<Event | null> {
+    return this.dataSource.manager.findOneBy(Event, { id });
   }
 
   // create new event
@@ -230,6 +236,42 @@ export class EventService {
       // rollback the transaction
       await queryRunner.rollbackTransaction();
       throw e;
+    }
+  }
+
+  async updateEventData(payload: any): Promise<Event | null> {
+    // check for existence
+    if (!(await this.checkEventExistence(payload.id))) {
+      throw new NotFoundException(`Event with Id=${payload.id} was not found!`);
+    }
+
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.startTransaction();
+
+      // update the entry
+      await queryRunner.manager.update(
+        Event,
+        { id: payload.id },
+        UpdateEventDto.toModel(payload),
+      );
+
+      await queryRunner.commitTransaction();
+      return this.findEvent(payload.id);
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw e;
+    }
+  }
+
+  private async checkEventExistence(id: number): Promise<boolean> {
+    try {
+      const event = await this.dataSource.manager.findOneByOrFail(Event, {
+        id,
+      });
+      return !!event;
+    } catch (e) {
+      return false;
     }
   }
 }

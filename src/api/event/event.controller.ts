@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   UploadedFiles,
@@ -20,6 +21,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { EventSerializer } from './serializers/event.serializer';
 import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('event')
@@ -83,5 +85,15 @@ export class EventController {
     return event
       ? EventSerializer.serialize(this.fileUtilityService, event)
       : null;
+  }
+
+  @Post('/update/:id')
+  async updateEventData(
+    @Body() data: UpdateEventDto,
+    @Param('id') eventId: number,
+  ) {
+    data.id = eventId;
+    const updated = await this.eventService.updateEventData(data);
+    return EventSerializer.serialize(this.fileUtilityService, updated);
   }
 }

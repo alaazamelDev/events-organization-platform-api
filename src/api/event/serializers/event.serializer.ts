@@ -12,7 +12,10 @@ import { EventAttachmentSerializer } from './event-attachment.serializer';
 import { EventApprovalStatusSerializer } from './event-approval-status.serializer';
 
 export class EventSerializer {
-  static serialize(fileUtilityService: FileUtilityService, data?: Event) {
+  static serialize(
+    fileUtilityService: FileUtilityService,
+    data?: Event | null,
+  ) {
     if (!data) return null;
     return {
       organization: OrganizationSerializer.serialize(data.organization),
