@@ -29,11 +29,18 @@ export class Event extends BaseEntity {
   address?: Address;
 
   @Column({
-    name: 'address_link',
+    name: 'address_notes',
     type: 'varchar',
     nullable: true,
   })
-  addressLink?: string;
+  addressNotes?: string;
+
+  @Column({
+    name: 'location',
+    type: 'simple-json',
+    nullable: true,
+  })
+  location?: { longitude: number; latitude: number };
 
   @Column({
     name: 'title',
