@@ -15,6 +15,7 @@ import { Employee } from '../employee/entities/employee.entity';
 import { EmployeeService } from '../employee/employee.service';
 import { User } from '../user/entities/user.entity';
 import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
+import { ConfigurationListsModule } from '../configurationLists/configuration-lists.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { FileUtilityModule } from '../../config/files/utility/file-utility.modul
     ]),
     EmployeeModule,
     FileUtilityModule,
+    ConfigurationListsModule,
   ],
   providers: [EventService, EmployeeService],
   controllers: [EventController],

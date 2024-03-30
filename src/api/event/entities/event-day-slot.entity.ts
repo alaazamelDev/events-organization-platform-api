@@ -15,6 +15,7 @@ export class EventDaySlot extends BaseEntity {
 
   @ManyToOne(() => SlotStatus, {
     onDelete: 'SET NULL',
+    eager: true,
   })
   @JoinColumn({ name: 'slot_status_id' })
   slotStatus?: SlotStatus;

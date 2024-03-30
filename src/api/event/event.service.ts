@@ -9,8 +9,8 @@ import { Employee } from '../employee/entities/employee.entity';
 import { Event } from './entities/event.entity';
 import { Organization } from '../organization/entities/organization.entity';
 import {
+  DEFAULT_DATE_FORMAT,
   DEFAULT_DB_DATE_FORMAT,
-  DEFAULT_DB_DATETIME_FORMAT,
   EVENT_FILES,
 } from '../../common/constants/constants';
 import * as moment from 'moment';
@@ -68,6 +68,7 @@ export class EventService {
         organization: { id: organizationId } as Organization,
         coverPictureUrl: `${EVENT_FILES}/${payload.cover_picture[0].filename}`,
         description: payload.description,
+        addressNotes: payload.address_notes ?? undefined,
         capacity: payload.capacity ?? undefined,
         registrationStartDate: payload.registration_start_date
           ? moment(payload.registration_start_date).format(
@@ -80,8 +81,8 @@ export class EventService {
       };
 
       let newData;
-      if (payload.address_link) {
-        newData = { ...data, addressLink: payload.address_link };
+      if (payload.location) {
+        newData = { ...data, location: payload.location };
       } else {
         const address = { id: payload.address_id } as Address;
         newData = { ...data, address };
@@ -168,54 +169,37 @@ export class EventService {
         for (const day of payload.days) {
           // store the main day entity
 
-          let dayData;
-
-          if (day.start_time) {
-            dayData = {
-              event: { id: savedEvent.id },
-              dayDate: moment(day.day_date).format(DEFAULT_DB_DATE_FORMAT),
-              startTime: moment(day.start_time).format(
-                DEFAULT_DB_DATETIME_FORMAT,
-              ),
-              endTime: day.end_time
-                ? moment(day.end_time).format(DEFAULT_DB_DATETIME_FORMAT)
-                : undefined,
-            };
-          } else {
-            dayData = {
-              event: { id: savedEvent.id },
-              dayDate: moment(day.day_date).format(DEFAULT_DB_DATE_FORMAT),
-              startTime: undefined,
-              endTime: undefined,
-            };
-          }
+          const dayData = {
+            event: { id: savedEvent.id },
+            dayDate: moment(day.day_date, DEFAULT_DATE_FORMAT).format(
+              DEFAULT_DB_DATE_FORMAT,
+            ),
+          };
 
           const createdDay = queryRunner.manager.create(EventDay, dayData);
           const savedDay = await queryRunner.manager.save(EventDay, createdDay);
 
-          if (!day.start_time) {
-            // store the slots
-            if (!day.slots || day.slots.length == 0) {
-              throw new BadRequestException('Day slots cannot be empty!');
-            }
-
-            const slotsData = (day.slots as Array<CreateEventDaySlotDto>)
-              .map((slot: CreateEventDaySlotDto) => {
-                return {
-                  eventDay: { id: savedDay.id },
-                  slotStatus: { id: SlotStatus.PENDING },
-                  label: slot.label,
-                  startTime: slot.start_time,
-                  endTime: slot.end_time,
-                };
-              })
-              .map((slot) => {
-                return queryRunner.manager.create(EventDaySlot, slot);
-              });
-
-            // save them all
-            await queryRunner.manager.save(EventDaySlot, slotsData);
+          // store the slots
+          if (!day.slots || day.slots.length == 0) {
+            throw new BadRequestException('Day slots cannot be empty!');
           }
+
+          const slotsData = (day.slots as Array<CreateEventDaySlotDto>)
+            .map((slot: CreateEventDaySlotDto) => {
+              return {
+                eventDay: { id: savedDay.id },
+                slotStatus: { id: SlotStatus.PENDING },
+                label: slot.label,
+                startTime: slot.start_time,
+                endTime: slot.end_time,
+              };
+            })
+            .map((slot) => {
+              return queryRunner.manager.create(EventDaySlot, slot);
+            });
+
+          // save them all
+          await queryRunner.manager.save(EventDaySlot, slotsData);
         }
       }
 
@@ -237,7 +221,7 @@ export class EventService {
       );
 
       // commit the transaction
-      // await queryRunner.commitTransaction();
+      await queryRunner.commitTransaction();
 
       return await queryRunner.manager.findOne(Event, {
         where: { id: savedEvent.id },

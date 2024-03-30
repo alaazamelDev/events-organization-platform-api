@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   UploadedFiles,
@@ -18,22 +19,31 @@ import {
 import { CreateEventDto } from './dto/create-event.dto';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { EventSerializer } from './serializers/event.serializer';
+import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
 
+@UseGuards(AccessTokenGuard)
 @Controller('event')
 export class EventController {
   private readonly eventService: EventService;
   private readonly fileUtilityService: FileUtilityService;
+  private readonly configurationListsService: ConfigurationListsService;
 
   constructor(
     eventService: EventService,
     fileUtilityService: FileUtilityService,
+    configurationListsService: ConfigurationListsService,
   ) {
     this.eventService = eventService;
     this.fileUtilityService = fileUtilityService;
+    this.configurationListsService = configurationListsService;
+  }
+
+  @Get('/lists')
+  async getCreationLists() {
+    return this.configurationListsService.getEventLists();
   }
 
   @Post('/create')
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
       [

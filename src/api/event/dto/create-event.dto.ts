@@ -8,7 +8,6 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
-  IsUrl,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
@@ -16,6 +15,7 @@ import { CreateEventDayDto } from './create-event-day.dto';
 import { Type } from 'class-transformer';
 import { CreateEventTagDto } from './create-event-tag.dto';
 import { CreateEventAgeGroupDto } from './create-event-age-group.dto';
+import { CreateLocationDto } from './create-location.dto';
 
 export class CreateEventDto {
   organization_id?: number;
@@ -24,9 +24,14 @@ export class CreateEventDto {
   @IsExist({ tableName: 'addresses', column: 'id' })
   address_id?: number;
 
-  @IsUrl()
   @IsOptional()
-  address_link?: string;
+  @Type(() => CreateLocationDto)
+  @ValidateNested()
+  location?: CreateLocationDto;
+
+  @IsString()
+  @IsOptional()
+  address_notes?: string;
 
   @IsString()
   @IsDefined()
