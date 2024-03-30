@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   UploadedFiles,
@@ -19,6 +20,7 @@ import {
 import { CreateEventDto } from './dto/create-event.dto';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { EventSerializer } from './serializers/event.serializer';
+import { GetEventAttendeesDto } from './dto/get-event-attendees.dto';
 import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
 
 @UseGuards(AccessTokenGuard)
@@ -83,5 +85,10 @@ export class EventController {
     return event
       ? EventSerializer.serialize(this.fileUtilityService, event)
       : null;
+  }
+
+  @Get('attendees/:id')
+  getEventAttendees(@Param('id') id: string) {
+    return this.eventService.getEventAttendees(+id);
   }
 }

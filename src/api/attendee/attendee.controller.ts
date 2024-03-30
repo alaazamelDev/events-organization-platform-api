@@ -27,6 +27,7 @@ import {
 import { LocalFileInterceptor } from '../../common/interceptors/local-file.interceptor';
 import * as path from 'path';
 import * as fs from 'fs';
+import { Request } from 'express';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -215,5 +216,13 @@ export class AttendeeController {
       console.log('File does not exist:', filePath);
     }
     return false;
+  }
+
+  @Get('events')
+  @UseGuards(AccessTokenGuard)
+  getAttendeeEvents(@Req() req: Request) {
+    const user: any = req.user;
+
+    return this.attendeeService.getAttendeeEvents(+user['sub']);
   }
 }

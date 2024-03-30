@@ -2,6 +2,7 @@ import { IsExist } from '../../../common/decorators/is_exist.decorator';
 import { EventType } from '../enums/event-type.enum';
 import {
   ArrayNotEmpty,
+  IsBoolean,
   IsDate,
   IsDefined,
   IsEnum,
@@ -76,4 +77,8 @@ export class CreateEventDto {
   @Type(() => CreateEventAgeGroupDto)
   @ValidateNested({ each: true })
   age_groups: CreateEventAgeGroupDto[];
+
+  @IsOptional()
+  @IsBoolean()
+  direct_register: boolean = true;
 }
