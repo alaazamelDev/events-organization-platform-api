@@ -1,5 +1,6 @@
 import { IsDateString, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { IsUnique } from '../../../common/decorators/is_unique.decorator';
+import { IsExist } from '../../../common/decorators/is_exist.decorator';
 
 export class CreateEmployeeDto {
   @IsString()
@@ -15,6 +16,7 @@ export class CreateEmployeeDto {
   birth_date: Date;
 
   @IsNotEmpty()
+  @IsExist({ tableName: 'organizations', column: 'id' })
   organization_id: number;
 
   @IsNotEmpty()
