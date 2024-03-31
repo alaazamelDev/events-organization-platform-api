@@ -1,11 +1,11 @@
-import { IsDecimal, IsDefined } from 'class-validator';
+import { IsDefined, IsString } from 'class-validator';
 
 export class CreateLocationDto {
   @IsDefined()
-  @IsDecimal()
+  @IsString()
   longitude: number;
 
   @IsDefined()
-  @IsDecimal()
+  @IsString()
   latitude: number;
 }
