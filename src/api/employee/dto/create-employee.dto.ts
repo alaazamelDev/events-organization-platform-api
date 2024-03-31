@@ -1,6 +1,7 @@
 import { IsDateString, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { IsUnique } from '../../../common/decorators/is_unique.decorator';
 import { IsExist } from '../../../common/decorators/is_exist.decorator';
+import { IsDateFormat } from '../../../common/decorators/is-date-format.decorator';
 
 export class CreateEmployeeDto {
   @IsString()
@@ -12,7 +13,7 @@ export class CreateEmployeeDto {
   @IsString()
   phone_number: string;
 
-  @IsDateString()
+  @IsDateFormat('YYYY-MM-DD')
   birth_date: Date;
 
   @IsNotEmpty()
