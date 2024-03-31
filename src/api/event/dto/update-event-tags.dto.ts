@@ -1,5 +1,4 @@
 import { EventTagDto } from './event-tag.dto';
-import { IsExist } from '../../../common/decorators/is_exist.decorator';
 import { IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
