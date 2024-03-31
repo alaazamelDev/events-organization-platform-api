@@ -30,9 +30,9 @@ export class FormField extends BaseEntity {
   @OneToMany(() => FieldOption, (option) => option.formField)
   options: FieldOption[];
 
-  @ManyToOne(() => Form, (form) => form.fields)
-  @JoinColumn({ name: 'form_id' })
-  form: Form;
+  // @ManyToOne(() => Form, (form) => form.fields)
+  // @JoinColumn({ name: 'form_id' })
+  // form: Form;
 
   @ManyToOne(() => FormGroup, (formGroup) => formGroup.fields)
   @JoinColumn({ name: 'group_id' })

@@ -7,6 +7,7 @@ import { FillFormDto } from '../dto/fill-form/fill-form.dto';
 import { EntityManager } from 'typeorm';
 import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import { Form } from '../entities/form.entity';
+import { reduce } from 'rxjs';
 
 @ValidatorConstraint({ name: 'requiredFieldsProvided', async: true })
 export class AreRequiredFieldsProvidedConstraint
@@ -19,7 +20,8 @@ export class AreRequiredFieldsProvidedConstraint
     const form = await this.entityManager
       .getRepository(Form)
       .createQueryBuilder('form')
-      .leftJoinAndSelect('form.fields', 'field')
+      .leftJoinAndSelect('form.groups', 'group')
+      .leftJoinAndSelect('group.fields', 'field')
       .where('form.id = :id', { id: object.form_id })
       .getOneOrFail();
 
@@ -28,10 +30,13 @@ export class AreRequiredFieldsProvidedConstraint
     });
 
     let result = true;
-    form.fields.map((field) => {
-      if (field.required && !fieldIds.includes(+field.id)) {
-        result = false;
-      }
+
+    form.groups.map((group) => {
+      group.fields.map((field) => {
+        if (field.required && !fieldIds.includes(+field.id)) {
+          result = false;
+        }
+      });
     });
 
     return result;

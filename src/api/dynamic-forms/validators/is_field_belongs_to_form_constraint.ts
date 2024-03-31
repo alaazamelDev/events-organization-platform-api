@@ -20,8 +20,10 @@ export class IsFieldBelongsToForm implements ValidatorConstraintInterface {
         return await this.entityManager
           .getRepository(FormField)
           .createQueryBuilder('field')
+          .leftJoinAndSelect('field.group', 'group')
+          .leftJoinAndSelect('group.form', 'form')
           .where('field.id = :id', { id: field.field_id })
-          .andWhere('field.form_id = :formId', { formId: form_id })
+          .andWhere('form.id = :formId', { formId: form_id })
           .getExists();
       }),
     );

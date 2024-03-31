@@ -17,6 +17,7 @@ import { Event } from '../entities/event.entity';
 import { FilledFormField } from '../entities/filled-form-field.entity';
 import { GetFilledFormDto } from '../dto/get-filled-form.dto';
 import { FormGroup } from '../entities/form-group.entity';
+import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 
 // TODO, replace the stub Event entity with the real one
 @Injectable()
@@ -34,7 +35,7 @@ export class DynamicFormsService {
     @InjectRepository(FilledFormField)
     private readonly filledFormFieldRepository: Repository<FilledFormField>,
     @InjectRepository(FormGroup)
-    private readonly formGroup: Repository<FormGroup>,
+    private readonly formGroupRepository: Repository<FormGroup>,
   ) {}
 
   async createForm(createFormDto: CreateFormDto) {
@@ -54,7 +55,7 @@ export class DynamicFormsService {
 
       await Promise.all(
         createFormDto.groups.map(async (group) => {
-          const createdGroup = this.formGroup.create({
+          const createdGroup = this.formGroupRepository.create({
             name: group.name,
             position: group.position,
             form: form,
@@ -69,7 +70,6 @@ export class DynamicFormsService {
               fieldType: { id: field.type_id } as FieldType,
               position: field.position,
               required: field.required,
-              // form: form,
               group: createdGroup,
             });
 
@@ -126,7 +126,6 @@ export class DynamicFormsService {
       where: { id: id },
       relations: {
         groups: { fields: { options: true, fieldType: true } },
-        // fields: { options: true, fieldType: true },
       },
     });
   }
@@ -147,6 +146,18 @@ export class DynamicFormsService {
     return field;
   }
 
+  async updateFormGroup(id: number, updateFormGroupDto: UpdateFormGroupDto) {
+    const group = await this.formGroupRepository.findOneOrFail({
+      where: { id: id },
+    });
+
+    Object.assign(group, updateFormGroupDto);
+
+    await this.formGroupRepository.save(group, { reload: true });
+
+    return group;
+  }
+
   async addField(id: number, createFormFieldDto: CreateFormFieldDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -159,7 +170,7 @@ export class DynamicFormsService {
         position: createFormFieldDto.position,
         required: createFormFieldDto.required,
         fieldType: { id: createFormFieldDto.type_id } as FieldType,
-        form: { id: id } as Form,
+        group: { id: id } as FormGroup,
       });
 
       await queryRunner.manager.save(field, { reload: true });
@@ -197,6 +208,10 @@ export class DynamicFormsService {
     return await this.formFieldRepository.softDelete({ id });
   }
 
+  async deleteGroup(id: number) {
+    return await this.formGroupRepository.softDelete({ id });
+  }
+
   async fillForm(fillFormDto: FillFormDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -225,7 +240,9 @@ export class DynamicFormsService {
         }),
       );
 
-      // await queryRunner.commitTransaction();
+      await queryRunner.commitTransaction();
+
+      return filledForm;
     } catch (e) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
@@ -235,88 +252,36 @@ export class DynamicFormsService {
   }
 
   async getAttendeeFilledForm(getFilledFormDto: GetFilledFormDto) {
-    return await this.filledFormRepository.findOneOrFail({
+    const filledForm = await this.filledFormRepository.findOneOrFail({
       where: {
         attendee: { id: getFilledFormDto.attendee_id } as Attendee,
         event: { id: getFilledFormDto.event_id } as Event,
       },
       relations: {
-        filledFormFields: { formField: { options: true }, option: true },
+        form: true,
       },
     });
+
+    return await this.dataSource
+      .getRepository(Form)
+      .createQueryBuilder('form')
+      .where('form.id = :formID', { formID: filledForm.form.id })
+      .leftJoinAndSelect('form.groups', 'group')
+      .leftJoinAndSelect('group.fields', 'field')
+      .leftJoinAndSelect('field.filledFormFields', 'filledFormField')
+      .where('filledFormField.filled_form_id = :ffID', { ffID: filledForm.id })
+      .getMany();
   }
 
   async getEventFilledForms(id: number) {
     return await this.filledFormRepository.find({
       where: { event: { id: id } as Event },
-      relations: { filledFormFields: { formField: { fieldType: true } } },
+      relations: {
+        form: true,
+        attendee: true,
+      },
     });
   }
-
-  // payload = {
-  //   event_id: 1,
-  //   groups: [
-  //     {
-  //       conditions: [
-  //         {
-  //           field_id: 15,
-  //           value: '10',
-  //           operator: '>=',
-  //         },
-  //         {
-  //           field_id: 13,
-  //           value: '16',
-  //           operator: '>=',
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       conditions: [
-  //         {
-  //           field_id: 13,
-  //           value: '155',
-  //           operator: '>=',
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // };
-
-  // async queryForms() {
-  //   let query = this.dataSource
-  //     .getRepository(FilledFormField)
-  //     .createQueryBuilder('f')
-  //     .select('DISTINCT(f.filled_form_id)');
-  //
-  //   let whereClause = '';
-  //   this.payload.groups.forEach((group, index) => {
-  //     let groupConditions = '';
-  //
-  //     group.conditions.forEach((condition, conIndex) => {
-  //       if (conIndex !== 0) {
-  //         groupConditions += 'AND';
-  //       }
-  //
-  //       groupConditions += `(f.filled_form_id IN
-  //         (SELECT f1.filled_form_id
-  //         FROM filled_form_fields f1
-  //         WHERE f1.form_field_id = ${condition.field_id}
-  //         AND f1.value ${condition.operator} '${condition.value}'))`;
-  //     });
-  //
-  //     if (index !== 0) {
-  //       whereClause += 'OR';
-  //     }
-  //     whereClause += `(${groupConditions})`;
-  //   });
-  //
-  //   if (whereClause !== '') {
-  //     query = query.where(whereClause);
-  //   }
-  //
-  //   const result = await query.getRawMany();
-  //   console.log(result);
-  // }
 
   private async getOptionValue(id: number) {
     if (id === undefined) return null;

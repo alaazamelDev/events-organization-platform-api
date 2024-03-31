@@ -21,8 +21,8 @@ export class Form extends BaseEntity {
   @OneToMany(() => Event, (event) => event.form)
   events: Event[];
 
-  @OneToMany(() => FormField, (formField) => formField.form)
-  fields: FormField[];
+  // @OneToMany(() => FormField, (formField) => formField.form)
+  // fields: FormField[];
 
   @OneToMany(() => FormGroup, (formGroup) => formGroup.form)
   groups: FormGroup[];

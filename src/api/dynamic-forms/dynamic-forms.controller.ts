@@ -16,6 +16,7 @@ import { FillFormDto } from './dto/fill-form/fill-form.dto';
 import { GetFilledFormDto } from './dto/get-filled-form.dto';
 import { DynamicFormsQueryService } from './services/dynamic-forms-query.service';
 import { QueryFormDto } from './dto/query-form/query-form.dto';
+import { UpdateFormGroupDto } from './dto/update-form/update-form-group.dto';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -53,6 +54,14 @@ export class DynamicFormsController {
     return this.dynamicFormsService.updateFormField(+id, updateFormFieldDto);
   }
 
+  @Patch('group/:id')
+  updateFormGroup(
+    @Param('id') id: string,
+    @Body() updateFormGroupDto: UpdateFormGroupDto,
+  ) {
+    return this.dynamicFormsService.updateFormGroup(+id, updateFormGroupDto);
+  }
+
   @Post('addField/:id')
   addField(
     @Param('id') id: string,
@@ -74,6 +83,11 @@ export class DynamicFormsController {
   @Delete('deleteField/:id')
   deleteField(@Param('id') id: string) {
     return this.dynamicFormsService.deleteField(+id);
+  }
+
+  @Delete('deleteGroup/:id')
+  deleteGroup(@Param('id') id: string) {
+    return this.dynamicFormsService.deleteGroup(+id);
   }
 
   @Post('fillForm')
