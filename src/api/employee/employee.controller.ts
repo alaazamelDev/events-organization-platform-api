@@ -116,4 +116,31 @@ export class EmployeeController {
   deleteProfilePicture(@Param('id') id: string) {
     return this.employeeService.removeProfilePicture(+id);
   }
+
+  @Post('updateProfilePicture/:id')
+  @UseInterceptors(
+    FileInterceptor('profile_picture', {
+      storage: diskStorage({
+        destination: './uploads/employees/pictures',
+        filename(
+          _req: e.Request,
+          file: Express.Multer.File,
+          callback: (error: Error | null, filename: string) => void,
+        ) {
+          const filename =
+            path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+
+          const extension = path.parse(file.originalname).ext;
+
+          callback(null, `${filename}${extension}`);
+        },
+      }),
+    }),
+  )
+  updateProfilePicture(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.employeeService.updateProfilePicture(+id, file.filename);
+  }
 }
