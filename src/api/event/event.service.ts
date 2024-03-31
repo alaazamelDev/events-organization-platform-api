@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DataSource, QueryRunner } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { EmployeeService } from '../employee/employee.service';
 import { Employee } from '../employee/entities/employee.entity';
 import { Event } from './entities/event.entity';
@@ -28,6 +28,8 @@ import { SlotStatus } from '../slot-status/entities/slot-status.entity';
 import { EventDaySlot } from './entities/event-day-slot.entity';
 import { ApprovalStatus } from '../approval-status/entities/approval-status.entity';
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
@@ -37,7 +39,12 @@ export class EventService {
   private readonly dataSource: DataSource;
   private readonly employeeService: EmployeeService;
 
-  constructor(employeeService: EmployeeService, dataSource: DataSource) {
+  constructor(
+    employeeService: EmployeeService,
+    dataSource: DataSource,
+    @InjectRepository(AttendeeEvent)
+    private readonly attendeeEventRepository: Repository<AttendeeEvent>,
+  ) {
     this.dataSource = dataSource;
     this.employeeService = employeeService;
   }
@@ -167,6 +174,7 @@ export class EventService {
         description: payload.description,
         addressNotes: payload.address_notes ?? undefined,
         capacity: payload.capacity ?? undefined,
+        directRegister: payload.direct_register,
         registrationStartDate: payload.registration_start_date
           ? moment(payload.registration_start_date).format(
               DEFAULT_DB_DATE_FORMAT,
@@ -368,5 +376,16 @@ export class EventService {
     } catch (e) {
       return false;
     }
+  }
+
+  async getEventAttendees(eventID: number) {
+    return await this.attendeeEventRepository.find({
+      where: {
+        event: { id: eventID } as Event,
+      },
+      relations: {
+        attendee: true,
+      },
+    });
   }
 }

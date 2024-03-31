@@ -127,4 +127,9 @@ export class EventController {
     const updated = await this.eventService.updateEventAgeGroups(eventId, data);
     return EventSerializer.serialize(this.fileUtilityService, updated);
   }
+
+  @Get('attendees/:id')
+  getEventAttendees(@Param('id') id: string) {
+    return this.eventService.getEventAttendees(+id);
+  }
 }

@@ -30,6 +30,7 @@ import { TagService } from '../tag/tag.service';
 import { Tag } from '../tag/entities/tag.entity';
 import { AgeGroup } from '../age-group/entities/age-group.entity';
 import { AgeGroupService } from '../age-group/age-group.service';
+import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AgeGroupService } from '../age-group/age-group.service';
       Address,
       Tag,
       AgeGroup,
+      AttendeeEvent,
     ]),
     UserModule,
     MulterConfigModule,
