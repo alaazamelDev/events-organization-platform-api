@@ -1,7 +1,15 @@
-import { IsDateString, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { IsUnique } from '../../../common/decorators/is_unique.decorator';
 import { IsExist } from '../../../common/decorators/is_exist.decorator';
 import { IsDateFormat } from '../../../common/decorators/is-date-format.decorator';
+import { AddPermissionDto } from './add-permission.dto';
+import { Type } from 'class-transformer';
 
 export class CreateEmployeeDto {
   @IsString()
@@ -14,7 +22,7 @@ export class CreateEmployeeDto {
   phone_number: string;
 
   @IsDateFormat('YYYY-MM-DD')
-  birth_date: Date;
+  birth_date: string;
 
   @IsNotEmpty()
   @IsExist({ tableName: 'organizations', column: 'id' })
@@ -31,7 +39,8 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   password: string;
 
-  // TODO, update the validation rule to take array of AddPermissionDTO
   @IsNotEmpty()
-  permissions: [number];
+  @Type(() => AddPermissionDto)
+  @ValidateNested({ each: true })
+  permissions: AddPermissionDto[];
 }

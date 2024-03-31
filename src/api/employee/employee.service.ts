@@ -61,7 +61,7 @@ export class EmployeeService {
       const permissions = createEmployeeDto.permissions.map((p) => {
         const employeePermission = new EmployeePermission();
         employeePermission.employee = employee;
-        employeePermission.permission = { id: p } as Permission;
+        employeePermission.permission = { id: p.permission_id } as Permission;
 
         return employeePermission;
       });
