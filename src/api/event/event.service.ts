@@ -1,9 +1,10 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { EmployeeService } from '../employee/employee.service';
 import { Employee } from '../employee/entities/employee.entity';
 import { Event } from './entities/event.entity';
@@ -15,11 +16,11 @@ import {
 } from '../../common/constants/constants';
 import * as moment from 'moment';
 import { Address } from '../address/entities/address.entity';
-import { CreateEventTagDto } from './dto/create-event-tag.dto';
+import { EventTagDto } from './dto/event-tag.dto';
 import { EventTag } from './entities/event-tag.entity';
 import { EventPhoto } from './entities/event-photo.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
-import { CreateEventAgeGroupDto } from './dto/create-event-age-group.dto';
+import { EventAgeGroupDto } from './dto/event-age-group.dto';
 import { EventAgeGroup } from './entities/event-age-group.entity';
 import { EventDay } from './entities/event-day.entity';
 import { CreateEventDaySlotDto } from './dto/create-event-day-slot.dto';
@@ -29,6 +30,9 @@ import { ApprovalStatus } from '../approval-status/entities/approval-status.enti
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
+import { UpdateEventDto } from './dto/update-event.dto';
+import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
+import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
 
 @Injectable()
 export class EventService {
@@ -43,6 +47,99 @@ export class EventService {
   ) {
     this.dataSource = dataSource;
     this.employeeService = employeeService;
+  }
+
+  async findEvent(id: number): Promise<Event | null> {
+    return this.dataSource.manager.findOneBy(Event, { id });
+  }
+
+  async updateEventTags(eventId: number, payload: UpdateEventTagsDto) {
+    // check for existence
+    if (!(await this.checkEventExistence(eventId))) {
+      throw new NotFoundException(`Event with Id=${eventId} was not found!`);
+    }
+
+    // pluck the ids
+    const deletedTagIds = payload.deleted_tags.map((item) => {
+      return item.tag_id;
+    });
+
+    // pluck the ids
+    const addedTags = payload.added_tags
+      .map((item) => {
+        return {
+          event: { id: eventId },
+          tag: { id: item.tag_id },
+        };
+      })
+      .map((item) => {
+        return this.dataSource.manager.create(EventTag, item);
+      });
+
+    // first, delete the deleted ones.
+    if (deletedTagIds.length > 0) {
+      await this.dataSource
+        .getRepository(EventTag)
+        .createQueryBuilder()
+        .delete()
+        .where('event_id = :eventId', { eventId })
+        .andWhere('tag_id IN (:...values)', { values: deletedTagIds })
+        .execute();
+    }
+
+    // second, insert the new ones
+    if (addedTags.length > 0) {
+      await this.dataSource.manager.save(EventTag, addedTags);
+    }
+
+    return this.findEvent(eventId);
+  }
+
+  async updateEventAgeGroups(
+    eventId: number,
+    payload: UpdateEventAgeGroupsDto,
+  ) {
+    // check for existence
+    if (!(await this.checkEventExistence(eventId))) {
+      throw new NotFoundException(`Event with Id=${eventId} was not found!`);
+    }
+
+    // pluck the ids
+    const deletedAgeGroupIds = payload.deleted_age_groups.map((item) => {
+      return item.age_group_id;
+    });
+
+    // pluck the ids
+    const addedAgeGroups = payload.added_age_groups
+      .map((item) => {
+        return {
+          event: { id: eventId },
+          ageGroup: { id: item.age_group_id },
+        };
+      })
+      .map((item) => {
+        return this.dataSource.manager.create(EventAgeGroup, item);
+      });
+
+    // first, delete the deleted ones.
+    if (deletedAgeGroupIds.length > 0) {
+      await this.dataSource
+        .getRepository(EventAgeGroup)
+        .createQueryBuilder()
+        .delete()
+        .where('event_id = :eventId', { eventId })
+        .andWhere('age_group_id IN (:...values)', {
+          values: deletedAgeGroupIds,
+        })
+        .execute();
+    }
+
+    // second, insert the new ones
+    if (addedAgeGroups.length > 0) {
+      await this.dataSource.manager.save(EventAgeGroup, addedAgeGroups);
+    }
+
+    return this.findEvent(eventId);
   }
 
   // create new event
@@ -102,8 +199,8 @@ export class EventService {
 
       // create the event tags
       if (payload.tags && payload.tags.length > 0) {
-        const eventTags = (payload.tags as Array<CreateEventTagDto>)
-          .map((tag: CreateEventTagDto) => {
+        const eventTags = (payload.tags as Array<EventTagDto>)
+          .map((tag: EventTagDto) => {
             return {
               event: { id: savedEvent.id },
               tag: { id: tag.tag_id },
@@ -119,10 +216,8 @@ export class EventService {
 
       // create the event age groups
       if (payload.age_groups && payload.age_groups.length > 0) {
-        const eventAgeGroups = (
-          payload.age_groups as Array<CreateEventAgeGroupDto>
-        )
-          .map((ageGroup: CreateEventAgeGroupDto) => {
+        const eventAgeGroups = (payload.age_groups as Array<EventAgeGroupDto>)
+          .map((ageGroup: EventAgeGroupDto) => {
             return {
               event: { id: savedEvent.id },
               ageGroup: { id: ageGroup.age_group_id },
@@ -231,13 +326,55 @@ export class EventService {
       // commit the transaction
       await queryRunner.commitTransaction();
 
-      return await queryRunner.manager.findOne(Event, {
+      const newEntity = await queryRunner.manager.findOne(Event, {
         where: { id: savedEvent.id },
       });
+
+      await queryRunner.release();
+      return newEntity;
     } catch (e) {
       // rollback the transaction
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
       throw e;
+    }
+  }
+
+  async updateEventData(payload: any): Promise<Event | null> {
+    // check for existence
+    if (!(await this.checkEventExistence(payload.id))) {
+      throw new NotFoundException(`Event with Id=${payload.id} was not found!`);
+    }
+
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.startTransaction();
+
+      // update the entry
+      await queryRunner.manager.update(
+        Event,
+        { id: payload.id },
+        UpdateEventDto.toModel(payload),
+      );
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return this.findEvent(payload.id);
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw e;
+    }
+  }
+
+  private async checkEventExistence(id: number): Promise<boolean> {
+    try {
+      const event = await this.dataSource.manager.findOneByOrFail(Event, {
+        id,
+      });
+      return !!event;
+    } catch (e) {
+      return false;
     }
   }
 
