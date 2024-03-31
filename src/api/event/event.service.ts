@@ -20,7 +20,7 @@ import { EventTagDto } from './dto/event-tag.dto';
 import { EventTag } from './entities/event-tag.entity';
 import { EventPhoto } from './entities/event-photo.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
-import { CreateEventAgeGroupDto } from './dto/create-event-age-group.dto';
+import { EventAgeGroupDto } from './dto/event-age-group.dto';
 import { EventAgeGroup } from './entities/event-age-group.entity';
 import { EventDay } from './entities/event-day.entity';
 import { CreateEventDaySlotDto } from './dto/create-event-day-slot.dto';
@@ -30,6 +30,7 @@ import { ApprovalStatus } from '../approval-status/entities/approval-status.enti
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
+import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
 
 @Injectable()
 export class EventService {
@@ -82,6 +83,53 @@ export class EventService {
     // second, insert the new ones
     if (addedTags.length > 0) {
       await this.dataSource.manager.save(EventTag, addedTags);
+    }
+
+    return this.findEvent(eventId);
+  }
+
+  async updateEventAgeGroups(
+    eventId: number,
+    payload: UpdateEventAgeGroupsDto,
+  ) {
+    // check for existence
+    if (!(await this.checkEventExistence(eventId))) {
+      throw new NotFoundException(`Event with Id=${eventId} was not found!`);
+    }
+
+    // pluck the ids
+    const deletedAgeGroupIds = payload.deleted_age_groups.map((item) => {
+      return item.age_group_id;
+    });
+
+    // pluck the ids
+    const addedAgeGroups = payload.added_age_groups
+      .map((item) => {
+        return {
+          event: { id: eventId },
+          ageGroup: { id: item.age_group_id },
+        };
+      })
+      .map((item) => {
+        return this.dataSource.manager.create(EventAgeGroup, item);
+      });
+
+    // first, delete the deleted ones.
+    if (deletedAgeGroupIds.length > 0) {
+      await this.dataSource
+        .getRepository(EventAgeGroup)
+        .createQueryBuilder()
+        .delete()
+        .where('event_id = :eventId', { eventId })
+        .andWhere('age_group_id IN (:...values)', {
+          values: deletedAgeGroupIds,
+        })
+        .execute();
+    }
+
+    // second, insert the new ones
+    if (addedAgeGroups.length > 0) {
+      await this.dataSource.manager.save(EventAgeGroup, addedAgeGroups);
     }
 
     return this.findEvent(eventId);
@@ -160,10 +208,8 @@ export class EventService {
 
       // create the event age groups
       if (payload.age_groups && payload.age_groups.length > 0) {
-        const eventAgeGroups = (
-          payload.age_groups as Array<CreateEventAgeGroupDto>
-        )
-          .map((ageGroup: CreateEventAgeGroupDto) => {
+        const eventAgeGroups = (payload.age_groups as Array<EventAgeGroupDto>)
+          .map((ageGroup: EventAgeGroupDto) => {
             return {
               event: { id: savedEvent.id },
               ageGroup: { id: ageGroup.age_group_id },
@@ -304,9 +350,11 @@ export class EventService {
       );
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
       return this.findEvent(payload.id);
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
       throw e;
     }
   }

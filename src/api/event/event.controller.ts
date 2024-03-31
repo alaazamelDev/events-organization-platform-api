@@ -24,6 +24,7 @@ import { EventSerializer } from './serializers/event.serializer';
 import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
+import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('event')
@@ -115,6 +116,15 @@ export class EventController {
     @Param('id') eventId: number,
   ) {
     const updated = await this.eventService.updateEventTags(eventId, data);
+    return EventSerializer.serialize(this.fileUtilityService, updated);
+  }
+
+  @Post('/update-age-groups/:id')
+  async updateEventAgeGroups(
+    @Body() data: UpdateEventAgeGroupsDto,
+    @Param('id') eventId: number,
+  ) {
+    const updated = await this.eventService.updateEventAgeGroups(eventId, data);
     return EventSerializer.serialize(this.fileUtilityService, updated);
   }
 }
