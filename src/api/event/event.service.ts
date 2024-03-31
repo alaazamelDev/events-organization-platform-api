@@ -16,7 +16,7 @@ import {
 } from '../../common/constants/constants';
 import * as moment from 'moment';
 import { Address } from '../address/entities/address.entity';
-import { CreateEventTagDto } from './dto/create-event-tag.dto';
+import { EventTagDto } from './dto/event-tag.dto';
 import { EventTag } from './entities/event-tag.entity';
 import { EventPhoto } from './entities/event-photo.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
@@ -29,6 +29,7 @@ import { EventDaySlot } from './entities/event-day-slot.entity';
 import { ApprovalStatus } from '../approval-status/entities/approval-status.entity';
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 
 @Injectable()
 export class EventService {
@@ -42,6 +43,48 @@ export class EventService {
 
   async findEvent(id: number): Promise<Event | null> {
     return this.dataSource.manager.findOneBy(Event, { id });
+  }
+
+  async updateEventTags(eventId: number, payload: UpdateEventTagsDto) {
+    // check for existence
+    if (!(await this.checkEventExistence(eventId))) {
+      throw new NotFoundException(`Event with Id=${eventId} was not found!`);
+    }
+
+    // pluck the ids
+    const deletedTagIds = payload.deleted_tags.map((item) => {
+      return item.tag_id;
+    });
+
+    // pluck the ids
+    const addedTags = payload.added_tags
+      .map((item) => {
+        return {
+          event: { id: eventId },
+          tag: { id: item.tag_id },
+        };
+      })
+      .map((item) => {
+        return this.dataSource.manager.create(EventTag, item);
+      });
+
+    // first, delete the deleted ones.
+    if (deletedTagIds.length > 0) {
+      await this.dataSource
+        .getRepository(EventTag)
+        .createQueryBuilder()
+        .delete()
+        .where('event_id = :eventId', { eventId })
+        .andWhere('tag_id IN (:...values)', { values: deletedTagIds })
+        .execute();
+    }
+
+    // second, insert the new ones
+    if (addedTags.length > 0) {
+      await this.dataSource.manager.save(EventTag, addedTags);
+    }
+
+    return this.findEvent(eventId);
   }
 
   // create new event
@@ -100,8 +143,8 @@ export class EventService {
 
       // create the event tags
       if (payload.tags && payload.tags.length > 0) {
-        const eventTags = (payload.tags as Array<CreateEventTagDto>)
-          .map((tag: CreateEventTagDto) => {
+        const eventTags = (payload.tags as Array<EventTagDto>)
+          .map((tag: EventTagDto) => {
             return {
               event: { id: savedEvent.id },
               tag: { id: tag.tag_id },
@@ -229,12 +272,16 @@ export class EventService {
       // commit the transaction
       await queryRunner.commitTransaction();
 
-      return await queryRunner.manager.findOne(Event, {
+      const newEntity = await queryRunner.manager.findOne(Event, {
         where: { id: savedEvent.id },
       });
+
+      await queryRunner.release();
+      return newEntity;
     } catch (e) {
       // rollback the transaction
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
       throw e;
     }
   }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Post,
   Req,
@@ -22,6 +23,7 @@ import { FileUtilityService } from '../../config/files/utility/file-utility.serv
 import { EventSerializer } from './serializers/event.serializer';
 import { ConfigurationListsService } from '../configurationLists/configuration-lists.service';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('event')
@@ -38,6 +40,16 @@ export class EventController {
     this.eventService = eventService;
     this.fileUtilityService = fileUtilityService;
     this.configurationListsService = configurationListsService;
+  }
+
+  @Get('/show/:id')
+  async showEvent(@Param('id') eventId: number) {
+    const event = await this.eventService.findEvent(eventId);
+
+    if (!event) {
+      throw new NotFoundException(`Event with Id=${eventId} was not found!`);
+    }
+    return EventSerializer.serialize(this.fileUtilityService, event);
   }
 
   @Get('/lists')
@@ -94,6 +106,15 @@ export class EventController {
   ) {
     data.id = eventId;
     const updated = await this.eventService.updateEventData(data);
+    return EventSerializer.serialize(this.fileUtilityService, updated);
+  }
+
+  @Post('/update-tags/:id')
+  async updateEventTags(
+    @Body() data: UpdateEventTagsDto,
+    @Param('id') eventId: number,
+  ) {
+    const updated = await this.eventService.updateEventTags(eventId, data);
     return EventSerializer.serialize(this.fileUtilityService, updated);
   }
 }
