@@ -14,8 +14,8 @@ import {
 } from 'class-validator';
 import { CreateEventDayDto } from './create-event-day.dto';
 import { Type } from 'class-transformer';
-import { CreateEventTagDto } from './create-event-tag.dto';
-import { CreateEventAgeGroupDto } from './create-event-age-group.dto';
+import { EventTagDto } from './event-tag.dto';
+import { EventAgeGroupDto } from './event-age-group.dto';
 import { CreateLocationDto } from './create-location.dto';
 
 export class CreateEventDto {
@@ -68,15 +68,15 @@ export class CreateEventDto {
 
   // Tags
   @ArrayNotEmpty()
-  @Type(() => CreateEventTagDto)
+  @Type(() => EventTagDto)
   @ValidateNested({ each: true })
-  tags: CreateEventTagDto[];
+  tags: EventTagDto[];
 
   // Age Groups
   @ArrayNotEmpty()
-  @Type(() => CreateEventAgeGroupDto)
+  @Type(() => EventAgeGroupDto)
   @ValidateNested({ each: true })
-  age_groups: CreateEventAgeGroupDto[];
+  age_groups: EventAgeGroupDto[];
 
   @IsOptional()
   @IsBoolean()

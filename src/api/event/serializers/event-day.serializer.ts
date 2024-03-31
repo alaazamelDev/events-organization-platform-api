@@ -4,6 +4,7 @@ import { EventDaySlotSerializer } from './event-day-slot.serializer';
 export class EventDaySerializer {
   static serialize(data: EventDay) {
     return {
+      id: data.id,
       day_date: data.dayDate,
       slots: EventDaySlotSerializer.serializeList(data.slots),
     };
