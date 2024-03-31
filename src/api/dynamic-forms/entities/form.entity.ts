@@ -2,7 +2,6 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { Organization } from '../../organization/entities/organization.entity';
 import { Event } from './event.entity';
-import { FormField } from './form-field.entity';
 import { FilledForm } from './filled-form.entity';
 import { FormGroup } from './form-group.entity';
 
@@ -20,9 +19,6 @@ export class Form extends BaseEntity {
 
   @OneToMany(() => Event, (event) => event.form)
   events: Event[];
-
-  // @OneToMany(() => FormField, (formField) => formField.form)
-  // fields: FormField[];
 
   @OneToMany(() => FormGroup, (formGroup) => formGroup.form)
   groups: FormGroup[];
