@@ -25,6 +25,11 @@ export class DynamicFormsController {
     private readonly dynamicFormsQueryService: DynamicFormsQueryService,
   ) {}
 
+  @Get('fieldTypes')
+  getFieldTypes() {
+    return this.dynamicFormsService.getFieldTypes();
+  }
+
   @Get('query')
   queryForms(@Body() queryFormDto: QueryFormDto) {
     return this.dynamicFormsQueryService.queryFilledForms(queryFormDto);

@@ -36,6 +36,8 @@ export class DynamicFormsService {
     private readonly filledFormFieldRepository: Repository<FilledFormField>,
     @InjectRepository(FormGroup)
     private readonly formGroupRepository: Repository<FormGroup>,
+    @InjectRepository(FieldType)
+    private readonly fieldTypeRepository: Repository<FieldType>,
   ) {}
 
   async createForm(createFormDto: CreateFormDto) {
@@ -125,7 +127,12 @@ export class DynamicFormsService {
     return await this.formRepository.findOneOrFail({
       where: { id: id },
       relations: {
-        groups: { fields: { options: true, fieldType: true } },
+        groups: {
+          fields: {
+            options: true,
+            fieldType: { fieldTypeOperators: { query_operator: true } },
+          },
+        },
       },
     });
   }
@@ -279,6 +286,14 @@ export class DynamicFormsService {
       relations: {
         form: true,
         attendee: true,
+      },
+    });
+  }
+
+  async getFieldTypes() {
+    return await this.fieldTypeRepository.find({
+      relations: {
+        fieldTypeOperators: { query_operator: true },
       },
     });
   }
