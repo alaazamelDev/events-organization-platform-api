@@ -4,6 +4,7 @@ import { FieldType } from './field-type.entity';
 import { FieldOption } from './field-option.entity';
 import { FilledFormField } from './filled-form-field.entity';
 import { FormGroup } from './form-group.entity';
+import { ValidationRule } from './validation-rule.entity';
 
 @Entity({ name: 'form_fields' })
 export class FormField extends BaseEntity {
@@ -38,4 +39,7 @@ export class FormField extends BaseEntity {
     (filledFormField) => filledFormField.formField,
   )
   filledFormFields: FilledFormField[];
+
+  @OneToMany(() => ValidationRule, (validationRule) => validationRule.formField)
+  validationRules: ValidationRule[];
 }
