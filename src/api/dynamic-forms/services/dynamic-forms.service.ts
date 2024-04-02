@@ -13,7 +13,7 @@ import { CreateFormFieldDto } from '../dto/create-form/create-form-field.dto';
 import { FillFormDto } from '../dto/fill-form/fill-form.dto';
 import { FilledForm } from '../entities/filled-form.entity';
 import { Attendee } from '../../attendee/entities/attendee.entity';
-import { Event } from '../entities/event.entity';
+import { Event } from '../../event/entities/event.entity';
 import { FilledFormField } from '../entities/filled-form-field.entity';
 import { GetFilledFormDto } from '../dto/get-filled-form.dto';
 import { FormGroup } from '../entities/form-group.entity';
@@ -21,7 +21,6 @@ import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { fieldTypesWithValidationRules } from '../constants/constants';
 
-// TODO, replace the stub Event entity with the real one
 // TODO, write seeders
 @Injectable()
 export class DynamicFormsService {

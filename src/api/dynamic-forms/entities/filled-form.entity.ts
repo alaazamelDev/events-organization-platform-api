@@ -2,7 +2,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { Attendee } from '../../attendee/entities/attendee.entity';
 import { Form } from './form.entity';
-import { Event } from './event.entity';
+import { Event } from '../../event/entities/event.entity';
 import { FilledFormField } from './filled-form-field.entity';
 
 @Entity({ name: 'filled_forms' })

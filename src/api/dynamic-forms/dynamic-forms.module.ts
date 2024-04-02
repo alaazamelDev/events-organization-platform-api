@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { DynamicFormsService } from './services/dynamic-forms.service';
 import { DynamicFormsController } from './dynamic-forms.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Event } from './entities/event.entity';
+import { Event } from '../event/entities/event.entity';
 import { Form } from './entities/form.entity';
 import { FormField } from './entities/form-field.entity';
 import { FieldType } from './entities/field-type.entity';
