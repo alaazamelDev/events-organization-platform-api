@@ -30,7 +30,6 @@ async function bootstrap(): Promise<void> {
   app.useGlobalInterceptors(new ResponseInterceptor());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  // TODO, modify later
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
