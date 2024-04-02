@@ -22,6 +22,7 @@ import { ValidationRule } from '../entities/validation-rule.entity';
 import { fieldTypesWithValidationRules } from '../constants/constants';
 
 // TODO, replace the stub Event entity with the real one
+// TODO, write seeders
 @Injectable()
 export class DynamicFormsService {
   constructor(
