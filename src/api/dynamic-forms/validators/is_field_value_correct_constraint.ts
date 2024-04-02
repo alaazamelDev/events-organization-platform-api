@@ -6,11 +6,9 @@ import {
 import { EntityManager } from 'typeorm';
 import { FormField } from '../entities/form-field.entity';
 import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
-import {
-  FIELD_TYPE,
-  fieldTypesWithOptions,
-} from '../dto/create-form/create-form-field.dto';
 import * as moment from 'moment';
+import { fieldTypesWithOptions } from '../constants/constants';
+import { FIELD_TYPE } from '../enums/field-types.enum';
 
 @ValidatorConstraint({ name: 'fieldValueCorrect', async: true })
 export class IsFieldValueCorrectConstraint

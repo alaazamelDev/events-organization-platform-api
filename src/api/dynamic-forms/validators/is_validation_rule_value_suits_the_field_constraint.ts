@@ -4,7 +4,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { CreateFormFieldValidationRuleDto } from '../dto/create-form/create-form-field-validation-rule.dto';
-import { rulesRequiresNumber } from '../constants/validation.constant';
+import { rulesRequiresNumber } from '../constants/constants';
 
 @ValidatorConstraint({
   name: 'IsValidationRuleValueSuitsTheFieldConstraint',

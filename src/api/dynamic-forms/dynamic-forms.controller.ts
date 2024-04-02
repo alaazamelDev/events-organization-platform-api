@@ -17,6 +17,7 @@ import { GetFilledFormDto } from './dto/get-filled-form.dto';
 import { DynamicFormsQueryService } from './services/dynamic-forms-query.service';
 import { QueryFormDto } from './dto/query-form/query-form.dto';
 import { UpdateFormGroupDto } from './dto/update-form/update-form-group.dto';
+import { AddValidationRuleDto } from './dto/update-form/add-validation-rule.dto';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -108,5 +109,15 @@ export class DynamicFormsController {
   @Get('event/:id')
   getEventFilledForms(@Param('id') id: string) {
     return this.dynamicFormsService.getEventFilledForms(+id);
+  }
+
+  @Post('validationRule')
+  addValidationRule(@Body() validationRuleDto: AddValidationRuleDto) {
+    return this.dynamicFormsService.addValidationRule(validationRuleDto);
+  }
+
+  @Delete('validationRule/:id')
+  deleteValidationRule(@Param('id') id: string) {
+    return this.dynamicFormsService.removeValidationRule(+id);
   }
 }

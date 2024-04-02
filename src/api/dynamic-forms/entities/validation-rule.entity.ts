@@ -19,4 +19,9 @@ export class ValidationRule extends BaseEntity {
   @ManyToOne(() => FormField, (formField) => formField.validationRules)
   @JoinColumn({ name: 'form_field_id' })
   formField: FormField;
+
+  constructor(partial: Partial<ValidationRule>) {
+    super();
+    Object.assign(this, partial);
+  }
 }

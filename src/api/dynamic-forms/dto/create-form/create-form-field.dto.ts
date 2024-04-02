@@ -12,20 +12,10 @@ import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { CreateFormFieldOptionDto } from './create-form-field-option.dto';
 import { Type } from 'class-transformer';
 import { CreateFormFieldValidationRuleDto } from './create-form-field-validation-rule.dto';
-
-export enum FIELD_TYPE {
-  TEXT = 1,
-  NUMBER = 2,
-  DATE = 3,
-  RADIO_BUTTON = 4,
-}
-
-export const fieldTypesWithOptions = [FIELD_TYPE.RADIO_BUTTON];
-
-export const fieldTypesWithValidationRules = [
-  FIELD_TYPE.NUMBER,
-  FIELD_TYPE.TEXT,
-];
+import {
+  fieldTypesWithOptions,
+  fieldTypesWithValidationRules,
+} from '../../constants/constants';
 
 export class CreateFormFieldDto {
   @IsString()

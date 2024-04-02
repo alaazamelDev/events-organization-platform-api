@@ -19,6 +19,8 @@ import { GetFilledFormDto } from '../dto/get-filled-form.dto';
 import { FormGroup } from '../entities/form-group.entity';
 import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { ValidationRule } from '../entities/validation-rule.entity';
+import { fieldTypesWithValidationRules } from '../constants/constants';
+import { AddValidationRuleDto } from '../dto/update-form/add-validation-rule.dto';
 
 // TODO, replace the stub Event entity with the real one
 @Injectable()
@@ -93,7 +95,10 @@ export class DynamicFormsService {
               );
             }
 
-            if (field.validation_rules) {
+            if (
+              field.validation_rules &&
+              fieldTypesWithValidationRules.includes(+field.type_id)
+            ) {
               await Promise.all(
                 field.validation_rules.map(async (vr) => {
                   const rule = this.validationRuleRepository.create({
@@ -216,6 +221,27 @@ export class DynamicFormsService {
         field.options = options;
       }
 
+      if (
+        createFormFieldDto.validation_rules &&
+        fieldTypesWithValidationRules.includes(+createFormFieldDto.type_id)
+      ) {
+        const rules = await Promise.all(
+          createFormFieldDto.validation_rules.map(async (vr) => {
+            const rule = this.validationRuleRepository.create({
+              rule: vr.rule,
+              value: vr.value,
+              formField: field,
+            });
+
+            await queryRunner.manager.save(rule, { reload: true });
+
+            return new ValidationRule(rule);
+          }),
+        );
+
+        field.validationRules = rules;
+      }
+
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
@@ -313,6 +339,22 @@ export class DynamicFormsService {
         fieldTypeOperators: { query_operator: true },
       },
     });
+  }
+
+  async addValidationRule(validationRuleDto: AddValidationRuleDto) {
+    const rule = this.validationRuleRepository.create({
+      rule: validationRuleDto.rule,
+      value: validationRuleDto.value,
+      formField: { id: validationRuleDto.field_id } as FormField,
+    });
+
+    await this.validationRuleRepository.save(rule);
+
+    return rule;
+  }
+
+  async removeValidationRule(id: number) {
+    return await this.validationRuleRepository.softDelete(id);
   }
 
   private async getOptionValue(id: number) {

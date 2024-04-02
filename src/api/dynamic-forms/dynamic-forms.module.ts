@@ -22,6 +22,7 @@ import { FormGroup } from './entities/form-group.entity';
 import { ValidationRule } from './entities/validation-rule.entity';
 import { IsValidationRuleValueSuitsTheFieldConstraint } from './validators/is_validation_rule_value_suits_the_field_constraint';
 import { IsFieldValueMeetsValidationRulesConstraint } from './validators/is_field_value_meets_validation_rules_constraint';
+import { IsFieldTypeSupportValidationRulesConstraint } from './validators/is_field_type_support_validation_rules_constraint';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { IsFieldValueMeetsValidationRulesConstraint } from './validators/is_fiel
     IsQueryOperatorSuitsTheFieldConstraint,
     IsValidationRuleValueSuitsTheFieldConstraint,
     IsFieldValueMeetsValidationRulesConstraint,
+    IsFieldTypeSupportValidationRulesConstraint,
   ],
 })
 export class DynamicFormsModule {}

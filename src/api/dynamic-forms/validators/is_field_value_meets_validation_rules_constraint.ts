@@ -4,14 +4,9 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
-import { FormField } from '../entities/form-field.entity';
 import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
-import {
-  FIELD_TYPE,
-  fieldTypesWithOptions,
-} from '../dto/create-form/create-form-field.dto';
-import * as moment from 'moment';
 import { ValidationRule } from '../entities/validation-rule.entity';
+import { ValidationRuleEnum } from '../enums/validation-rule.enum';
 
 @ValidatorConstraint({
   name: 'IsFieldValueMeetsValidationRulesConstraint',
@@ -31,25 +26,21 @@ export class IsFieldValueMeetsValidationRulesConstraint
       .where('rule.form_field_id = :id', { id: +object.field_id })
       .getMany();
 
-    // const field_type = await this.entityManager
-    //   .getRepository(FormField)
-    //   .createQueryBuilder('field')
-    //   .where('field.id = :id', { id: +object.field_id })
-    //   .getOneOrFail();
-    //
-    // if (fieldTypesWithOptions.includes(+field_type.fieldTypeId)) {
-    //   return true;
-    // } else if (+field_type.fieldTypeId === FIELD_TYPE.NUMBER) {
-    //   return !isNaN(+_value);
-    // } else if (+field_type.fieldTypeId === FIELD_TYPE.DATE) {
-    //   return moment(_value, 'YYYY-MM-DD', true).isValid();
-    // }
-    return true;
+    const result = rules.map((rule) => {
+      switch (rule.rule) {
+        case ValidationRuleEnum.MIN:
+          return +_value >= +rule.value;
+        case ValidationRuleEnum.MAX:
+          return +_value <= +rule.value;
+        default:
+          return true;
+      }
+    });
+
+    return !result.includes(false);
   }
 
-  // TODO, write the error message based on the validation rule
   defaultMessage(_args: ValidationArguments) {
-    const object = _args.object as FillFormFieldDto;
-    return `${_args.property} must meet the field type for the field with id: ${object.field_id}`;
+    return `value does not meet the constraints`;
   }
 }
