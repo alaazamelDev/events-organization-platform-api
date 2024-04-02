@@ -2,6 +2,7 @@ import { IsInt, IsNotEmpty, Validate } from 'class-validator';
 import { IsFieldOptionRequiredConstraint } from '../../validators/is_field_option_required_constraint';
 import { IsOptionBelongsToTheFieldConstraint } from '../../validators/is_option_belongs_to_the_field_constraint';
 import { IsFieldValueCorrectConstraint } from '../../validators/is_field_value_correct_constraint';
+import { IsFieldValueMeetsValidationRulesConstraint } from '../../validators/is_field_value_meets_validation_rules_constraint';
 
 export class FillFormFieldDto {
   @IsInt()
@@ -9,6 +10,7 @@ export class FillFormFieldDto {
 
   @IsNotEmpty()
   @Validate(IsFieldValueCorrectConstraint)
+  @Validate(IsFieldValueMeetsValidationRulesConstraint)
   value: string;
 
   @Validate(IsFieldOptionRequiredConstraint)

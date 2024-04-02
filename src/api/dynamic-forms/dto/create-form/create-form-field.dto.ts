@@ -3,6 +3,7 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
+  IsOptional,
   IsString,
   ValidateIf,
   ValidateNested,
@@ -10,6 +11,7 @@ import {
 import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { CreateFormFieldOptionDto } from './create-form-field-option.dto';
 import { Type } from 'class-transformer';
+import { CreateFormFieldValidationRuleDto } from './create-form-field-validation-rule.dto';
 
 export enum FIELD_TYPE {
   TEXT = 1,
@@ -19,6 +21,11 @@ export enum FIELD_TYPE {
 }
 
 export const fieldTypesWithOptions = [FIELD_TYPE.RADIO_BUTTON];
+
+export const fieldTypesWithValidationRules = [
+  FIELD_TYPE.NUMBER,
+  FIELD_TYPE.TEXT,
+];
 
 export class CreateFormFieldDto {
   @IsString()
@@ -36,10 +43,17 @@ export class CreateFormFieldDto {
   @IsExist({ tableName: 'field_types', column: 'id' })
   type_id: number;
 
-  @ValidateIf((body) => [FIELD_TYPE.RADIO_BUTTON].includes(body.type_id))
+  @ValidateIf((body) => fieldTypesWithOptions.includes(body.type_id))
   @IsArray()
   @Type(() => CreateFormFieldOptionDto)
   @ValidateNested({ each: true })
   @ArrayMinSize(2)
   options: CreateFormFieldOptionDto[];
+
+  @ValidateIf((body) => fieldTypesWithValidationRules.includes(body.type_id))
+  @IsOptional()
+  @IsArray()
+  @Type(() => CreateFormFieldValidationRuleDto)
+  @ValidateNested({ each: true })
+  validation_rules: CreateFormFieldValidationRuleDto[];
 }

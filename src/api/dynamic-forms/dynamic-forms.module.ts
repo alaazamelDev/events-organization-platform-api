@@ -19,6 +19,9 @@ import { QueryOperator } from './entities/query-operator';
 import { FieldTypeOperatorsEntity } from './entities/field-type-operators.entity';
 import { IsQueryOperatorSuitsTheFieldConstraint } from './validators/is_query_operator_suits_the_field_constraint';
 import { FormGroup } from './entities/form-group.entity';
+import { ValidationRule } from './entities/validation-rule.entity';
+import { IsValidationRuleValueSuitsTheFieldConstraint } from './validators/is_validation_rule_value_suits_the_field_constraint';
+import { IsFieldValueMeetsValidationRulesConstraint } from './validators/is_field_value_meets_validation_rules_constraint';
 
 @Module({
   imports: [
@@ -33,6 +36,7 @@ import { FormGroup } from './entities/form-group.entity';
       QueryOperator,
       FieldTypeOperatorsEntity,
       FormGroup,
+      ValidationRule,
     ]),
   ],
   controllers: [DynamicFormsController],
@@ -45,6 +49,8 @@ import { FormGroup } from './entities/form-group.entity';
     AreRequiredFieldsProvidedConstraint,
     IsFieldValueCorrectConstraint,
     IsQueryOperatorSuitsTheFieldConstraint,
+    IsValidationRuleValueSuitsTheFieldConstraint,
+    IsFieldValueMeetsValidationRulesConstraint,
   ],
 })
 export class DynamicFormsModule {}

@@ -18,6 +18,7 @@ import { FilledFormField } from '../entities/filled-form-field.entity';
 import { GetFilledFormDto } from '../dto/get-filled-form.dto';
 import { FormGroup } from '../entities/form-group.entity';
 import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
+import { ValidationRule } from '../entities/validation-rule.entity';
 
 // TODO, replace the stub Event entity with the real one
 @Injectable()
@@ -38,6 +39,8 @@ export class DynamicFormsService {
     private readonly formGroupRepository: Repository<FormGroup>,
     @InjectRepository(FieldType)
     private readonly fieldTypeRepository: Repository<FieldType>,
+    @InjectRepository(ValidationRule)
+    private readonly validationRuleRepository: Repository<ValidationRule>,
   ) {}
 
   async createForm(createFormDto: CreateFormDto) {
@@ -86,6 +89,20 @@ export class DynamicFormsService {
                   });
 
                   await queryRunner.manager.save(option, { reload: true });
+                }),
+              );
+            }
+
+            if (field.validation_rules) {
+              await Promise.all(
+                field.validation_rules.map(async (vr) => {
+                  const rule = this.validationRuleRepository.create({
+                    rule: vr.rule,
+                    value: vr.value,
+                    formField: createdField,
+                  });
+
+                  await queryRunner.manager.save(rule, { reload: true });
                 }),
               );
             }
