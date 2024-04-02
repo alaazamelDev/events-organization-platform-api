@@ -20,7 +20,6 @@ import { FormGroup } from '../entities/form-group.entity';
 import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { fieldTypesWithValidationRules } from '../constants/constants';
-import { AddValidationRuleDto } from '../dto/update-form/add-validation-rule.dto';
 
 // TODO, replace the stub Event entity with the real one
 @Injectable()
@@ -187,6 +186,8 @@ export class DynamicFormsService {
     return group;
   }
 
+  // TODO, add group
+
   async addField(id: number, createFormFieldDto: CreateFormFieldDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -205,7 +206,7 @@ export class DynamicFormsService {
       await queryRunner.manager.save(field, { reload: true });
 
       if (createFormFieldDto.options) {
-        const options = await Promise.all(
+        field.options = await Promise.all(
           createFormFieldDto.options.map(async (op) => {
             const option = this.fieldOptionRepository.create({
               name: op.name,
@@ -217,15 +218,13 @@ export class DynamicFormsService {
             return new FieldOption({ id: option.id, name: option.name });
           }),
         );
-
-        field.options = options;
       }
 
       if (
         createFormFieldDto.validation_rules &&
         fieldTypesWithValidationRules.includes(+createFormFieldDto.type_id)
       ) {
-        const rules = await Promise.all(
+        field.validationRules = await Promise.all(
           createFormFieldDto.validation_rules.map(async (vr) => {
             const rule = this.validationRuleRepository.create({
               rule: vr.rule,
@@ -238,8 +237,6 @@ export class DynamicFormsService {
             return new ValidationRule(rule);
           }),
         );
-
-        field.validationRules = rules;
       }
 
       await queryRunner.commitTransaction();
@@ -333,28 +330,12 @@ export class DynamicFormsService {
     });
   }
 
-  async getFieldTypes() {
+  async getFieldsTypes() {
     return await this.fieldTypeRepository.find({
       relations: {
         fieldTypeOperators: { query_operator: true },
       },
     });
-  }
-
-  async addValidationRule(validationRuleDto: AddValidationRuleDto) {
-    const rule = this.validationRuleRepository.create({
-      rule: validationRuleDto.rule,
-      value: validationRuleDto.value,
-      formField: { id: validationRuleDto.field_id } as FormField,
-    });
-
-    await this.validationRuleRepository.save(rule);
-
-    return rule;
-  }
-
-  async removeValidationRule(id: number) {
-    return await this.validationRuleRepository.softDelete(id);
   }
 
   private async getOptionValue(id: number) {

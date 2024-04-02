@@ -18,17 +18,19 @@ import { DynamicFormsQueryService } from './services/dynamic-forms-query.service
 import { QueryFormDto } from './dto/query-form/query-form.dto';
 import { UpdateFormGroupDto } from './dto/update-form/update-form-group.dto';
 import { AddValidationRuleDto } from './dto/update-form/add-validation-rule.dto';
+import { DynamicFormsValidationRulesService } from './services/dynamic-forms-validation-rules.service';
 
 @Controller('forms')
 export class DynamicFormsController {
   constructor(
     private readonly dynamicFormsService: DynamicFormsService,
     private readonly dynamicFormsQueryService: DynamicFormsQueryService,
+    private readonly dynamicFormsValidationRulesService: DynamicFormsValidationRulesService,
   ) {}
 
-  @Get('fieldTypes')
-  getFieldTypes() {
-    return this.dynamicFormsService.getFieldTypes();
+  @Get('fieldsTypes')
+  getFieldsTypes() {
+    return this.dynamicFormsService.getFieldsTypes();
   }
 
   @Get('query')
@@ -113,11 +115,13 @@ export class DynamicFormsController {
 
   @Post('validationRule')
   addValidationRule(@Body() validationRuleDto: AddValidationRuleDto) {
-    return this.dynamicFormsService.addValidationRule(validationRuleDto);
+    return this.dynamicFormsValidationRulesService.addValidationRule(
+      validationRuleDto,
+    );
   }
 
   @Delete('validationRule/:id')
   deleteValidationRule(@Param('id') id: string) {
-    return this.dynamicFormsService.removeValidationRule(+id);
+    return this.dynamicFormsValidationRulesService.removeValidationRule(+id);
   }
 }
