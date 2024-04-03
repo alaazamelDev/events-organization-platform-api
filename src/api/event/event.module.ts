@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { EventTag } from './entities/event-tag.entity';
 import { EventPhoto } from './entities/event-photo.entity';
-import { EventDay } from './entities/event-day.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
 import { EventApprovalStatus } from './entities/event-approval-status.entity';
 import { EventAgeGroup } from './entities/event-age-group.entity';
@@ -17,6 +16,7 @@ import { User } from '../user/entities/user.entity';
 import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
 import { ConfigurationListsModule } from '../configurationLists/configuration-lists.module';
 import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
+import { EventDay } from '../event-day/entities/event-day.entity';
 
 @Module({
   imports: [

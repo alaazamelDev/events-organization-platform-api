@@ -61,11 +61,15 @@ export class UpdateEventDto {
       map.eventType = dto.event_type;
     }
 
-    if (dto.address_id) {
+    if (dto.address_id == null) {
+      map.address = null;
+    } else {
       map.address = { id: dto.address_id };
     }
 
-    if (dto.address_notes) {
+    if (dto.address_notes == null) {
+      map.addressNotes = null;
+    } else {
       map.addressNotes = dto.address_notes;
     }
 
@@ -73,7 +77,9 @@ export class UpdateEventDto {
       map.capacity = dto.capacity;
     }
 
-    if (dto.location) {
+    if (dto.location == null) {
+      map.location = null;
+    } else {
       map.location = dto.location;
     }
 
