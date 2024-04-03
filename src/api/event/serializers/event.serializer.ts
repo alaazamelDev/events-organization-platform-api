@@ -18,6 +18,7 @@ export class EventSerializer {
   ) {
     if (!data) return null;
     return {
+      id: data.id,
       organization: OrganizationSerializer.serialize(data.organization),
       location: data.location ?? null,
       address: data.address ? AddressSerializer.serialize(data.address) : null,
