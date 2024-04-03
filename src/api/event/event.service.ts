@@ -22,7 +22,6 @@ import { EventPhoto } from './entities/event-photo.entity';
 import { EventAttachment } from './entities/event-attachment.entity';
 import { EventAgeGroupDto } from './dto/event-age-group.dto';
 import { EventAgeGroup } from './entities/event-age-group.entity';
-import { EventDay } from './entities/event-day.entity';
 import { CreateEventDaySlotDto } from './dto/create-event-day-slot.dto';
 import { SlotStatus } from '../slot-status/entities/slot-status.entity';
 import { EventDaySlot } from './entities/event-day-slot.entity';
@@ -33,6 +32,7 @@ import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
+import { EventDay } from '../event-day/entities/event-day.entity';
 
 @Injectable()
 export class EventService {
@@ -367,17 +367,6 @@ export class EventService {
     }
   }
 
-  private async checkEventExistence(id: number): Promise<boolean> {
-    try {
-      const event = await this.dataSource.manager.findOneByOrFail(Event, {
-        id,
-      });
-      return !!event;
-    } catch (e) {
-      return false;
-    }
-  }
-
   async getEventAttendees(eventID: number) {
     return await this.attendeeEventRepository.find({
       where: {
@@ -387,5 +376,16 @@ export class EventService {
         attendee: true,
       },
     });
+  }
+
+  private async checkEventExistence(id: number): Promise<boolean> {
+    try {
+      const event = await this.dataSource.manager.findOneByOrFail(Event, {
+        id,
+      });
+      return !!event;
+    } catch (e) {
+      return false;
+    }
   }
 }

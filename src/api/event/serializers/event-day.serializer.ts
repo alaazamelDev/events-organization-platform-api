@@ -1,5 +1,5 @@
-import { EventDay } from '../entities/event-day.entity';
 import { EventDaySlotSerializer } from './event-day-slot.serializer';
+import { EventDay } from '../../event-day/entities/event-day.entity';
 
 export class EventDaySerializer {
   static serialize(data: EventDay) {

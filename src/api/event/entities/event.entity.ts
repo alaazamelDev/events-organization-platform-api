@@ -4,12 +4,12 @@ import { Organization } from '../../organization/entities/organization.entity';
 import { Address } from '../../address/entities/address.entity';
 import { EventType } from '../enums/event-type.enum';
 import { EventTag } from './event-tag.entity';
-import { EventDay } from './event-day.entity';
 import { EventPhoto } from './event-photo.entity';
 import { EventAttachment } from './event-attachment.entity';
 import { EventApprovalStatus } from './event-approval-status.entity';
 import { EventAgeGroup } from './event-age-group.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
+import { EventDay } from '../../event-day/entities/event-day.entity';
 
 @Entity('events')
 export class Event extends BaseEntity {

@@ -1,9 +1,9 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Event } from './event.entity';
-import { EventDaySlot } from './event-day-slot.entity';
 import * as moment from 'moment';
 import { DEFAULT_DB_DATE_FORMAT } from '../../../common/constants/constants';
+import { EventDaySlot } from '../../event/entities/event-day-slot.entity';
+import { Event } from '../../event/entities/event.entity';
 
 @Entity('event_days')
 export class EventDay extends BaseEntity {
@@ -26,20 +26,6 @@ export class EventDay extends BaseEntity {
     },
   })
   dayDate!: Date;
-
-  @Column({
-    name: 'start_time',
-    type: 'timestamptz',
-    nullable: true,
-  })
-  startTime?: Date;
-
-  @Column({
-    name: 'end_time',
-    type: 'timestamptz',
-    nullable: true,
-  })
-  endTime?: Date;
 
   @OneToMany(() => EventDaySlot, (slot) => slot.eventDay, { eager: true })
   slots?: EventDaySlot[];
