@@ -20,6 +20,7 @@ import { FormGroup } from '../entities/form-group.entity';
 import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { fieldTypesWithValidationRules } from '../constants/constants';
+import { AddGroupDto } from '../dto/update-form/add-group.dto';
 
 // TODO, write seeders
 @Injectable()
@@ -187,6 +188,73 @@ export class DynamicFormsService {
   }
 
   // TODO, add group
+
+  async addGroup(addGroupDto: AddGroupDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+
+    try {
+      const createdGroup = this.formGroupRepository.create({
+        name: addGroupDto.name,
+        position: addGroupDto.position,
+        form: { id: addGroupDto.form_id } as Form,
+      });
+      await queryRunner.manager.save(createdGroup, { reload: true });
+
+      await Promise.all(
+        addGroupDto.fields.map(async (field) => {
+          const createdField = this.formFieldRepository.create({
+            name: field.name,
+            label: field.label,
+            fieldType: { id: field.type_id } as FieldType,
+            position: field.position,
+            required: field.required,
+            group: createdGroup,
+          });
+
+          await queryRunner.manager.save(createdField, { reload: true });
+
+          if (field.options) {
+            await Promise.all(
+              field.options.map(async (op) => {
+                const option = this.fieldOptionRepository.create({
+                  name: op.name,
+                  formField: createdField,
+                });
+
+                await queryRunner.manager.save(option, { reload: true });
+              }),
+            );
+          }
+
+          if (
+            field.validation_rules &&
+            fieldTypesWithValidationRules.includes(+field.type_id)
+          ) {
+            await Promise.all(
+              field.validation_rules.map(async (vr) => {
+                const rule = this.validationRuleRepository.create({
+                  rule: vr.rule,
+                  value: vr.value,
+                  formField: createdField,
+                });
+
+                await queryRunner.manager.save(rule, { reload: true });
+              }),
+            );
+          }
+        }),
+      );
+      await queryRunner.commitTransaction();
+
+      return createdGroup;
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw e;
+    }
+  }
 
   async addField(id: number, createFormFieldDto: CreateFormFieldDto) {
     const queryRunner = this.dataSource.createQueryRunner();

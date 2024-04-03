@@ -19,6 +19,7 @@ import { QueryFormDto } from './dto/query-form/query-form.dto';
 import { UpdateFormGroupDto } from './dto/update-form/update-form-group.dto';
 import { AddValidationRuleDto } from './dto/update-form/add-validation-rule.dto';
 import { DynamicFormsValidationRulesService } from './services/dynamic-forms-validation-rules.service';
+import { AddGroupDto } from './dto/update-form/add-group.dto';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -76,6 +77,11 @@ export class DynamicFormsController {
     @Body() createFormFieldDto: CreateFormFieldDto,
   ) {
     return this.dynamicFormsService.addField(+id, createFormFieldDto);
+  }
+
+  @Post('addGroup')
+  addGroup(@Body() addGroupDto: AddGroupDto) {
+    return this.dynamicFormsService.addGroup(addGroupDto);
   }
 
   @Patch(':id')
