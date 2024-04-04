@@ -21,6 +21,7 @@ import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { fieldTypesWithValidationRules } from '../constants/constants';
 import { AddGroupDto } from '../dto/update-form/add-group.dto';
+import { CreateFormGroupDto } from '../dto/create-form/create-form-group.dto';
 
 // TODO, write seeders
 @Injectable()
@@ -186,8 +187,6 @@ export class DynamicFormsService {
 
     return group;
   }
-
-  // TODO, add group
 
   async addGroup(addGroupDto: AddGroupDto) {
     const queryRunner = this.dataSource.createQueryRunner();

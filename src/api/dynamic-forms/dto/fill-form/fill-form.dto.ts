@@ -12,7 +12,6 @@ export class FillFormDto {
 
   @IsInt()
   @IsExist({ tableName: 'forms', column: 'id' })
-  //TODO, validate if this form belongs to the organizer of the event
   form_id: number;
 
   @IsInt()
