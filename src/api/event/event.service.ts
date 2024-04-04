@@ -32,7 +32,7 @@ import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
-import { EventDay } from '../event-day/entities/event-day.entity';
+import { EventDay } from './entities/event-day.entity';
 
 @Injectable()
 export class EventService {
@@ -356,6 +356,58 @@ export class EventService {
         { id: payload.id },
         UpdateEventDto.toModel(payload),
       );
+
+      // update days if exist.
+      if (payload.days) {
+        // delete the old days
+        await queryRunner.manager
+          .createQueryBuilder()
+          .delete()
+          .from(EventDay)
+          .where('event_id = :event_id')
+          .setParameters({ event_id: payload.id })
+          .execute();
+
+        if (payload.days.length == 0) {
+          throw new BadRequestException('Event Days cannot be empty!');
+        }
+
+        for (const day of payload.days) {
+          // store the main day entity
+
+          const dayData = {
+            event: { id: payload.id },
+            dayDate: moment(day.day_date, 'YYYY-MM-DD').format(
+              DEFAULT_DB_DATE_FORMAT,
+            ),
+          };
+
+          const createdDay = queryRunner.manager.create(EventDay, dayData);
+          const savedDay = await queryRunner.manager.save(EventDay, createdDay);
+
+          // store the slots
+          if (!day.slots || day.slots.length == 0) {
+            throw new BadRequestException('Day slots cannot be empty!');
+          }
+
+          const slotsData = (day.slots as Array<CreateEventDaySlotDto>)
+            .map((slot: CreateEventDaySlotDto) => {
+              return {
+                eventDay: { id: savedDay.id },
+                slotStatus: { id: SlotStatus.PENDING },
+                label: slot.label,
+                startTime: slot.start_time,
+                endTime: slot.end_time,
+              };
+            })
+            .map((slot) => {
+              return queryRunner.manager.create(EventDaySlot, slot);
+            });
+
+          // save them all
+          await queryRunner.manager.save(EventDaySlot, slotsData);
+        }
+      }
 
       await queryRunner.commitTransaction();
       await queryRunner.release();

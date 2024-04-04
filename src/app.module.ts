@@ -39,7 +39,6 @@ import { EventModule } from './api/event/event.module';
 import { AgeGroupModule } from './api/age-group/age-group.module';
 import { SlotStatusModule } from './api/slot-status/slot-status.module';
 import { AttendEventModule } from './api/attend-event/attend-event.module';
-import { EventDayModule } from './api/event-day/event-day.module';
 
 @Module({
   imports: [
@@ -97,7 +96,6 @@ import { EventDayModule } from './api/event-day/event-day.module';
     AgeGroupModule,
     SlotStatusModule,
     AttendEventModule,
-    EventDayModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

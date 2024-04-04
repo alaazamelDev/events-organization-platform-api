@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { SlotStatus } from '../../slot-status/entities/slot-status.entity';
 import * as moment from 'moment';
 import { DEFAULT_DB_DATETIME_FORMAT } from '../../../common/constants/constants';
-import { EventDay } from '../../event-day/entities/event-day.entity';
+import { EventDay } from './event-day.entity';
 
 @Entity('event_day_slots')
 export class EventDaySlot extends BaseEntity {

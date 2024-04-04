@@ -2,8 +2,8 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import * as moment from 'moment';
 import { DEFAULT_DB_DATE_FORMAT } from '../../../common/constants/constants';
-import { EventDaySlot } from '../../event/entities/event-day-slot.entity';
-import { Event } from '../../event/entities/event.entity';
+import { EventDaySlot } from './event-day-slot.entity';
+import { Event } from './event.entity';
 
 @Entity('event_days')
 export class EventDay extends BaseEntity {
