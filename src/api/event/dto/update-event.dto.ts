@@ -1,4 +1,5 @@
 import {
+  ArrayNotEmpty,
   IsDate,
   IsEnum,
   IsNumberString,
@@ -11,6 +12,7 @@ import { IsExist } from '../../../common/decorators/is_exist.decorator';
 import { Type } from 'class-transformer';
 import { CreateLocationDto } from './create-location.dto';
 import { EventType } from '../enums/event-type.enum';
+import { CreateEventDayDto } from './create-event-day.dto';
 
 export class UpdateEventDto {
   id?: number;
@@ -54,6 +56,13 @@ export class UpdateEventDto {
   @Type(() => Date)
   @IsDate()
   registration_end_date?: Date;
+
+  // Days
+  @IsOptional()
+  @ArrayNotEmpty()
+  @Type(() => CreateEventDayDto)
+  @ValidateNested({ each: true })
+  days: CreateEventDayDto[];
 
   static toModel(dto: UpdateEventDto) {
     let map: LooseObject = {};

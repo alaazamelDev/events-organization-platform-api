@@ -4,7 +4,7 @@ import { IsOptional, ValidateNested } from 'class-validator';
 import { CreateEventDaySlotDto } from './create-event-day-slot.dto';
 
 export class CreateEventDayDto {
-  @IsDateFormat('DD-MM-YYYY')
+  @IsDateFormat('YYYY-MM-DD')
   day_date!: Date;
 
   @IsOptional()

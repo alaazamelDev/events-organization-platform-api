@@ -16,7 +16,7 @@ import { User } from '../user/entities/user.entity';
 import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
 import { ConfigurationListsModule } from '../configurationLists/configuration-lists.module';
 import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
-import { EventDay } from '../event-day/entities/event-day.entity';
+import { EventDay } from './entities/event-day.entity';
 
 @Module({
   imports: [

@@ -9,7 +9,7 @@ import { EventAttachment } from './event-attachment.entity';
 import { EventApprovalStatus } from './event-approval-status.entity';
 import { EventAgeGroup } from './event-age-group.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
-import { EventDay } from '../../event-day/entities/event-day.entity';
+import { EventDay } from './event-day.entity';
 import { Form } from '../../dynamic-forms/entities/form.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 
