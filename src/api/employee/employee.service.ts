@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -61,7 +61,7 @@ export class EmployeeService {
       const permissions = createEmployeeDto.permissions.map((p) => {
         const employeePermission = new EmployeePermission();
         employeePermission.employee = employee;
-        employeePermission.permission = { id: p } as Permission;
+        employeePermission.permission = { id: p.permission_id } as Permission;
 
         return employeePermission;
       });
@@ -129,5 +129,24 @@ export class EmployeeService {
     await this.employeeRepository.save(employee);
 
     return employee;
+  }
+
+  async updateProfilePicture(id: number, fileName: string | undefined) {
+    const employee = await this.employeeRepository.findOneOrFail({
+      where: { id },
+    });
+
+    if (fileName) {
+      employee.profile_picture = fileName;
+
+      await this.employeeRepository.save(employee);
+
+      return employee;
+    } else {
+      throw new HttpException(
+        'could not update the profile picture',
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
   }
 }

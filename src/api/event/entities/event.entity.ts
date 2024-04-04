@@ -10,6 +10,8 @@ import { EventApprovalStatus } from './event-approval-status.entity';
 import { EventAgeGroup } from './event-age-group.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 import { EventDay } from './event-day.entity';
+import { Form } from '../../dynamic-forms/entities/form.entity';
+import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 
 @Entity('events')
 export class Event extends BaseEntity {
@@ -132,4 +134,11 @@ export class Event extends BaseEntity {
 
   @OneToMany(() => AttendeeEvent, (attendeeEvent) => attendeeEvent.event)
   attendees: AttendeeEvent[];
+
+  @ManyToOne(() => Form, (form) => form.events)
+  @JoinColumn({ name: 'form_id' })
+  form: Form;
+
+  @OneToMany(() => FilledForm, (filledForm) => filledForm.event)
+  filledForms: FilledForm[];
 }
