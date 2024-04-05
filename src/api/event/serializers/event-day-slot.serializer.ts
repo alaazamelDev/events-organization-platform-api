@@ -6,6 +6,7 @@ import { DEFAULT_DB_DATETIME_FORMAT } from '../../../common/constants/constants'
 export class EventDaySlotSerializer {
   static serialize(data: EventDaySlot) {
     return {
+      id: data.id,
       label: data.label,
       start_time: moment(data.startTime).format(DEFAULT_DB_DATETIME_FORMAT),
       end_time: moment(data.endTime).format(DEFAULT_DB_DATETIME_FORMAT),
