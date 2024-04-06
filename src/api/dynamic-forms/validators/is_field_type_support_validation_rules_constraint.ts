@@ -7,6 +7,7 @@ import { EntityManager } from 'typeorm';
 import { FormField } from '../entities/form-field.entity';
 import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import { fieldTypesWithValidationRules } from '../constants/constants';
+import { AddValidationRuleDto } from '../dto/update-form/add-validation-rule.dto';
 
 @ValidatorConstraint({
   name: 'IsFieldTypeSupportValidationRulesConstraint',
@@ -18,7 +19,7 @@ export class IsFieldTypeSupportValidationRulesConstraint
   constructor(private readonly entityManager: EntityManager) {}
 
   async validate(_value: any, _args: ValidationArguments) {
-    const object = _args.object as FillFormFieldDto;
+    const object = _args.object as AddValidationRuleDto;
 
     const { fieldTypeId } = await this.entityManager
       .getRepository(FormField)

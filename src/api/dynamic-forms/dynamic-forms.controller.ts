@@ -20,6 +20,7 @@ import { UpdateFormGroupDto } from './dto/update-form/update-form-group.dto';
 import { AddValidationRuleDto } from './dto/update-form/add-validation-rule.dto';
 import { DynamicFormsValidationRulesService } from './services/dynamic-forms-validation-rules.service';
 import { AddGroupDto } from './dto/update-form/add-group.dto';
+import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -27,6 +28,7 @@ export class DynamicFormsController {
     private readonly dynamicFormsService: DynamicFormsService,
     private readonly dynamicFormsQueryService: DynamicFormsQueryService,
     private readonly dynamicFormsValidationRulesService: DynamicFormsValidationRulesService,
+    private readonly dynamicFormsFillService: DynamicFormsFillService,
   ) {}
 
   @Get('fieldsTypes')
@@ -106,17 +108,17 @@ export class DynamicFormsController {
 
   @Post('fillForm')
   fillForm(@Body() fillFormDto: FillFormDto) {
-    return this.dynamicFormsService.fillForm(fillFormDto);
+    return this.dynamicFormsFillService.fillForm(fillFormDto);
   }
 
   @Get('attendee/filledForm')
   getAttendeeFilledForm(@Body() getFilledFormDto: GetFilledFormDto) {
-    return this.dynamicFormsService.getAttendeeFilledForm(getFilledFormDto);
+    return this.dynamicFormsFillService.getAttendeeFilledForm(getFilledFormDto);
   }
 
   @Get('event/:id')
   getEventFilledForms(@Param('id') id: string) {
-    return this.dynamicFormsService.getEventFilledForms(+id);
+    return this.dynamicFormsFillService.getEventFilledForms(+id);
   }
 
   @Post('validationRule')
