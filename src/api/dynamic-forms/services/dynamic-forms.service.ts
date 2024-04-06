@@ -65,6 +65,7 @@ export class DynamicFormsService {
         createFormDto.groups.map(async (group) => {
           const createdGroup = this.formGroupRepository.create({
             name: group.name,
+            description: group.description,
             position: group.position,
             form: form,
           });
@@ -197,6 +198,7 @@ export class DynamicFormsService {
     try {
       const createdGroup = this.formGroupRepository.create({
         name: addGroupDto.name,
+        description: addGroupDto.description,
         position: addGroupDto.position,
         form: { id: addGroupDto.form_id } as Form,
       });

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import helmet from 'helmet';
 
@@ -10,6 +10,8 @@ import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { SwaggerConfigService } from './config/openapi/swagger/config.service';
 import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
 import { useContainer } from 'class-validator';
+
+const logger = new Logger('MAIN');
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -52,6 +54,6 @@ async function bootstrap(): Promise<void> {
 
 bootstrap()
   .then(() => {
-    console.log('Done');
+    logger.log('DONE');
   })
   .catch(() => new Error('Something fail loading the app'));
