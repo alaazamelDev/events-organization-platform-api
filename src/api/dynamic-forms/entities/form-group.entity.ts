@@ -8,6 +8,12 @@ export class FormGroup extends BaseEntity {
   @Column()
   name: string;
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  description: string | null;
+
   @Column()
   position: number;
 
