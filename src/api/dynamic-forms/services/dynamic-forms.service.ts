@@ -52,57 +52,7 @@ export class DynamicFormsService {
 
       await Promise.all(
         createFormDto.groups.map(async (group) => {
-          const createdGroup = this.formGroupRepository.create({
-            name: group.name,
-            description: group.description,
-            position: group.position,
-            form: form,
-          });
-
-          await queryRunner.manager.save(createdGroup, { reload: true });
-
-          group.fields.map(async (field) => {
-            const createdField = this.formFieldRepository.create({
-              name: field.name,
-              label: field.label,
-              fieldType: { id: field.type_id } as FieldType,
-              position: field.position,
-              required: field.required,
-              group: createdGroup,
-            });
-
-            await queryRunner.manager.save(createdField, { reload: true });
-
-            if (field.options) {
-              await Promise.all(
-                field.options.map(async (op) => {
-                  const option = this.fieldOptionRepository.create({
-                    name: op.name,
-                    formField: createdField,
-                  });
-
-                  await queryRunner.manager.save(option, { reload: true });
-                }),
-              );
-            }
-
-            if (
-              field.validation_rules &&
-              fieldTypesWithValidationRules.includes(+field.type_id)
-            ) {
-              await Promise.all(
-                field.validation_rules.map(async (vr) => {
-                  const rule = this.validationRuleRepository.create({
-                    rule: vr.rule,
-                    value: vr.value,
-                    formField: createdField,
-                  });
-
-                  await queryRunner.manager.save(rule, { reload: true });
-                }),
-              );
-            }
-          });
+          await this.createGroup({ ...group, form_id: form.id }, queryRunner);
         }),
       );
 
@@ -130,12 +80,6 @@ export class DynamicFormsService {
     return form;
   }
 
-  async getOrganizationForms(id: number) {
-    return await this.formRepository.find({
-      where: { organization: { id: id } },
-    });
-  }
-
   async getForm(id: number) {
     return await this.formRepository.findOneOrFail({
       where: { id: id },
@@ -152,6 +96,12 @@ export class DynamicFormsService {
 
   async deleteForm(id: number) {
     return await this.formRepository.softDelete({ id });
+  }
+
+  async getOrganizationForms(id: number) {
+    return await this.formRepository.find({
+      where: { organization: { id: id } },
+    });
   }
 
   async updateFormField(id: number, updateFormFieldDto: UpdateFormFieldDto) {
@@ -185,58 +135,7 @@ export class DynamicFormsService {
     await queryRunner.startTransaction();
 
     try {
-      const createdGroup = this.formGroupRepository.create({
-        name: addGroupDto.name,
-        description: addGroupDto.description,
-        position: addGroupDto.position,
-        form: { id: addGroupDto.form_id } as Form,
-      });
-      await queryRunner.manager.save(createdGroup, { reload: true });
-
-      await Promise.all(
-        addGroupDto.fields.map(async (field) => {
-          const createdField = this.formFieldRepository.create({
-            name: field.name,
-            label: field.label,
-            fieldType: { id: field.type_id } as FieldType,
-            position: field.position,
-            required: field.required,
-            group: createdGroup,
-          });
-
-          await queryRunner.manager.save(createdField, { reload: true });
-
-          if (field.options) {
-            await Promise.all(
-              field.options.map(async (op) => {
-                const option = this.fieldOptionRepository.create({
-                  name: op.name,
-                  formField: createdField,
-                });
-
-                await queryRunner.manager.save(option, { reload: true });
-              }),
-            );
-          }
-
-          if (
-            field.validation_rules &&
-            fieldTypesWithValidationRules.includes(+field.type_id)
-          ) {
-            await Promise.all(
-              field.validation_rules.map(async (vr) => {
-                const rule = this.validationRuleRepository.create({
-                  rule: vr.rule,
-                  value: vr.value,
-                  formField: createdField,
-                });
-
-                await queryRunner.manager.save(rule, { reload: true });
-              }),
-            );
-          }
-        }),
-      );
+      const createdGroup = await this.createGroup(addGroupDto, queryRunner);
       await queryRunner.commitTransaction();
 
       return createdGroup;
@@ -252,50 +151,7 @@ export class DynamicFormsService {
     await queryRunner.startTransaction();
 
     try {
-      const field = this.formFieldRepository.create({
-        name: createFormFieldDto.name,
-        label: createFormFieldDto.label,
-        position: createFormFieldDto.position,
-        required: createFormFieldDto.required,
-        fieldType: { id: createFormFieldDto.type_id } as FieldType,
-        group: { id: id } as FormGroup,
-      });
-
-      await queryRunner.manager.save(field, { reload: true });
-
-      if (createFormFieldDto.options) {
-        field.options = await Promise.all(
-          createFormFieldDto.options.map(async (op) => {
-            const option = this.fieldOptionRepository.create({
-              name: op.name,
-              formField: field,
-            });
-
-            await queryRunner.manager.save(option);
-
-            return new FieldOption({ id: option.id, name: option.name });
-          }),
-        );
-      }
-
-      if (
-        createFormFieldDto.validation_rules &&
-        fieldTypesWithValidationRules.includes(+createFormFieldDto.type_id)
-      ) {
-        field.validationRules = await Promise.all(
-          createFormFieldDto.validation_rules.map(async (vr) => {
-            const rule = this.validationRuleRepository.create({
-              rule: vr.rule,
-              value: vr.value,
-              formField: field,
-            });
-
-            await queryRunner.manager.save(rule, { reload: true });
-
-            return new ValidationRule(rule);
-          }),
-        );
-      }
+      const field = await this.createField(createFormFieldDto, id, queryRunner);
 
       await queryRunner.commitTransaction();
       await queryRunner.release();
@@ -307,6 +163,24 @@ export class DynamicFormsService {
 
       throw e;
     }
+  }
+
+  async createGroup(addGroupDto: AddGroupDto, queryRunner: QueryRunner) {
+    const createdGroup = this.formGroupRepository.create({
+      name: addGroupDto.name,
+      description: addGroupDto.description,
+      position: addGroupDto.position,
+      form: { id: addGroupDto.form_id } as Form,
+    });
+    await queryRunner.manager.save(createdGroup, { reload: true });
+
+    await Promise.all(
+      addGroupDto.fields.map(async (field) => {
+        await this.createField(field, createdGroup.id, queryRunner);
+      }),
+    );
+
+    return createdGroup;
   }
 
   async createField(
@@ -325,7 +199,6 @@ export class DynamicFormsService {
 
     await queryRunner.manager.save(field, { reload: true });
 
-    // if (createFormFieldDto.options) {
     field.options = await Promise.all(
       createFormFieldDto.options.map(async (op) => {
         const option = this.fieldOptionRepository.create({
@@ -338,29 +211,23 @@ export class DynamicFormsService {
         return new FieldOption({ id: option.id, name: option.name });
       }),
     );
-    // }
 
-    // if (
-    //   createFormFieldDto.validation_rules &&
-    //   fieldTypesWithValidationRules.includes(+createFormFieldDto.type_id)
-    // ) {
-    field.validationRules = await Promise.all(
-      createFormFieldDto.validation_rules.map(async (vr) => {
-        const rule = this.validationRuleRepository.create({
-          rule: vr.rule,
-          value: vr.value,
-          formField: field,
-        });
+    // TODO, apply validation on this
+    if (fieldTypesWithValidationRules.includes(+createFormFieldDto.type_id)) {
+      field.validationRules = await Promise.all(
+        createFormFieldDto.validation_rules.map(async (vr) => {
+          const rule = this.validationRuleRepository.create({
+            rule: vr.rule,
+            value: vr.value,
+            formField: field,
+          });
 
-        await queryRunner.manager.save(rule, { reload: true });
+          await queryRunner.manager.save(rule, { reload: true });
 
-        return new ValidationRule(rule);
-      }),
-    );
-    // }
-    //
-    // await queryRunner.commitTransaction();
-    // await queryRunner.release();
+          return new ValidationRule(rule);
+        }),
+      );
+    }
 
     return field;
   }
