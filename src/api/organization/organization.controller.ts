@@ -1,16 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  ClassSerializerInterceptor,
+  Controller,
   Delete,
-  UseInterceptors,
-  UploadedFiles,
+  ForbiddenException,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
   Res,
   UploadedFile,
-  ClassSerializerInterceptor,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -30,10 +34,16 @@ import * as path from 'path';
 import { of } from 'rxjs';
 import * as process from 'process';
 import e from 'express';
+import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
+import { BlockAttendeeDto } from './dto/block-attendee.dto';
+import { EmployeeService } from '../employee/employee.service';
 
 @Controller('organization')
 export class OrganizationController {
-  constructor(private readonly organizationService: OrganizationService) {}
+  constructor(
+    private readonly organizationService: OrganizationService,
+    private readonly employeeService: EmployeeService,
+  ) {}
 
   @Post()
   create(@Body() createOrganizationDto: CreateOrganizationDto) {
@@ -239,5 +249,46 @@ export class OrganizationController {
   @Delete('mainPicture/:id')
   removeMainPicture(@Param('id') id: string) {
     return this.organizationService.removeOrganizationMainPicture(+id);
+  }
+
+  @Post('block-attendee')
+  @UseGuards(AccessTokenGuard)
+  async blockAttendee(
+    @Body() blockAttendeeDto: BlockAttendeeDto,
+    @Req() req: any,
+  ) {
+    const userData = req.user;
+    const employee = await this.employeeService.findByUserId(userData.sub);
+
+    if (!employee) {
+      throw new ForbiddenException('You are not allowed to make this action');
+    }
+
+    return this.organizationService.blockAttendee(blockAttendeeDto, employee);
+  }
+
+  @Post('unblock-attendee')
+  @UseGuards(AccessTokenGuard)
+  async unblockAttendee(
+    @Body() blockAttendeeDto: BlockAttendeeDto,
+    @Req() req: any,
+  ) {
+    const userData = req.user;
+    const employee = await this.employeeService.findByUserId(userData.sub);
+
+    if (!employee) {
+      throw new ForbiddenException('You are not allowed to make this action');
+    }
+
+    const unblocked = await this.organizationService.unBlockAttendee(
+      blockAttendeeDto,
+      employee,
+    );
+
+    if (!unblocked) {
+      throw new BadRequestException('The Attendee is not blocked.');
+    }
+
+    return true;
   }
 }

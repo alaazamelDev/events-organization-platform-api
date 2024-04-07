@@ -12,6 +12,8 @@ import { AddressOrganization } from './entities/address_organization.entity';
 import { Address } from '../address/entities/address.entity';
 import { City } from '../city/entities/city.entity';
 import { State } from '../state/entities/state.entity';
+import { BlockedAttendee } from './entities/blocked-attendee.entity';
+import { EmployeeModule } from '../employee/employee.module';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { State } from '../state/entities/state.entity';
       City,
       State,
       AddressOrganization,
+      BlockedAttendee,
     ]),
+    EmployeeModule,
   ],
   controllers: [OrganizationController],
   providers: [OrganizationService],
