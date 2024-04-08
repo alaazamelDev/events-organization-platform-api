@@ -25,6 +25,8 @@ import { IsFieldValueMeetsValidationRulesConstraint } from './validators/is_fiel
 import { IsFieldTypeSupportValidationRulesConstraint } from './validators/is_field_type_support_validation_rules_constraint';
 import { DynamicFormsValidationRulesService } from './services/dynamic-forms-validation-rules.service';
 import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
+import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.service';
+import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
     DynamicFormsQueryService,
     DynamicFormsValidationRulesService,
     DynamicFormsFillService,
+    DynamicFormsFieldsService,
+    DynamicFormsGroupsService,
     IsFieldBelongsToForm,
     IsFieldOptionRequiredConstraint,
     IsOptionBelongsToTheFieldConstraint,

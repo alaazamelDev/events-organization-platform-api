@@ -21,6 +21,8 @@ import { AddValidationRuleDto } from './dto/update-form/add-validation-rule.dto'
 import { DynamicFormsValidationRulesService } from './services/dynamic-forms-validation-rules.service';
 import { AddGroupDto } from './dto/update-form/add-group.dto';
 import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
+import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.service';
+import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -29,6 +31,8 @@ export class DynamicFormsController {
     private readonly dynamicFormsQueryService: DynamicFormsQueryService,
     private readonly dynamicFormsValidationRulesService: DynamicFormsValidationRulesService,
     private readonly dynamicFormsFillService: DynamicFormsFillService,
+    private readonly dynamicFormsFieldsService: DynamicFormsFieldsService,
+    private readonly dynamicFormsGroupsService: DynamicFormsGroupsService,
   ) {}
 
   @Get('fieldsTypes')
@@ -62,7 +66,11 @@ export class DynamicFormsController {
     @Param('id') id: string,
     @Body() updateFormFieldDto: UpdateFormFieldDto,
   ) {
-    return this.dynamicFormsService.updateFormField(+id, updateFormFieldDto);
+    // return this.dynamicFormsService.updateFormField(+id, updateFormFieldDto);
+    return this.dynamicFormsFieldsService.updateFormField(
+      +id,
+      updateFormFieldDto,
+    );
   }
 
   @Patch('group/:id')
@@ -70,7 +78,11 @@ export class DynamicFormsController {
     @Param('id') id: string,
     @Body() updateFormGroupDto: UpdateFormGroupDto,
   ) {
-    return this.dynamicFormsService.updateFormGroup(+id, updateFormGroupDto);
+    // return this.dynamicFormsService.updateFormGroup(+id, updateFormGroupDto);
+    return this.dynamicFormsGroupsService.updateFormGroup(
+      +id,
+      updateFormGroupDto,
+    );
   }
 
   @Post('addField/:id')
@@ -78,12 +90,14 @@ export class DynamicFormsController {
     @Param('id') id: string,
     @Body() createFormFieldDto: CreateFormFieldDto,
   ) {
-    return this.dynamicFormsService.addField(+id, createFormFieldDto);
+    // return this.dynamicFormsService.addField(+id, createFormFieldDto);
+    return this.dynamicFormsFieldsService.addField(+id, createFormFieldDto);
   }
 
   @Post('addGroup')
   addGroup(@Body() addGroupDto: AddGroupDto) {
-    return this.dynamicFormsService.addGroup(addGroupDto);
+    // return this.dynamicFormsService.addGroup(addGroupDto);
+    return this.dynamicFormsGroupsService.addGroup(addGroupDto);
   }
 
   @Patch(':id')
@@ -98,12 +112,14 @@ export class DynamicFormsController {
 
   @Delete('deleteField/:id')
   deleteField(@Param('id') id: string) {
-    return this.dynamicFormsService.deleteField(+id);
+    // return this.dynamicFormsService.deleteField(+id);
+    return this.dynamicFormsFieldsService.deleteField(+id);
   }
 
   @Delete('deleteGroup/:id')
   deleteGroup(@Param('id') id: string) {
-    return this.dynamicFormsService.deleteGroup(+id);
+    // return this.dynamicFormsService.deleteGroup(+id);
+    return this.dynamicFormsGroupsService.deleteGroup(+id);
   }
 
   @Post('fillForm')

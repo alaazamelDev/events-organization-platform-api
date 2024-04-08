@@ -5,6 +5,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Min,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -28,6 +29,7 @@ export class CreateFormFieldDto {
   required: boolean;
 
   @IsInt()
+  @Min(1)
   position: number;
 
   @IsExist({ tableName: 'field_types', column: 'id' })
