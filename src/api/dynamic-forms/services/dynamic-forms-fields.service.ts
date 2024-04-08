@@ -20,6 +20,8 @@ export class DynamicFormsFieldsService {
     private readonly fieldOptionRepository: Repository<FieldOption>,
     @InjectRepository(ValidationRule)
     private readonly validationRuleRepository: Repository<ValidationRule>,
+    @InjectRepository(FieldType)
+    private readonly fieldTypeRepository: Repository<FieldType>,
   ) {}
 
   async updateFormField(id: number, updateFormFieldDto: UpdateFormFieldDto) {
@@ -141,5 +143,13 @@ export class DynamicFormsFieldsService {
 
   async deleteField(id: number) {
     return await this.formFieldRepository.softDelete({ id });
+  }
+
+  async getFieldsTypes() {
+    return await this.fieldTypeRepository.find({
+      relations: {
+        fieldTypeOperators: { query_operator: true },
+      },
+    });
   }
 }

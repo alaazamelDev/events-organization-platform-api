@@ -37,7 +37,7 @@ export class DynamicFormsController {
 
   @Get('fieldsTypes')
   getFieldsTypes() {
-    return this.dynamicFormsService.getFieldsTypes();
+    return this.dynamicFormsFieldsService.getFieldsTypes();
   }
 
   @Get('query')
