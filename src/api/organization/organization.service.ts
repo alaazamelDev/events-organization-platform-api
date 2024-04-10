@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -26,6 +27,7 @@ import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.
 import { AllOrganizationsAdminSerializer } from './serializers/all_organizations_admin.serializer';
 import { hash } from 'bcrypt';
 import { BlockedAttendee } from './entities/blocked-attendee.entity';
+import { BlockedAttendeeSerializer } from './serializers/blocked-attendee.serializer';
 
 @Injectable()
 export class OrganizationService {
@@ -44,6 +46,22 @@ export class OrganizationService {
     private readonly addressOrganizationRepository: Repository<AddressOrganization>,
     private readonly dataSource: DataSource,
   ) {}
+
+  async getOrganizationBlackList(organizationId: number) {
+    const organization = await this.organizationRepository.findOne({
+      where: { id: organizationId },
+      relations: { blockedAttendees: { attendee: { job: true } } },
+    });
+
+    if (!organization) {
+      throw new NotFoundException(
+        `Organization with ID=${organizationId} was not found`,
+      );
+    }
+
+    const data = organization.blockedAttendees;
+    return BlockedAttendeeSerializer.serializeList(data);
+  }
 
   async create(createOrganizationDto: CreateOrganizationDto) {
     const queryRunner = this.dataSource.createQueryRunner();

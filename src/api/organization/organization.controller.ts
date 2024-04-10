@@ -47,6 +47,25 @@ export class OrganizationController {
     private readonly employeeService: EmployeeService,
   ) {}
 
+  @Get('blacklist')
+  @UseGuards(AccessTokenGuard)
+  async getBlackList(@Req() req: any) {
+    const userData = req.user;
+    const userId = userData.sub;
+
+    // get employee organization id,
+    const employee = await this.employeeService.findByUserId(userId);
+    if (!employee) {
+      throw new ForbiddenException(
+        "You don't have the permissions to check the blacklist!",
+      );
+    }
+
+    return await this.organizationService.getOrganizationBlackList(
+      employee.organization.id,
+    );
+  }
+
   @Post()
   create(@Body() createOrganizationDto: CreateOrganizationDto) {
     return this.organizationService.create(createOrganizationDto);

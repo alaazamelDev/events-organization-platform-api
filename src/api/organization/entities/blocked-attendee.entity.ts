@@ -12,11 +12,11 @@ export class BlockedAttendee extends BaseEntity {
   organization: Organization;
 
   // attendee reference.
-  @ManyToOne(() => Attendee)
+  @ManyToOne(() => Attendee, { eager: true })
   @JoinColumn({ name: 'attendee_id' })
   attendee: Attendee;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true, eager: true })
   @JoinColumn({ name: 'blocked_by' })
   blockedBy?: User;
 }
