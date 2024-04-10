@@ -50,7 +50,10 @@ export class EventService {
   }
 
   async findEvent(id: number): Promise<Event | null> {
-    return this.dataSource.manager.findOneBy(Event, { id });
+    return this.dataSource.manager.findOne(Event, {
+      where: { id },
+      relations: { organization: true },
+    });
   }
 
   async updateEventTags(eventId: number, payload: UpdateEventTagsDto) {

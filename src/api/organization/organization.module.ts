@@ -14,6 +14,7 @@ import { City } from '../city/entities/city.entity';
 import { State } from '../state/entities/state.entity';
 import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { EmployeeModule } from '../employee/employee.module';
+import { AttendeeModule } from '../attendee/attendee.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { EmployeeModule } from '../employee/employee.module';
       BlockedAttendee,
     ]),
     EmployeeModule,
+    AttendeeModule,
   ],
   controllers: [OrganizationController],
   providers: [OrganizationService],

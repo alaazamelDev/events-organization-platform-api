@@ -50,6 +50,7 @@ export class EventController {
     if (!event) {
       throw new NotFoundException(`Event with Id=${eventId} was not found!`);
     }
+
     return EventSerializer.serialize(this.fileUtilityService, event);
   }
 

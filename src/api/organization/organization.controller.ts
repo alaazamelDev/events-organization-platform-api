@@ -37,11 +37,13 @@ import e from 'express';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { BlockAttendeeDto } from './dto/block-attendee.dto';
 import { EmployeeService } from '../employee/employee.service';
+import { AttendeeService } from '../attendee/services/attendee.service';
 
 @Controller('organization')
 export class OrganizationController {
   constructor(
     private readonly organizationService: OrganizationService,
+    private readonly attendeeService: AttendeeService,
     private readonly employeeService: EmployeeService,
   ) {}
 
@@ -94,7 +96,15 @@ export class OrganizationController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @UseGuards(AccessTokenGuard)
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    const userData = req.user;
+    const userId = userData.sub;
+    const isBlocked = await this.attendeeService.isAttendeeBlocked(+id, userId);
+    if (isBlocked) {
+      throw new ForbiddenException('The attendee is blocked...');
+    }
+
     return this.organizationService.findOne(+id);
   }
 

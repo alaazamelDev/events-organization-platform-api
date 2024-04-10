@@ -21,6 +21,7 @@ import { Address } from '../../address/entities/address.entity';
 import { AttendeeContact } from '../entities/attendee-contact.entity';
 import { Contact } from '../../contact/entities/contact.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
+import { BlockedAttendee } from '../../organization/entities/blocked-attendee.entity';
 
 @Injectable()
 export class AttendeeService {
@@ -34,6 +35,21 @@ export class AttendeeService {
     @InjectRepository(AttendeeEvent)
     private readonly attendeeEventRepository: Repository<AttendeeEvent>,
   ) {}
+
+  async isAttendeeBlocked(organizationId: number, userId: number) {
+    let attendee;
+    try {
+      attendee = await this.getAttendeeByUserId(userId);
+      return await this.dataSource.manager.exists(BlockedAttendee, {
+        where: {
+          attendee: { id: attendee.id },
+          organization: { id: organizationId },
+        },
+      });
+    } catch (e) {
+      return false;
+    }
+  }
 
   async getAttendeeByUserId(userId: number): Promise<Attendee> {
     const attendee = await this.attendeeRepository.findOneBy({
