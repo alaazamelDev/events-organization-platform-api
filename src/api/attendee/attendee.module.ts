@@ -71,5 +71,6 @@ import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
     },
   ],
   controllers: [AttendeeController],
+  exports: [AttendeeService],
 })
 export class AttendeeModule {}

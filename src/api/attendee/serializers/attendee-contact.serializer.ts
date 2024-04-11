@@ -9,7 +9,7 @@ export class AttendeeContactSerializer {
     };
   }
 
-  static serializeList(attendeeContacts: AttendeeContact[]) {
-    return attendeeContacts.map((value) => this.serialize(value));
+  static serializeList(attendeeContacts?: AttendeeContact[]) {
+    return (attendeeContacts ?? []).map((value) => this.serialize(value));
   }
 }

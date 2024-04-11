@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +26,8 @@ import { AddOrganizationAddressDto } from './dto/add-organization-address.dto';
 import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.dto';
 import { AllOrganizationsAdminSerializer } from './serializers/all_organizations_admin.serializer';
 import { hash } from 'bcrypt';
+import { BlockedAttendee } from './entities/blocked-attendee.entity';
+import { BlockedAttendeeSerializer } from './serializers/blocked-attendee.serializer';
 
 @Injectable()
 export class OrganizationService {
@@ -38,6 +46,22 @@ export class OrganizationService {
     private readonly addressOrganizationRepository: Repository<AddressOrganization>,
     private readonly dataSource: DataSource,
   ) {}
+
+  async getOrganizationBlackList(organizationId: number) {
+    const organization = await this.organizationRepository.findOne({
+      where: { id: organizationId },
+      relations: { blockedAttendees: { attendee: { job: true } } },
+    });
+
+    if (!organization) {
+      throw new NotFoundException(
+        `Organization with ID=${organizationId} was not found`,
+      );
+    }
+
+    const data = organization.blockedAttendees;
+    return BlockedAttendeeSerializer.serializeList(data);
+  }
 
   async create(createOrganizationDto: CreateOrganizationDto) {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -324,5 +348,60 @@ export class OrganizationService {
     await this.organizationRepository.save(organization);
 
     return organization;
+  }
+
+  async blockAttendee(payload: any, employee: Employee) {
+    if (!employee.organization) {
+      throw new BadRequestException(
+        "You don't have permissions to block a user.",
+      );
+    }
+
+    // check if the attendee is already blocked, do nothing.
+    const isBlocked = await this.dataSource.manager.exists(BlockedAttendee, {
+      where: {
+        organization: { id: employee.organization.id },
+        attendee: { id: payload.attendee_id },
+      },
+    });
+
+    if (isBlocked) {
+      return true;
+    }
+
+    const created = this.dataSource.manager.create(BlockedAttendee, {
+      organization: { id: employee.organization.id },
+      attendee: { id: payload.attendee_id },
+      blockedBy: { id: employee.user.id },
+    });
+    await this.dataSource.manager.save(BlockedAttendee, created);
+
+    return true;
+  }
+
+  async unBlockAttendee(payload: any, employee: Employee) {
+    if (!employee.organization) {
+      throw new BadRequestException(
+        "You don't have permissions to block a user.",
+      );
+    }
+
+    // check if the attendee is already blocked, do nothing.
+    const isBlocked = await this.dataSource.manager.findOne(BlockedAttendee, {
+      where: {
+        organization: { id: employee.organization.id },
+        attendee: { id: payload.attendee_id },
+      },
+    });
+
+    if (!isBlocked) {
+      return false;
+    }
+
+    // TODO: CHECK FOR POSSIBLE ALTERNATIVES.
+    // unBlock the user
+    await this.dataSource.manager.delete(BlockedAttendee, { id: isBlocked.id });
+
+    return true;
   }
 }

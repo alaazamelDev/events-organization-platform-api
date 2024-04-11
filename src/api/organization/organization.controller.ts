@@ -1,16 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  ClassSerializerInterceptor,
+  Controller,
   Delete,
-  UseInterceptors,
-  UploadedFiles,
+  ForbiddenException,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
   Res,
   UploadedFile,
-  ClassSerializerInterceptor,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -30,10 +34,37 @@ import * as path from 'path';
 import { of } from 'rxjs';
 import * as process from 'process';
 import e from 'express';
+import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
+import { BlockAttendeeDto } from './dto/block-attendee.dto';
+import { EmployeeService } from '../employee/employee.service';
+import { AttendeeService } from '../attendee/services/attendee.service';
 
 @Controller('organization')
 export class OrganizationController {
-  constructor(private readonly organizationService: OrganizationService) {}
+  constructor(
+    private readonly organizationService: OrganizationService,
+    private readonly attendeeService: AttendeeService,
+    private readonly employeeService: EmployeeService,
+  ) {}
+
+  @Get('blacklist')
+  @UseGuards(AccessTokenGuard)
+  async getBlackList(@Req() req: any) {
+    const userData = req.user;
+    const userId = userData.sub;
+
+    // get employee organization id,
+    const employee = await this.employeeService.findByUserId(userId);
+    if (!employee) {
+      throw new ForbiddenException(
+        "You don't have the permissions to check the blacklist!",
+      );
+    }
+
+    return await this.organizationService.getOrganizationBlackList(
+      employee.organization.id,
+    );
+  }
 
   @Post()
   create(@Body() createOrganizationDto: CreateOrganizationDto) {
@@ -84,7 +115,15 @@ export class OrganizationController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @UseGuards(AccessTokenGuard)
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    const userData = req.user;
+    const userId = userData.sub;
+    const isBlocked = await this.attendeeService.isAttendeeBlocked(+id, userId);
+    if (isBlocked) {
+      throw new ForbiddenException('The attendee is blocked...');
+    }
+
     return this.organizationService.findOne(+id);
   }
 
@@ -239,5 +278,46 @@ export class OrganizationController {
   @Delete('mainPicture/:id')
   removeMainPicture(@Param('id') id: string) {
     return this.organizationService.removeOrganizationMainPicture(+id);
+  }
+
+  @Post('block-attendee')
+  @UseGuards(AccessTokenGuard)
+  async blockAttendee(
+    @Body() blockAttendeeDto: BlockAttendeeDto,
+    @Req() req: any,
+  ) {
+    const userData = req.user;
+    const employee = await this.employeeService.findByUserId(userData.sub);
+
+    if (!employee) {
+      throw new ForbiddenException('You are not allowed to make this action');
+    }
+
+    return this.organizationService.blockAttendee(blockAttendeeDto, employee);
+  }
+
+  @Post('unblock-attendee')
+  @UseGuards(AccessTokenGuard)
+  async unblockAttendee(
+    @Body() blockAttendeeDto: BlockAttendeeDto,
+    @Req() req: any,
+  ) {
+    const userData = req.user;
+    const employee = await this.employeeService.findByUserId(userData.sub);
+
+    if (!employee) {
+      throw new ForbiddenException('You are not allowed to make this action');
+    }
+
+    const unblocked = await this.organizationService.unBlockAttendee(
+      blockAttendeeDto,
+      employee,
+    );
+
+    if (!unblocked) {
+      throw new BadRequestException('The Attendee is not blocked.');
+    }
+
+    return true;
   }
 }

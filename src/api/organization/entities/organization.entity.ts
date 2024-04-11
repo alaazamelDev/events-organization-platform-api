@@ -4,6 +4,7 @@ import { ContactOrganization } from './contact_organization.entity';
 import { Employee } from '../../employee/entities/employee.entity';
 import { AddressOrganization } from './address_organization.entity';
 import { Form } from '../../dynamic-forms/entities/form.entity';
+import { BlockedAttendee } from './blocked-attendee.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization extends BaseEntity {
@@ -39,4 +40,10 @@ export class Organization extends BaseEntity {
 
   @OneToMany(() => Form, (form) => form.organization)
   forms: Form[];
+
+  @OneToMany(
+    () => BlockedAttendee,
+    (blockedAttendee) => blockedAttendee.organization,
+  )
+  blockedAttendees?: BlockedAttendee[];
 }

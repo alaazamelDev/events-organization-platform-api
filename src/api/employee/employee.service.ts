@@ -9,7 +9,6 @@ import { UserRole } from '../userRole/entities/user_role.entity';
 import { Organization } from '../organization/entities/organization.entity';
 import { Permission } from '../permission/entities/permission.entity';
 import { EmployeePermission } from './entities/employee_permission.entity';
-import { AllEmployeesSerializer } from './seializers/all_employees.serializer';
 import { hash } from 'bcrypt';
 
 @Injectable()
@@ -24,7 +23,7 @@ export class EmployeeService {
 
   async findByUserId(userId: number): Promise<Employee | null> {
     return await this.employeeRepository.findOne({
-      relations: { organization: true },
+      relations: { organization: true, user: true },
       where: { user: { id: userId } },
     });
   }
