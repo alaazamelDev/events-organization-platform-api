@@ -61,14 +61,10 @@ export class DynamicFormsController {
     return this.dynamicFormsService.getForm(+id);
   }
 
-  @Patch('field/:id')
-  updateFormField(
-    @Param('id') id: string,
-    @Body() updateFormFieldDto: UpdateFormFieldDto,
-  ) {
-    // return this.dynamicFormsService.updateFormField(+id, updateFormFieldDto);
+  @Patch('field')
+  updateFormField(@Body() updateFormFieldDto: UpdateFormFieldDto) {
     return this.dynamicFormsFieldsService.updateFormField(
-      +id,
+      updateFormFieldDto.field_id,
       updateFormFieldDto,
     );
   }
@@ -78,7 +74,6 @@ export class DynamicFormsController {
     @Param('id') id: string,
     @Body() updateFormGroupDto: UpdateFormGroupDto,
   ) {
-    // return this.dynamicFormsService.updateFormGroup(+id, updateFormGroupDto);
     return this.dynamicFormsGroupsService.updateFormGroup(
       +id,
       updateFormGroupDto,
@@ -90,13 +85,11 @@ export class DynamicFormsController {
     @Param('id') id: string,
     @Body() createFormFieldDto: CreateFormFieldDto,
   ) {
-    // return this.dynamicFormsService.addField(+id, createFormFieldDto);
     return this.dynamicFormsFieldsService.addField(+id, createFormFieldDto);
   }
 
   @Post('addGroup')
   addGroup(@Body() addGroupDto: AddGroupDto) {
-    // return this.dynamicFormsService.addGroup(addGroupDto);
     return this.dynamicFormsGroupsService.addGroup(addGroupDto);
   }
 
@@ -112,13 +105,11 @@ export class DynamicFormsController {
 
   @Delete('deleteField/:id')
   deleteField(@Param('id') id: string) {
-    // return this.dynamicFormsService.deleteField(+id);
     return this.dynamicFormsFieldsService.deleteField(+id);
   }
 
   @Delete('deleteGroup/:id')
   deleteGroup(@Param('id') id: string) {
-    // return this.dynamicFormsService.deleteGroup(+id);
     return this.dynamicFormsGroupsService.deleteGroup(+id);
   }
 

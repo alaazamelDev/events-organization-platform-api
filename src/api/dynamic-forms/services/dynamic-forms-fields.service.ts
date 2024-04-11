@@ -34,6 +34,10 @@ export class DynamicFormsFieldsService {
 
     Object.assign(field, updateFormFieldDto);
 
+    if (updateFormFieldDto.group_id) {
+      field.group = { id: updateFormFieldDto.group_id } as FormGroup;
+    }
+
     await this.formFieldRepository.save(field, { reload: true });
 
     await this.handleFieldPosition(field, field.group.id);
