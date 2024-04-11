@@ -24,36 +24,23 @@ export class DynamicFormsFieldsService {
     private readonly fieldTypeRepository: Repository<FieldType>,
   ) {}
 
-  async updateFormField(id: number, updateFormFieldDto: UpdateFormFieldDto) {
-    const field = await this.formFieldRepository.findOneOrFail({
-      where: { id: id },
-      relations: {
-        group: true,
-      },
-    });
-
-    Object.assign(field, updateFormFieldDto);
-
-    if (updateFormFieldDto.group_id) {
-      field.group = { id: updateFormFieldDto.group_id } as FormGroup;
-    }
-
-    await this.formFieldRepository.save(field, { reload: true });
-
-    await this.handleFieldPosition(field, field.group.id);
-
-    return field;
-  }
-
-  async addField(id: number, createFormFieldDto: CreateFormFieldDto) {
+  async addField(groupID: number, createFormFieldDto: CreateFormFieldDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const field = await this.createField(createFormFieldDto, id, queryRunner);
+      const position = await this.calcFieldPosition(
+        createFormFieldDto.position,
+        groupID,
+      );
+      const field = await this.createField(
+        { ...createFormFieldDto, position: position },
+        groupID,
+        queryRunner,
+      );
 
-      await this.handleFieldPosition(field, id);
+      await this.handleFieldPosition(field, groupID);
 
       await queryRunner.commitTransaction();
       await queryRunner.release();
@@ -65,6 +52,39 @@ export class DynamicFormsFieldsService {
 
       throw e;
     }
+  }
+
+  async updateFormField(
+    fieldID: number,
+    updateFormFieldDto: UpdateFormFieldDto,
+  ) {
+    const field = await this.formFieldRepository.findOneOrFail({
+      where: { id: fieldID },
+      relations: {
+        group: true,
+      },
+    });
+
+    if (updateFormFieldDto.position) {
+      const position = this.calcFieldPosition(
+        updateFormFieldDto.position,
+        field.group.id,
+      );
+
+      Object.assign(field, { ...updateFormFieldDto, position: position });
+    } else {
+      Object.assign(field, updateFormFieldDto);
+    }
+
+    if (updateFormFieldDto.group_id) {
+      field.group = { id: updateFormFieldDto.group_id } as FormGroup;
+    }
+
+    await this.formFieldRepository.save(field, { reload: true });
+
+    await this.handleFieldPosition(field, field.group.id);
+
+    return field;
   }
 
   async handleFieldPosition(field: FormField, groupID: number) {
@@ -155,5 +175,20 @@ export class DynamicFormsFieldsService {
         fieldTypeOperators: { query_operator: true },
       },
     });
+  }
+
+  private async calcFieldPosition(position: number, group_id: number) {
+    const lastPosition = await this.formFieldRepository
+      .findOneOrFail({
+        where: { group: { id: group_id } },
+        order: { position: 'DESC' },
+      })
+      .then((field) => field.position);
+
+    if (position > lastPosition) {
+      return lastPosition + 1;
+    }
+
+    return position;
   }
 }

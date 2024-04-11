@@ -5,8 +5,6 @@ import {
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
 import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
-import { FieldOption } from '../entities/field-option.entity';
-import { CreateFormFieldDto } from '../dto/create-form/create-form-field.dto';
 import { UpdateFormFieldDto } from '../dto/update-form/update-form-field.dto';
 import { FormField } from '../entities/form-field.entity';
 import { FormGroup } from '../entities/form-group.entity';
@@ -39,9 +37,6 @@ export class IsGroupBelongsToTheFieldFormConstraint
       .leftJoinAndSelect('group.form', 'form')
       .getOneOrFail()
       .then((row) => row.form.id);
-
-    console.log(field_form_id);
-    console.log(group_form_id);
 
     return +field_form_id === +group_form_id;
   }

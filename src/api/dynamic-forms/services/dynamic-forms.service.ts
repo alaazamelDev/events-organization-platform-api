@@ -33,12 +33,16 @@ export class DynamicFormsService {
       await queryRunner.manager.save(form, { reload: true });
 
       await Promise.all(
-        createFormDto.groups.map(async (group) => {
-          await this.dynamicFormsGroupsService.createGroup(
-            { ...group, form_id: form.id },
-            queryRunner,
-          );
-        }),
+        createFormDto.groups
+          .sort((groupA, groupB) =>
+            groupA.position <= groupB.position ? -1 : 1,
+          )
+          .map(async (group, index) => {
+            await this.dynamicFormsGroupsService.createGroup(
+              { ...group, form_id: form.id, position: index + 1 },
+              queryRunner,
+            );
+          }),
       );
 
       await queryRunner.commitTransaction();

@@ -6,6 +6,7 @@ import { AddGroupDto } from '../dto/update-form/add-group.dto';
 import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DynamicFormsFieldsService } from './dynamic-forms-fields.service';
+import { CreateFormGroupDto } from '../dto/create-form/create-form-group.dto';
 
 @Injectable()
 export class DynamicFormsGroupsService {
@@ -23,7 +24,15 @@ export class DynamicFormsGroupsService {
     await queryRunner.startTransaction();
 
     try {
-      const group = await this.createGroup(addGroupDto, queryRunner);
+      const position = await this.getGroupPosition(
+        addGroupDto.position,
+        addGroupDto.form_id,
+      );
+
+      const group = await this.createGroup(
+        { ...addGroupDto, position: position },
+        queryRunner,
+      );
 
       await this.handleGroupPosition(group, addGroupDto.form_id);
 
@@ -75,13 +84,15 @@ export class DynamicFormsGroupsService {
     await queryRunner.manager.save(createdGroup, { reload: true });
 
     await Promise.all(
-      addGroupDto.fields.map(async (field) => {
-        await this.dynamicFormsFieldsService.createField(
-          field,
-          createdGroup.id,
-          queryRunner,
-        );
-      }),
+      addGroupDto.fields
+        .sort((fieldA, fieldB) => (fieldA.position <= fieldB.position ? -1 : 1))
+        .map(async (field, index) => {
+          await this.dynamicFormsFieldsService.createField(
+            { ...field, position: index + 1 },
+            createdGroup.id,
+            queryRunner,
+          );
+        }),
     );
 
     return createdGroup;
@@ -95,7 +106,16 @@ export class DynamicFormsGroupsService {
       },
     });
 
-    Object.assign(group, updateFormGroupDto);
+    if (updateFormGroupDto.position) {
+      const position = await this.getGroupPosition(
+        updateFormGroupDto.position,
+        group.form.id,
+      );
+
+      Object.assign(group, { ...updateFormGroupDto, position: position });
+    } else {
+      Object.assign(group, updateFormGroupDto);
+    }
 
     await this.formGroupRepository.save(group, { reload: true });
 
@@ -106,5 +126,20 @@ export class DynamicFormsGroupsService {
 
   async deleteGroup(id: number) {
     return await this.formGroupRepository.softDelete({ id });
+  }
+
+  private async getGroupPosition(position: number, form_id: number) {
+    const lastPosition = await this.formGroupRepository
+      .findOneOrFail({
+        where: { form: { id: form_id } },
+        order: { position: 'DESC' },
+      })
+      .then((group) => group.position);
+
+    if (position > lastPosition) {
+      return lastPosition + 1;
+    }
+
+    return position;
   }
 }

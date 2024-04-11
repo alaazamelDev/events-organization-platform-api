@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -17,6 +18,7 @@ export class CreateFormGroupDto {
   description: string;
 
   @IsInt()
+  @Min(1)
   position: number;
 
   @IsNotEmpty()
