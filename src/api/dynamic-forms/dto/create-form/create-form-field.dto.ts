@@ -5,6 +5,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Min,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -28,6 +29,7 @@ export class CreateFormFieldDto {
   required: boolean;
 
   @IsInt()
+  @Min(1)
   position: number;
 
   @IsExist({ tableName: 'field_types', column: 'id' })
@@ -38,12 +40,12 @@ export class CreateFormFieldDto {
   @Type(() => CreateFormFieldOptionDto)
   @ValidateNested({ each: true })
   @ArrayMinSize(2)
-  options: CreateFormFieldOptionDto[];
+  options: CreateFormFieldOptionDto[] = [];
 
   @ValidateIf((body) => fieldTypesWithValidationRules.includes(body.type_id))
   @IsOptional()
   @IsArray()
   @Type(() => CreateFormFieldValidationRuleDto)
   @ValidateNested({ each: true })
-  validation_rules: CreateFormFieldValidationRuleDto[];
+  validation_rules: CreateFormFieldValidationRuleDto[] = [];
 }

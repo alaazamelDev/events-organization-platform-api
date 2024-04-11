@@ -24,6 +24,10 @@ import { IsValidationRuleValueSuitsTheFieldConstraint } from './validators/is_va
 import { IsFieldValueMeetsValidationRulesConstraint } from './validators/is_field_value_meets_validation_rules_constraint';
 import { IsFieldTypeSupportValidationRulesConstraint } from './validators/is_field_type_support_validation_rules_constraint';
 import { DynamicFormsValidationRulesService } from './services/dynamic-forms-validation-rules.service';
+import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
+import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.service';
+import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
+import { IsGroupBelongsToTheFieldFormConstraint } from './validators/is_group_belongs_to_the_field_form_constraint';
 
 @Module({
   imports: [
@@ -46,6 +50,9 @@ import { DynamicFormsValidationRulesService } from './services/dynamic-forms-val
     DynamicFormsService,
     DynamicFormsQueryService,
     DynamicFormsValidationRulesService,
+    DynamicFormsFillService,
+    DynamicFormsFieldsService,
+    DynamicFormsGroupsService,
     IsFieldBelongsToForm,
     IsFieldOptionRequiredConstraint,
     IsOptionBelongsToTheFieldConstraint,
@@ -55,6 +62,7 @@ import { DynamicFormsValidationRulesService } from './services/dynamic-forms-val
     IsValidationRuleValueSuitsTheFieldConstraint,
     IsFieldValueMeetsValidationRulesConstraint,
     IsFieldTypeSupportValidationRulesConstraint,
+    IsGroupBelongsToTheFieldFormConstraint,
   ],
 })
 export class DynamicFormsModule {}
