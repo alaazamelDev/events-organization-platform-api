@@ -49,7 +49,10 @@ export class OrganizationService {
 
   async getOrganizationBlackList(organizationId: number) {
     const organization = await this.organizationRepository.findOne({
-      where: { id: organizationId },
+      where: {
+        id: organizationId,
+        blockedAttendees: { attendee: true },
+      },
       relations: { blockedAttendees: { attendee: { job: true } } },
     });
 
