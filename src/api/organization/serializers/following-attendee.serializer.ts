@@ -1,7 +1,7 @@
 import { AttendeeDetailsSerializer } from '../../attendee/serializers/attendee-details.serializer';
 import { DEFAULT_DB_DATETIME_FORMAT } from '../../../common/constants/constants';
 import { FollowingAttendee } from '../entities/following-attendee.entity';
-import moment from 'moment-timezone';
+import * as moment from 'moment';
 
 export class FollowingAttendeeSerializer {
   static serialize(data?: FollowingAttendee) {
@@ -10,9 +10,7 @@ export class FollowingAttendeeSerializer {
     }
     return {
       attendee: AttendeeDetailsSerializer.serialize(data.attendee),
-      following_date: moment(data.createdAt)
-        // .tz('')
-        .format(DEFAULT_DB_DATETIME_FORMAT),
+      following_date: moment(data.createdAt).format(DEFAULT_DB_DATETIME_FORMAT),
     };
   }
 
