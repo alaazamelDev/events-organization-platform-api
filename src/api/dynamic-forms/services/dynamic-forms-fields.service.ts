@@ -66,7 +66,7 @@ export class DynamicFormsFieldsService {
     });
 
     if (updateFormFieldDto.position) {
-      const position = this.calcFieldPosition(
+      const position = await this.calcFieldPosition(
         updateFormFieldDto.position,
         field.group.id,
       );
@@ -184,6 +184,8 @@ export class DynamicFormsFieldsService {
         order: { position: 'DESC' },
       })
       .then((field) => (field ? field.position : 0));
+
+    console.log(lastPosition);
 
     if (position > lastPosition) {
       return lastPosition + 1;
