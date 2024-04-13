@@ -1,4 +1,9 @@
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { CreateFormGroupDto } from './create-form-group.dto';
@@ -7,6 +12,7 @@ export class CreateFormDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
   description: string;
 

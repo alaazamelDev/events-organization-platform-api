@@ -130,11 +130,11 @@ export class DynamicFormsGroupsService {
 
   private async getGroupPosition(position: number, form_id: number) {
     const lastPosition = await this.formGroupRepository
-      .findOneOrFail({
+      .findOne({
         where: { form: { id: form_id } },
         order: { position: 'DESC' },
       })
-      .then((group) => group.position);
+      .then((group) => (group ? group.position : 0));
 
     if (position > lastPosition) {
       return lastPosition + 1;

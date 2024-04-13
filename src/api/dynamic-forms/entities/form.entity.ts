@@ -10,8 +10,11 @@ export class Form extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
-  description: string;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  description: string | null;
 
   @ManyToOne(() => Organization, (organization) => organization.forms)
   @JoinColumn({ name: 'organization_id' })
