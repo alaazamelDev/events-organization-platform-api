@@ -22,6 +22,7 @@ import { AttendeeContact } from '../entities/attendee-contact.entity';
 import { Contact } from '../../contact/entities/contact.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 import { BlockedAttendee } from '../../organization/entities/blocked-attendee.entity';
+import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
 
 @Injectable()
 export class AttendeeService {
@@ -49,6 +50,28 @@ export class AttendeeService {
     } catch (e) {
       return false;
     }
+  }
+
+  async followOrganization(organizationId: number, attendeeId: number) {
+    const followed = await this.dataSource.manager.findOne(FollowingAttendee, {
+      relations: { organization: true },
+      where: {
+        attendee: { id: attendeeId },
+        organization: { id: organizationId },
+      },
+    });
+
+    if (followed) {
+      return followed;
+    }
+
+    const created = this.dataSource.manager.create(FollowingAttendee, {
+      organization: { id: organizationId },
+      attendee: { id: attendeeId },
+    });
+    return await this.dataSource.manager.save(FollowingAttendee, created, {
+      reload: true,
+    });
   }
 
   async getAttendeeByUserId(userId: number): Promise<Attendee> {

@@ -66,6 +66,29 @@ export class OrganizationController {
     );
   }
 
+  @Get('is-blocked/:id')
+  @UseGuards(AccessTokenGuard)
+  async checkIfAttendeeIsBlocked(
+    @Req() req: any,
+    @Param('id') attendeeId: number,
+  ) {
+    const userData = req.user;
+    const userId = userData.sub;
+
+    // get employee organization id,
+    const employee = await this.employeeService.findByUserId(userId);
+    if (!employee) {
+      throw new ForbiddenException(
+        "You don't have the permissions to check the blacklist!",
+      );
+    }
+
+    return await this.organizationService.checkIfAttendeeIsBlocked(
+      employee.organization.id,
+      attendeeId,
+    );
+  }
+
   @Post()
   create(@Body() createOrganizationDto: CreateOrganizationDto) {
     return this.organizationService.create(createOrganizationDto);
