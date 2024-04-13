@@ -179,11 +179,11 @@ export class DynamicFormsFieldsService {
 
   private async calcFieldPosition(position: number, group_id: number) {
     const lastPosition = await this.formFieldRepository
-      .findOneOrFail({
+      .findOne({
         where: { group: { id: group_id } },
         order: { position: 'DESC' },
       })
-      .then((field) => field.position);
+      .then((field) => (field ? field.position : 0));
 
     if (position > lastPosition) {
       return lastPosition + 1;
