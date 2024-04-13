@@ -5,6 +5,7 @@ import { Employee } from '../../employee/entities/employee.entity';
 import { AddressOrganization } from './address_organization.entity';
 import { Form } from '../../dynamic-forms/entities/form.entity';
 import { BlockedAttendee } from './blocked-attendee.entity';
+import { FollowingAttendee } from './following-attendee.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization extends BaseEntity {
@@ -46,4 +47,10 @@ export class Organization extends BaseEntity {
     (blockedAttendee) => blockedAttendee.organization,
   )
   blockedAttendees?: BlockedAttendee[];
+
+  @OneToMany(
+    () => FollowingAttendee,
+    (followingAttendee) => followingAttendee.organization,
+  )
+  followingAttendees?: FollowingAttendee[];
 }

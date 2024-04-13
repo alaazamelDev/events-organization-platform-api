@@ -15,6 +15,7 @@ import { State } from '../state/entities/state.entity';
 import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { EmployeeModule } from '../employee/employee.module';
 import { AttendeeModule } from '../attendee/attendee.module';
+import { FollowingAttendee } from './entities/following-attendee.entity';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AttendeeModule } from '../attendee/attendee.module';
       State,
       AddressOrganization,
       BlockedAttendee,
+      FollowingAttendee,
     ]),
     EmployeeModule,
     AttendeeModule,

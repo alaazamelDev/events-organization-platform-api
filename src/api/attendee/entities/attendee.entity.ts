@@ -13,6 +13,7 @@ import { Job } from '../../job/entities/job.entity';
 import { AttendeeContact } from './attendee-contact.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
+import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
 
 @Entity('attendees')
 export class Attendee extends BaseEntity {
@@ -89,4 +90,10 @@ export class Attendee extends BaseEntity {
 
   @OneToMany(() => FilledForm, (filledForm) => filledForm.attendee)
   filledForms: FilledForm[];
+
+  @OneToMany(
+    () => FollowingAttendee,
+    (followingAttendee) => followingAttendee.attendee,
+  )
+  followingOrganizations: FollowingAttendee[];
 }

@@ -47,6 +47,13 @@ export class OrganizationService {
     private readonly dataSource: DataSource,
   ) {}
 
+  async checkIfAttendeeIsBlocked(organizationId: number, attendeeId: number) {
+    return await this.dataSource.manager.existsBy(BlockedAttendee, {
+      attendee: { id: attendeeId },
+      organization: { id: organizationId },
+    });
+  }
+
   async getOrganizationBlackList(organizationId: number) {
     const organization = await this.organizationRepository.findOne({
       where: {
