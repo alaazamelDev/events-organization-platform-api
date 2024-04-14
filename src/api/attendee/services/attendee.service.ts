@@ -62,15 +62,45 @@ export class AttendeeService {
     });
 
     if (followed) {
-      return followed;
+      return true;
     }
 
     const created = this.dataSource.manager.create(FollowingAttendee, {
       organization: { id: organizationId },
       attendee: { id: attendeeId },
     });
-    return await this.dataSource.manager.save(FollowingAttendee, created, {
-      reload: true,
+    const saved = await this.dataSource.manager.save(
+      FollowingAttendee,
+      created,
+    );
+    return !!saved;
+  }
+
+  async unfollowOrganization(organizationId: number, attendeeId: number) {
+    const followed = await this.dataSource.manager.findOne(FollowingAttendee, {
+      relations: { organization: true },
+      where: {
+        attendee: { id: attendeeId },
+        organization: { id: organizationId },
+      },
+    });
+
+    if (!followed) {
+      return true;
+    }
+
+    const deleted = await this.dataSource.manager.delete(FollowingAttendee, {
+      organization: { id: organizationId },
+      attendee: { id: attendeeId },
+    });
+
+    return deleted.affected != null && deleted.affected > 0;
+  }
+
+  async getListOfFollowedOrganizations(attendeeId: number) {
+    return await this.dataSource.manager.find(FollowingAttendee, {
+      where: { attendee: { id: attendeeId } },
+      relations: { organization: true },
     });
   }
 

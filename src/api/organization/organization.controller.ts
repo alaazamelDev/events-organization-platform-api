@@ -38,6 +38,7 @@ import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { BlockAttendeeDto } from './dto/block-attendee.dto';
 import { EmployeeService } from '../employee/employee.service';
 import { AttendeeService } from '../attendee/services/attendee.service';
+import { FollowingAttendeeSerializer } from './serializers/following-attendee.serializer';
 
 @Controller('organization')
 export class OrganizationController {
@@ -87,6 +88,30 @@ export class OrganizationController {
       employee.organization.id,
       attendeeId,
     );
+  }
+
+  @Get('followers-list')
+  @UseGuards(AccessTokenGuard)
+  async getListOfOrganizationFollowers(@Req() req: any) {
+    const userData = req.user;
+    const userId = userData.sub;
+
+    // get employee organization id,
+    const employee = await this.employeeService.findByUserId(userId);
+    if (!employee) {
+      throw new ForbiddenException(
+        "You don't have the permissions to check the organization followers!",
+      );
+    }
+
+    // get the data
+    const result =
+      await this.organizationService.getListOfOrganizationFollowers(
+        employee.organization.id,
+      );
+
+    // serialize and return
+    return FollowingAttendeeSerializer.serializeList(result);
   }
 
   @Post()

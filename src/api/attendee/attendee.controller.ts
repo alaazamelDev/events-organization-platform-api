@@ -28,6 +28,8 @@ import { LocalFileInterceptor } from '../../common/interceptors/local-file.inter
 import * as path from 'path';
 import * as fs from 'fs';
 import { Request } from 'express';
+import { OrganizationFollowingDto } from './dto/organization-following.dto';
+import { FollowingAttendeeSerializer } from '../organization/serializers/following-attendee.serializer';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -99,6 +101,51 @@ export class AttendeeController {
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
     payload.id = attendee.id;
     return this.attendeeService.updateAttendeeProfile(payload);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenGuard)
+  @Post('/follow-org')
+  async followOrganization(
+    @Body() payload: OrganizationFollowingDto,
+    @Req() req: any,
+  ) {
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+    return this.attendeeService.followOrganization(
+      payload.organization_id,
+      attendee.id,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenGuard)
+  @Post('/unfollow-org')
+  async unfollowOrganization(
+    @Body() payload: OrganizationFollowingDto,
+    @Req() req: any,
+  ) {
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+    return this.attendeeService.unfollowOrganization(
+      payload.organization_id,
+      attendee.id,
+    );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/followed-organizations')
+  async getListOfFollowedOrganizations(@Req() req: any) {
+    const userId = req.user.sub;
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+
+    // get the result
+    const result = await this.attendeeService.getListOfFollowedOrganizations(
+      attendee.id,
+    );
+
+    // serialize and return
+    return FollowingAttendeeSerializer.serializeList(result);
   }
 
   @UseInterceptors(
