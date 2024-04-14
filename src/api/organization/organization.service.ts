@@ -28,6 +28,7 @@ import { AllOrganizationsAdminSerializer } from './serializers/all_organizations
 import { hash } from 'bcrypt';
 import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { BlockedAttendeeSerializer } from './serializers/blocked-attendee.serializer';
+import { FollowingAttendee } from './entities/following-attendee.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -71,6 +72,13 @@ export class OrganizationService {
 
     const data = organization.blockedAttendees;
     return BlockedAttendeeSerializer.serializeList(data);
+  }
+
+  getListOfOrganizationFollowers(organizationId: number) {
+    return this.dataSource.manager.find(FollowingAttendee, {
+      where: { organization: { id: organizationId } },
+      relations: { attendee: true },
+    });
   }
 
   async create(createOrganizationDto: CreateOrganizationDto) {
