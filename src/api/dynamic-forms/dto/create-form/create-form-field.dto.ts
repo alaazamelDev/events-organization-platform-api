@@ -39,7 +39,7 @@ export class CreateFormFieldDto {
   @IsArray()
   @Type(() => CreateFormFieldOptionDto)
   @ValidateNested({ each: true })
-  @ArrayMinSize(2)
+  @ArrayMinSize(1)
   options: CreateFormFieldOptionDto[] = [];
 
   @ValidateIf((body) => fieldTypesWithValidationRules.includes(body.type_id))

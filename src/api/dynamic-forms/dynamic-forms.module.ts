@@ -28,6 +28,7 @@ import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
 import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.service';
 import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
 import { IsGroupBelongsToTheFieldFormConstraint } from './validators/is_group_belongs_to_the_field_form_constraint';
+import { IsFieldTypeSupportOptionsConstraint } from './validators/is_field_type_support_options_constraint';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { IsGroupBelongsToTheFieldFormConstraint } from './validators/is_group_be
     IsFieldValueMeetsValidationRulesConstraint,
     IsFieldTypeSupportValidationRulesConstraint,
     IsGroupBelongsToTheFieldFormConstraint,
+    IsFieldTypeSupportOptionsConstraint,
   ],
 })
 export class DynamicFormsModule {}

@@ -23,6 +23,7 @@ import { AddGroupDto } from './dto/update-form/add-group.dto';
 import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
 import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.service';
 import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
+import { AddOptionDto } from './dto/update-form/add-option.dto';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -133,6 +134,16 @@ export class DynamicFormsController {
     return this.dynamicFormsValidationRulesService.addValidationRule(
       validationRuleDto,
     );
+  }
+
+  @Post('addOption')
+  addOptionToField(@Body() addOptionDto: AddOptionDto) {
+    return this.dynamicFormsFieldsService.addOptionToField(addOptionDto);
+  }
+
+  @Delete('field/option/:id')
+  deleteFieldOption(@Param('id') id: string) {
+    return this.dynamicFormsFieldsService.deleteFieldOption(+id);
   }
 
   @Delete('validationRule/:id')

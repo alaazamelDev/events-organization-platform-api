@@ -8,6 +8,7 @@ import { FillFormFieldDto } from '../dto/fill-form/fill-form-field.dto';
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { ValidationRuleEnum } from '../enums/validation-rule.enum';
 import { FIELD_TYPE } from '../enums/field-types.enum';
+import { FormField } from '../entities/form-field.entity';
 
 @ValidatorConstraint({
   name: 'IsFieldValueMeetsValidationRulesConstraint',
@@ -21,6 +22,12 @@ export class IsFieldValueMeetsValidationRulesConstraint
   async validate(_value: any, _args: ValidationArguments) {
     const object = _args.object as FillFormFieldDto;
 
+    const { fieldTypeId } = await this.entityManager
+      .getRepository(FormField)
+      .createQueryBuilder('field')
+      .where('field.id = :id', { id: +object.field_id })
+      .getOneOrFail();
+
     const rules = await this.entityManager
       .getRepository(ValidationRule)
       .createQueryBuilder('rule')
@@ -28,17 +35,18 @@ export class IsFieldValueMeetsValidationRulesConstraint
       .getMany();
 
     const result = rules.map((rule) => {
+      console.log(object.field_id);
       switch (rule.rule) {
         case ValidationRuleEnum.MIN:
-          if (+object.field_id === FIELD_TYPE.NUMBER)
+          if (+fieldTypeId === +FIELD_TYPE.NUMBER)
             return +_value >= +rule.value;
-          else if (+object.field_id === FIELD_TYPE.TEXT)
+          else if (+fieldTypeId === +FIELD_TYPE.TEXT)
             return _value.length >= +rule.value;
           return false;
         case ValidationRuleEnum.MAX:
-          if (+object.field_id === FIELD_TYPE.NUMBER)
+          if (+fieldTypeId === +FIELD_TYPE.NUMBER)
             return +_value <= +rule.value;
-          else if (+object.field_id === FIELD_TYPE.TEXT)
+          else if (+fieldTypeId === +FIELD_TYPE.TEXT)
             return _value.length <= +rule.value;
           return false;
         default:

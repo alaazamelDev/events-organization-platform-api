@@ -1,9 +1,17 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 import { FormField } from './form-field.entity';
 import { FilledFormField } from './filled-form-field.entity';
 
 @Entity({ name: 'field_options' })
+@Unique(['name', 'formField'])
 export class FieldOption extends BaseEntity {
   @Column()
   name: string;

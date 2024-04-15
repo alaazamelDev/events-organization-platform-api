@@ -6,9 +6,13 @@ import { DataSource, Not, QueryRunner, Repository } from 'typeorm';
 import { FormGroup } from '../entities/form-group.entity';
 import { FieldType } from '../entities/field-type.entity';
 import { FieldOption } from '../entities/field-option.entity';
-import { fieldTypesWithValidationRules } from '../constants/constants';
+import {
+  fieldTypesWithOptions,
+  fieldTypesWithValidationRules,
+} from '../constants/constants';
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AddOptionDto } from '../dto/update-form/add-option.dto';
 
 @Injectable()
 export class DynamicFormsFieldsService {
@@ -132,20 +136,21 @@ export class DynamicFormsFieldsService {
 
     await queryRunner.manager.save(field, { reload: true });
 
-    field.options = await Promise.all(
-      createFormFieldDto.options.map(async (op) => {
-        const option = this.fieldOptionRepository.create({
-          name: op.name,
-          formField: field,
-        });
+    if (fieldTypesWithOptions.includes(+createFormFieldDto.type_id)) {
+      field.options = await Promise.all(
+        createFormFieldDto.options.map(async (op) => {
+          const option = this.fieldOptionRepository.create({
+            name: op.name,
+            formField: field,
+          });
 
-        await queryRunner.manager.save(option);
+          await queryRunner.manager.save(option);
 
-        return new FieldOption({ id: option.id, name: option.name });
-      }),
-    );
+          return new FieldOption({ id: option.id, name: option.name });
+        }),
+      );
+    }
 
-    // TODO, apply validation on this
     if (fieldTypesWithValidationRules.includes(+createFormFieldDto.type_id)) {
       field.validationRules = await Promise.all(
         createFormFieldDto.validation_rules.map(async (vr) => {
@@ -167,6 +172,21 @@ export class DynamicFormsFieldsService {
 
   async deleteField(id: number) {
     return await this.formFieldRepository.softDelete({ id });
+  }
+
+  async addOptionToField(addOptionDto: AddOptionDto) {
+    const option = this.fieldOptionRepository.create({
+      name: addOptionDto.name,
+      formField: { id: addOptionDto.field_id } as FormField,
+    });
+
+    await this.fieldOptionRepository.save(option, { reload: true });
+
+    return option;
+  }
+
+  async deleteFieldOption(optionID: number) {
+    return await this.fieldOptionRepository.softDelete(optionID);
   }
 
   async getFieldsTypes() {
