@@ -16,6 +16,7 @@ import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { EmployeeModule } from '../employee/employee.module';
 import { AttendeeModule } from '../attendee/attendee.module';
 import { FollowingAttendee } from './entities/following-attendee.entity';
+import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FollowingAttendee } from './entities/following-attendee.entity';
     ]),
     EmployeeModule,
     AttendeeModule,
+    FileUtilityModule,
   ],
   controllers: [OrganizationController],
   providers: [OrganizationService],
