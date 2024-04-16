@@ -52,6 +52,15 @@ export class AttendeeService {
     }
   }
 
+  async isAttendeeFollowingOrg(organizationId: number, attendeeId: number) {
+    return this.dataSource.manager.exists(FollowingAttendee, {
+      where: {
+        organization: { id: organizationId },
+        attendee: { id: attendeeId },
+      },
+    });
+  }
+
   async followOrganization(organizationId: number, attendeeId: number) {
     const followed = await this.dataSource.manager.findOne(FollowingAttendee, {
       relations: { organization: true },
@@ -279,7 +288,7 @@ export class AttendeeService {
 
   async getAttendeeDetails(attendeeId: number) {
     const attendee = await this.attendeeRepository.findOne({
-      relations: { address: true, contacts: true, job: true },
+      relations: { address: true, contacts: true, job: true, user: true },
       where: { id: attendeeId },
     });
 

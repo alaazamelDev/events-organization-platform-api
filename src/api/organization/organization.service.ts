@@ -29,6 +29,7 @@ import { hash } from 'bcrypt';
 import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { BlockedAttendeeSerializer } from './serializers/blocked-attendee.serializer';
 import { FollowingAttendee } from './entities/following-attendee.entity';
+import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 
 @Injectable()
 export class OrganizationService {
@@ -46,6 +47,7 @@ export class OrganizationService {
     @InjectRepository(AddressOrganization)
     private readonly addressOrganizationRepository: Repository<AddressOrganization>,
     private readonly dataSource: DataSource,
+    private readonly fileUtilityService: FileUtilityService,
   ) {}
 
   async checkIfAttendeeIsBlocked(organizationId: number, attendeeId: number) {
@@ -71,7 +73,10 @@ export class OrganizationService {
     }
 
     const data = organization.blockedAttendees;
-    return BlockedAttendeeSerializer.serializeList(data);
+    return BlockedAttendeeSerializer.serializeList(
+      data,
+      this.fileUtilityService,
+    );
   }
 
   getListOfOrganizationFollowers(organizationId: number) {

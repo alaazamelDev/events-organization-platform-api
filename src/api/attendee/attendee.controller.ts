@@ -30,13 +30,29 @@ import * as fs from 'fs';
 import { Request } from 'express';
 import { OrganizationFollowingDto } from './dto/organization-following.dto';
 import { FollowingAttendeeSerializer } from '../organization/serializers/following-attendee.serializer';
+import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 
 @Controller('attendee')
 export class AttendeeController {
   constructor(
     private readonly configurationListsService: ConfigurationListsService,
+    private readonly fileUtilityService: FileUtilityService,
     private readonly attendeeService: AttendeeService,
   ) {}
+
+  @Get('/is-following/:id')
+  @UseGuards(AccessTokenGuard)
+  async isFollowing(@Req() req: any, @Param('id') organizationId: number) {
+    const userData = req.user;
+    const userId = userData.sub;
+
+    const attendee = await this.attendeeService.getAttendeeByUserId(userId);
+    const attendeeId = attendee.id;
+    return await this.attendeeService.isAttendeeFollowingOrg(
+      organizationId,
+      attendeeId,
+    );
+  }
 
   @Post('/register')
   @UseInterceptors(
@@ -145,7 +161,10 @@ export class AttendeeController {
     );
 
     // serialize and return
-    return FollowingAttendeeSerializer.serializeList(result);
+    return FollowingAttendeeSerializer.serializeList(
+      result,
+      this.fileUtilityService,
+    );
   }
 
   @UseInterceptors(
@@ -231,7 +250,6 @@ export class AttendeeController {
       cover_img: `${ATTENDEE_PROFILES_STORAGE_PATH}/${coverImg.filename}`,
     };
 
-    console.log(updatedData);
     return this.attendeeService.updateAttendeeProfile(updatedData);
   }
 
