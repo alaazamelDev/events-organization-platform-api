@@ -68,10 +68,13 @@ export class EmployeeService {
       await queryRunner.manager.save(permissions);
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return employee;
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       throw e;
     }
   }

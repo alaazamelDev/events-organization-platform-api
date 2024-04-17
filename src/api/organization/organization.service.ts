@@ -135,10 +135,13 @@ export class OrganizationService {
       await queryRunner.manager.save(employeePermissions);
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return organization;
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       throw e;
     }
   }
@@ -229,6 +232,7 @@ export class OrganizationService {
     } catch (e) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
+
       throw e;
     }
   }
