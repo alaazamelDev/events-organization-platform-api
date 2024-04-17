@@ -1,13 +1,15 @@
 import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
+  BadRequestException,
   CallHandler,
+  ExecutionContext,
   HttpException,
   HttpStatus,
+  Injectable,
+  NestInterceptor,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -20,22 +22,24 @@ export class ResponseInterceptor implements NestInterceptor {
     );
   }
 
-  errorHandler(exception: HttpException, context: ExecutionContext) {
+  errorHandler(exception: any, context: ExecutionContext) {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
+    const exc = this.handleException(exception);
+
     const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
+      exc instanceof HttpException
+        ? exc.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     response.status(status).json({
       status: false,
       statusCode: status,
       path: request.url,
-      message: exception.message,
-      result: exception,
+      message: exc.message,
+      result: exc,
     });
   }
 
@@ -52,5 +56,22 @@ export class ResponseInterceptor implements NestInterceptor {
       statusCode,
       result: res,
     };
+  }
+
+  private handleException(exception: any) {
+    if (exception instanceof QueryFailedError) {
+      const exc = exception as any;
+      if (exc.code === '23505') {
+        const messageStart = exc.table.split('_').join(' ') + ' with';
+
+        return new BadRequestException(exc.detail.replace('Key', messageStart));
+      }
+
+      return exception;
+    } else if (exception instanceof EntityNotFoundError) {
+      return new BadRequestException('The provided id was not found');
+    }
+
+    return exception;
   }
 }

@@ -35,7 +35,6 @@ export class IsFieldValueMeetsValidationRulesConstraint
       .getMany();
 
     const result = rules.map((rule) => {
-      console.log(object.field_id);
       switch (rule.rule) {
         case ValidationRuleEnum.MIN:
           if (+fieldTypeId === +FIELD_TYPE.NUMBER)
