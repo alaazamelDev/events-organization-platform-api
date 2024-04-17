@@ -52,6 +52,7 @@ export class DynamicFormsFillService {
       );
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return filledForm;
     } catch (e) {

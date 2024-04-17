@@ -46,10 +46,10 @@ export class DynamicFormsService {
       );
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return form;
     } catch (e) {
-      console.log(e);
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
 

@@ -37,10 +37,13 @@ export class DynamicFormsGroupsService {
       await this.handleGroupPosition(group, addGroupDto.form_id);
 
       await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return group;
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       throw e;
     }
   }

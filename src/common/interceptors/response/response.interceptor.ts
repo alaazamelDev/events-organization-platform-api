@@ -10,6 +10,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
+import * as process from 'process';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
