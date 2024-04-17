@@ -13,6 +13,7 @@ export class AttendeeDetailsSerializer {
   ) {
     return {
       id: attendee.id,
+      user_id: attendee.user?.id,
       first_name: attendee.firstName,
       last_name: attendee.lastName,
       full_name: `${attendee.firstName} ${attendee.lastName}`,

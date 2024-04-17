@@ -39,6 +39,7 @@ import { BlockAttendeeDto } from './dto/block-attendee.dto';
 import { EmployeeService } from '../employee/employee.service';
 import { AttendeeService } from '../attendee/services/attendee.service';
 import { FollowingAttendeeSerializer } from './serializers/following-attendee.serializer';
+import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 
 @Controller('organization')
 export class OrganizationController {
@@ -46,6 +47,7 @@ export class OrganizationController {
     private readonly organizationService: OrganizationService,
     private readonly attendeeService: AttendeeService,
     private readonly employeeService: EmployeeService,
+    private readonly fileUtilityService: FileUtilityService,
   ) {}
 
   @Get('blacklist')
@@ -111,7 +113,10 @@ export class OrganizationController {
       );
 
     // serialize and return
-    return FollowingAttendeeSerializer.serializeList(result);
+    return FollowingAttendeeSerializer.serializeList(
+      result,
+      this.fileUtilityService,
+    );
   }
 
   @Post()
