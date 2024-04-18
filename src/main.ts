@@ -10,6 +10,7 @@ import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { SwaggerConfigService } from './config/openapi/swagger/config.service';
 import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
 import { useContainer } from 'class-validator';
+import { TimeoutInterceptor } from './common/interceptors/timeout/timeout.interceptor';
 
 const logger = new Logger('MAIN');
 
@@ -30,6 +31,8 @@ async function bootstrap(): Promise<void> {
 
   app.use(helmet({ crossOriginResourcePolicy: false }));
   app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalInterceptors(new TimeoutInterceptor());
+
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   app.enableCors({
