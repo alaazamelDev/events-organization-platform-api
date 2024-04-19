@@ -14,6 +14,18 @@ export class UserService {
     private readonly userRepository: IUserRepository,
   ) {}
 
+  async loadUserMenu(user: User) {
+    const userRoleId = user.userRole.id;
+
+    switch (userRoleId) {
+      case UserRole.ATTENDEE:
+        break;
+
+      case UserRole.EMPLOYEE:
+        break;
+    }
+  }
+
   async findOneByEmailOrUsername(username: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: [{ username }, { email: username }],
@@ -21,7 +33,10 @@ export class UserService {
   }
 
   async findById(id: number): Promise<User | null> {
-    return this.userRepository.findOneBy({ id });
+    return this.userRepository.findOne({
+      where: { id },
+      relations: { userRole: true },
+    });
   }
 
   async createUser(
