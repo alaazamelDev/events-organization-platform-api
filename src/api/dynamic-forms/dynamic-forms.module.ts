@@ -29,6 +29,8 @@ import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.servi
 import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
 import { IsGroupBelongsToTheFieldFormConstraint } from './validators/is_group_belongs_to_the_field_form_constraint';
 import { IsFieldTypeSupportOptionsConstraint } from './validators/is_field_type_support_options_constraint';
+import { IsOptionNameUniqueConstraint } from './validators/is_option_name_unique_constraint.dto';
+import { Attendee } from '../attendee/entities/attendee.entity';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { IsFieldTypeSupportOptionsConstraint } from './validators/is_field_type_
       FieldTypeOperatorsEntity,
       FormGroup,
       ValidationRule,
+      Attendee,
     ]),
   ],
   controllers: [DynamicFormsController],
@@ -65,6 +68,7 @@ import { IsFieldTypeSupportOptionsConstraint } from './validators/is_field_type_
     IsFieldTypeSupportValidationRulesConstraint,
     IsGroupBelongsToTheFieldFormConstraint,
     IsFieldTypeSupportOptionsConstraint,
+    IsOptionNameUniqueConstraint,
   ],
 })
 export class DynamicFormsModule {}

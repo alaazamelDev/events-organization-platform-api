@@ -2,6 +2,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -11,7 +12,6 @@ import { FormField } from './form-field.entity';
 import { FilledFormField } from './filled-form-field.entity';
 
 @Entity({ name: 'field_options' })
-@Unique(['name', 'formField'])
 export class FieldOption extends BaseEntity {
   @Column()
   name: string;

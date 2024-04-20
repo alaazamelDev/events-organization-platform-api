@@ -10,6 +10,7 @@ import { FilledForm } from '../entities/filled-form.entity';
 import { FilledFormField } from '../entities/filled-form-field.entity';
 import { FieldOption } from '../entities/field-option.entity';
 import { GetFilledFormDto } from '../dto/get-filled-form.dto';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class DynamicFormsFillService {
@@ -21,16 +22,22 @@ export class DynamicFormsFillService {
     private readonly filledFormFieldRepository: Repository<FilledFormField>,
     @InjectRepository(FieldOption)
     private readonly fieldOptionRepository: Repository<FieldOption>,
+    @InjectRepository(Attendee)
+    private readonly attendeeRepository: Repository<Attendee>,
   ) {}
 
-  async fillForm(fillFormDto: FillFormDto) {
+  async fillForm(fillFormDto: FillFormDto, userID: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
     await queryRunner.startTransaction();
     try {
+      const attendee = await this.attendeeRepository.findOneOrFail({
+        where: { user: { id: userID } as User },
+      });
+
       const filledForm = this.filledFormRepository.create({
-        attendee: { id: fillFormDto.attendee_id } as Attendee,
+        attendee: attendee,
         form: { id: fillFormDto.form_id } as Form,
         event: { id: fillFormDto.event_id } as Event,
       });

@@ -13,6 +13,8 @@ import {
 import { ValidationRule } from '../entities/validation-rule.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AddOptionDto } from '../dto/update-form/add-option.dto';
+import { FilledFormField } from '../entities/filled-form-field.entity';
+import { UpdateOptionNameDto } from '../dto/update-form/update-option-name.dto';
 
 @Injectable()
 export class DynamicFormsFieldsService {
@@ -26,6 +28,8 @@ export class DynamicFormsFieldsService {
     private readonly validationRuleRepository: Repository<ValidationRule>,
     @InjectRepository(FieldType)
     private readonly fieldTypeRepository: Repository<FieldType>,
+    @InjectRepository(FilledFormField)
+    private readonly filledFormFieldRepository: Repository<FilledFormField>,
   ) {}
 
   async addField(groupID: number, createFormFieldDto: CreateFormFieldDto) {
@@ -187,6 +191,43 @@ export class DynamicFormsFieldsService {
 
   async deleteFieldOption(optionID: number) {
     return await this.fieldOptionRepository.softDelete(optionID);
+  }
+
+  async updateFieldOptionName(updateOptionName: UpdateOptionNameDto) {
+    const queryRunner = await this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const option = await this.fieldOptionRepository.findOneOrFail({
+        where: { id: updateOptionName.option_id },
+      });
+
+      option.name = updateOptionName.name;
+
+      await queryRunner.manager.save(option, { reload: true });
+
+      const filled_fields = await this.filledFormFieldRepository.find({
+        where: { option: { id: option.id } },
+      });
+
+      await Promise.all(
+        filled_fields.map(async (f) => {
+          f.value = updateOptionName.name;
+          await queryRunner.manager.save(f);
+        }),
+      );
+
+      await queryRunner.commitTransaction();
+      return option;
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+
+      throw e;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getFieldsTypes() {

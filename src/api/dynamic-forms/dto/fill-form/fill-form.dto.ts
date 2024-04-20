@@ -14,9 +14,9 @@ export class FillFormDto {
   @IsExist({ tableName: 'forms', column: 'id' })
   form_id: number;
 
-  @IsInt()
-  @IsExist({ tableName: 'attendees', column: 'id' })
-  attendee_id: number;
+  // @IsInt()
+  // @IsExist({ tableName: 'attendees', column: 'id' })
+  // attendee_id: number;
 
   @IsArray()
   @Type(() => FillFormFieldDto)

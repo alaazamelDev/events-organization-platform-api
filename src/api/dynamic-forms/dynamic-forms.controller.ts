@@ -6,6 +6,8 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { DynamicFormsService } from './services/dynamic-forms.service';
 import { CreateFormDto } from './dto/create-form/create-form.dto';
@@ -24,6 +26,9 @@ import { DynamicFormsFillService } from './services/dynamic-forms-fill.service';
 import { DynamicFormsFieldsService } from './services/dynamic-forms-fields.service';
 import { DynamicFormsGroupsService } from './services/dynamic-forms-groups.service';
 import { AddOptionDto } from './dto/update-form/add-option.dto';
+import { UpdateOptionNameDto } from './dto/update-form/update-option-name.dto';
+import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
+import { Request } from 'express';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -115,8 +120,10 @@ export class DynamicFormsController {
   }
 
   @Post('fillForm')
-  fillForm(@Body() fillFormDto: FillFormDto) {
-    return this.dynamicFormsFillService.fillForm(fillFormDto);
+  @UseGuards(AccessTokenGuard)
+  fillForm(@Body() fillFormDto: FillFormDto, @Req() req: Request) {
+    const user: any = req.user;
+    return this.dynamicFormsFillService.fillForm(fillFormDto, +user['sub']);
   }
 
   @Get('attendee/filledForm')
@@ -149,5 +156,12 @@ export class DynamicFormsController {
   @Delete('validationRule/:id')
   deleteValidationRule(@Param('id') id: string) {
     return this.dynamicFormsValidationRulesService.removeValidationRule(+id);
+  }
+
+  @Patch('field/option')
+  updateFieldOptionName(@Body() updateOptionNameDto: UpdateOptionNameDto) {
+    return this.dynamicFormsFieldsService.updateFieldOptionName(
+      updateOptionNameDto,
+    );
   }
 }
