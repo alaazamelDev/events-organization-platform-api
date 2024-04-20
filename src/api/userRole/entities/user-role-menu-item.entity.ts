@@ -7,7 +7,7 @@ import { MenuItem } from '../../user/entities/menu-item.entity';
 export class UserRoleMenuItem extends BaseEntity {
   // relate the two relations
 
-  @ManyToOne(() => UserRole)
+  @ManyToOne(() => UserRole, { cascade: true })
   @JoinColumn({ name: 'user_role_id' })
   userRole: UserRole;
 
@@ -17,7 +17,7 @@ export class UserRoleMenuItem extends BaseEntity {
   )
   userRoleId: number;
 
-  @ManyToOne(() => MenuItem, { eager: true })
+  @ManyToOne(() => MenuItem, { eager: true, cascade: true })
   @JoinColumn({ name: 'menu_item_id' })
   menuItem: MenuItem;
 

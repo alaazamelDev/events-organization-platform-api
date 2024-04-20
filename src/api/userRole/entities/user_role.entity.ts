@@ -29,6 +29,6 @@ export class UserRole extends BaseEntity {
   createdAt: Date;
 
   // add the new relation. (user role menu items)
-  @OneToMany(() => UserRoleMenuItem, (item) => item.userRole, { eager: true })
+  @OneToMany(() => UserRoleMenuItem, (item) => item.userRole)
   roleMenuItems: UserRoleMenuItem[];
 }

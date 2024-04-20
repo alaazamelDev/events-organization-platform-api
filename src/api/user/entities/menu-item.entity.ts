@@ -33,7 +33,7 @@ export class MenuItem extends BaseEntity {
   icon?: string;
 
   // Parent MenuItem (null for root items)
-  @ManyToOne(() => MenuItem, { nullable: true })
+  @ManyToOne(() => MenuItem, (item: MenuItem) => item.subMenuItems)
   @JoinColumn({ name: 'parent_item_id' })
   parentItem?: MenuItem;
 
@@ -41,11 +41,10 @@ export class MenuItem extends BaseEntity {
   parentItemId?: number;
 
   // SubMenu Items (it can be empty)
-  @OneToMany(() => MenuItem, (item: MenuItem) => item.parentItem, {
-    eager: true,
-  })
+  @OneToMany(() => MenuItem, (item) => item.parentItem)
   subMenuItems: MenuItem[];
 
   @OneToMany(() => UserRoleMenuItem, (item) => item.menuItem)
+  @JoinColumn({ name: 'parent_item_id' })
   userRoleMenuItems: UserRoleMenuItem[];
 }
