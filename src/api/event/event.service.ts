@@ -328,7 +328,6 @@ export class EventService {
 
       // commit the transaction
       await queryRunner.commitTransaction();
-      await queryRunner.release();
 
       const newEntity = await queryRunner.manager.findOne(Event, {
         where: { id: savedEvent.id },
