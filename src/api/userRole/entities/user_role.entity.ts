@@ -2,6 +2,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Exclude } from 'class-transformer';
+import { UserRoleMenuItem } from './user-role-menu-item.entity';
 
 @Entity('user_roles')
 export class UserRole extends BaseEntity {
@@ -26,4 +27,8 @@ export class UserRole extends BaseEntity {
 
   @Exclude()
   createdAt: Date;
+
+  // add the new relation. (user role menu items)
+  @OneToMany(() => UserRoleMenuItem, (item) => item.userRole)
+  roleMenuItems: UserRoleMenuItem[];
 }

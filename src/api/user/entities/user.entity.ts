@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, RelationId } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserRole } from '../../userRole/entities/user_role.entity';
 import { Exclude } from 'class-transformer';
@@ -37,6 +37,9 @@ export class User extends BaseEntity {
   })
   @JoinColumn({ name: 'user_role_id' })
   userRole!: UserRole;
+
+  @RelationId((user: User) => user.userRole, 'user_role_id')
+  userRoleId: number;
 
   @Column({
     name: 'refresh_token',

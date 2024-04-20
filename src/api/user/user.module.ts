@@ -8,9 +8,11 @@ import { User } from './entities/user.entity';
 import { UserService } from './services/user.service';
 import { DataSource } from 'typeorm';
 import { userRepository } from './repositories/user.repository';
+import { UserController } from './user.controller';
+import { MenuItem } from './entities/menu-item.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, MenuItem])],
   exports: [UserService],
   providers: [
     UserService,
@@ -22,5 +24,6 @@ import { userRepository } from './repositories/user.repository';
       },
     },
   ],
+  controllers: [UserController],
 })
 export class UserModule {}

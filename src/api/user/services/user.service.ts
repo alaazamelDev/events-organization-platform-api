@@ -3,25 +3,40 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IUserRepository } from '../interfaces/user_repo.interface';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { QueryRunner } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { UserRole } from '../../userRole/entities/user_role.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UserRoleMenuItem } from '../../userRole/entities/user-role-menu-item.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: IUserRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
+  async loadUserMenu(user: User): Promise<UserRoleMenuItem[]> {
+    const userRoleId = user.userRole.id;
+
+    return this.dataSource.manager.find(UserRoleMenuItem, {
+      where: { userRole: { id: userRoleId } },
+      relations: { menuItem: { subMenuItems: true } },
+      relationLoadStrategy: 'query',
+    });
+  }
+
   async findOneByEmailOrUsername(username: string): Promise<User | null> {
-    return this.userRepository.findOne({
+    return this.dataSource.manager.findOne(User, {
       where: [{ username }, { email: username }],
+      loadRelationIds: true,
     });
   }
 
   async findById(id: number): Promise<User | null> {
-    return this.userRepository.findOneBy({ id });
+    return this.userRepository.findOne({
+      where: { id },
+    });
   }
 
   async createUser(
