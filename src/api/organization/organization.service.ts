@@ -157,7 +157,7 @@ export class OrganizationService {
   }
 
   async findOne(id: number) {
-    return await this.organizationRepository.findOneOrFail({
+    const organization = await this.organizationRepository.findOneOrFail({
       where: { id: id },
       relations: {
         addresses: { address: true },
@@ -165,6 +165,18 @@ export class OrganizationService {
         employees: { user: true },
       },
     });
+
+    const followingAttendeesCount = await this.dataSource.manager.count(
+      FollowingAttendee,
+      {
+        where: { organization: { id } },
+      },
+    );
+
+    return {
+      organization_followers_count: followingAttendeesCount,
+      ...organization,
+    };
   }
 
   async update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
