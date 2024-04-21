@@ -29,13 +29,14 @@ export class UserService {
   async findOneByEmailOrUsername(username: string): Promise<User | null> {
     return this.dataSource.manager.findOne(User, {
       where: [{ username }, { email: username }],
-      loadRelationIds: true,
+      relations: { userRole: true },
     });
   }
 
   async findById(id: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
+      relations: { userRole: true },
     });
   }
 
