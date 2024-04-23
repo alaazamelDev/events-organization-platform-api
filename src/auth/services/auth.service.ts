@@ -29,7 +29,6 @@ export class AuthService {
   }
 
   async login(user: User) {
-    console.log(user);
     const accessToken = await this.createAccessToken(user);
     const refreshToken = await this.createRefreshToken(user);
 
