@@ -92,24 +92,13 @@ export class OrganizationController {
     );
   }
 
-  @Get('followers-list')
+  @Get('followers-list/:id')
   @UseGuards(AccessTokenGuard)
-  async getListOfOrganizationFollowers(@Req() req: any) {
-    const userData = req.user;
-    const userId = userData.sub;
-
-    // get employee organization id,
-    const employee = await this.employeeService.findByUserId(userId);
-    if (!employee) {
-      throw new ForbiddenException(
-        "You don't have the permissions to check the organization followers!",
-      );
-    }
-
+  async getListOfOrganizationFollowers(@Param('id') organizationId: number) {
     // get the data
     const result =
       await this.organizationService.getListOfOrganizationFollowers(
-        employee.organization.id,
+        organizationId,
       );
 
     // serialize and return

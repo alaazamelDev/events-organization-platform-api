@@ -5,6 +5,7 @@ import { User } from '../../api/user/entities/user.entity';
 import * as uuid from 'uuid';
 import { compare, hash } from 'bcrypt';
 import { QueryRunner } from 'typeorm';
+import { UserRole } from '../../api/userRole/entities/user_role.entity';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,7 @@ export class AuthService {
   }
 
   async login(user: User) {
+    console.log(user);
     const accessToken = await this.createAccessToken(user);
     const refreshToken = await this.createRefreshToken(user);
 
@@ -74,11 +76,21 @@ export class AuthService {
   }
 
   public async createAccessToken(user: User) {
-    const payload = {
-      role_id: user.userRole.id,
-      username: user.username,
-      sub: user.id,
-    };
+    let payload;
+    if (user.userRole.id == UserRole.EMPLOYEE) {
+      payload = {
+        organization_id: user.employee!.organization.id,
+        role_id: user.userRole.id,
+        username: user.username,
+        sub: user.id,
+      };
+    } else {
+      payload = {
+        role_id: user.userRole.id,
+        username: user.username,
+        sub: user.id,
+      };
+    }
     return this.jwtService.sign(payload);
   }
 

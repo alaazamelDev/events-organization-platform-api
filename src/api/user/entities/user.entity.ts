@@ -1,7 +1,17 @@
-import { Column, Entity, JoinColumn, ManyToOne, RelationId } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  RelationId,
+} from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { UserRole } from '../../userRole/entities/user_role.entity';
 import { Exclude } from 'class-transformer';
+import { Employee } from '../../employee/entities/employee.entity';
+import { Attendee } from '../../attendee/entities/attendee.entity';
+import { Admin } from '../../admin/entities/admin.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -47,4 +57,13 @@ export class User extends BaseEntity {
     type: 'varchar',
   })
   refreshToken?: string;
+
+  @OneToOne(() => Employee, (type) => type.user)
+  employee?: Employee;
+
+  @OneToOne(() => Attendee, (type) => type.user)
+  attendee?: Attendee;
+
+  @OneToOne(() => Admin, (type) => type.user)
+  admin?: Admin;
 }
