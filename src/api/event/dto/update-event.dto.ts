@@ -13,6 +13,7 @@ import { Type } from 'class-transformer';
 import { CreateLocationDto } from './create-location.dto';
 import { EventType } from '../enums/event-type.enum';
 import { CreateEventDayDto } from './create-event-day.dto';
+import { Form } from '../../dynamic-forms/entities/form.entity';
 
 export class UpdateEventDto {
   id?: number;
@@ -64,8 +65,15 @@ export class UpdateEventDto {
   @ValidateNested({ each: true })
   days: CreateEventDayDto[];
 
+  @IsOptional()
+  @IsExist({ tableName: 'forms', column: 'id' })
+  form_id: number;
+
   static toModel(dto: UpdateEventDto) {
     let map: LooseObject = {};
+    if (dto.form_id) {
+      map.form = { id: dto.form_id } as Form;
+    }
     if (dto.event_type) {
       map.eventType = dto.event_type;
     }

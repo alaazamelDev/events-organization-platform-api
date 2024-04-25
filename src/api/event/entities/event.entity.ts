@@ -135,9 +135,9 @@ export class Event extends BaseEntity {
   @OneToMany(() => AttendeeEvent, (attendeeEvent) => attendeeEvent.event)
   attendees: AttendeeEvent[];
 
-  @ManyToOne(() => Form, (form) => form.events)
+  @ManyToOne(() => Form, (form) => form.events, { nullable: true })
   @JoinColumn({ name: 'form_id' })
-  form: Form;
+  form: Form | null;
 
   @OneToMany(() => FilledForm, (filledForm) => filledForm.event)
   filledForms: FilledForm[];

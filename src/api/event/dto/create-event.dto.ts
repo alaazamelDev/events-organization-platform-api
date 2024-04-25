@@ -81,4 +81,8 @@ export class CreateEventDto {
   @IsOptional()
   @IsBoolean()
   direct_register: boolean = true;
+
+  @IsOptional()
+  @IsExist({ tableName: 'forms', column: 'id' })
+  form_id: number;
 }

@@ -33,6 +33,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
 import { EventDay } from './entities/event-day.entity';
+import { Form } from '../dynamic-forms/entities/form.entity';
 
 @Injectable()
 export class EventService {
@@ -44,6 +45,8 @@ export class EventService {
     dataSource: DataSource,
     @InjectRepository(AttendeeEvent)
     private readonly attendeeEventRepository: Repository<AttendeeEvent>,
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
   ) {
     this.dataSource = dataSource;
     this.employeeService = employeeService;
@@ -148,6 +151,7 @@ export class EventService {
   // create new event
   async createEvent(payload: any) {
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
 
     try {
       // create a transaction
@@ -186,6 +190,7 @@ export class EventService {
         registrationEndDate: payload.registration_end_date
           ? moment(payload.registration_end_date).format(DEFAULT_DB_DATE_FORMAT)
           : undefined,
+        form: { id: payload.form_id } as Form,
       };
 
       let newData;
@@ -350,6 +355,8 @@ export class EventService {
     }
 
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
     try {
       await queryRunner.startTransaction();
 
@@ -420,6 +427,18 @@ export class EventService {
       await queryRunner.release();
       throw e;
     }
+  }
+
+  async deleteEventForm(eventID: number) {
+    const event = await this.eventRepository.findOneOrFail({
+      where: {
+        id: eventID,
+      },
+    });
+
+    event.form = null;
+
+    await this.eventRepository.save(event);
   }
 
   async getEventAttendees(eventID: number) {

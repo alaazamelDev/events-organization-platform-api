@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -132,5 +133,10 @@ export class EventController {
   @Get('attendees/:id')
   getEventAttendees(@Param('id') id: string) {
     return this.eventService.getEventAttendees(+id);
+  }
+
+  @Delete('/:id/form')
+  deleteEventForm(@Param('id') eventID: string) {
+    return this.eventService.deleteEventForm(+eventID);
   }
 }
