@@ -46,6 +46,11 @@ export class DynamicFormsController {
     return this.dynamicFormsFieldsService.getFieldsTypes();
   }
 
+  @Get(':formID/events')
+  getFormEvents(@Param('formID') formID: string) {
+    return this.dynamicFormsService.getFormEvents(+formID);
+  }
+
   @Post('query')
   queryForms(@Body() queryFormDto: QueryFormDto) {
     return this.dynamicFormsQueryService.queryFilledForms(queryFormDto);

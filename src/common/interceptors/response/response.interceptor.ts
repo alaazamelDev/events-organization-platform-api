@@ -10,7 +10,6 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
-import * as process from 'process';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -72,9 +71,18 @@ export class ResponseInterceptor implements NestInterceptor {
 
       return exception;
     } else if (exception instanceof EntityNotFoundError) {
-      return new BadRequestException(['The provided id was not found']);
+      const entityName = this.getEntityNameFromMessage(exception.message);
+      return new BadRequestException([
+        `The provided id was not found in ${entityName}`,
+      ]);
     }
 
     return exception;
+  }
+
+  private getEntityNameFromMessage(message: string) {
+    const entity = message.match(/"([^"]+)"/);
+
+    return entity ? entity[1].toLowerCase().concat('s') : '';
   }
 }

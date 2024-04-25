@@ -6,6 +6,7 @@ import { CreateFormDto } from '../dto/create-form/create-form.dto';
 import { Organization } from '../../organization/entities/organization.entity';
 import { UpdateFormDto } from '../dto/update-form/update-form.dto';
 import { DynamicFormsGroupsService } from './dynamic-forms-groups.service';
+import { Event } from '../../event/entities/event.entity';
 
 // TODO, write seeders
 @Injectable()
@@ -14,6 +15,8 @@ export class DynamicFormsService {
     private readonly dataSource: DataSource,
     @InjectRepository(Form)
     private readonly formRepository: Repository<Form>,
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
     private readonly dynamicFormsGroupsService: DynamicFormsGroupsService,
   ) {}
 
@@ -91,5 +94,21 @@ export class DynamicFormsService {
     return await this.formRepository.find({
       where: { organization: { id: id } },
     });
+  }
+
+  async getFormEvents(formID: number) {
+    return await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .where('event.form = :formID', { formID: formID })
+      .select(['event.id', 'event.title'])
+      .leftJoin('event.organization', 'organization')
+      .addSelect(['organization.id', 'organization.name'])
+      .getMany();
+    // return await this.eventRepository.find({
+    //   where: { form: { id: formID } },
+    //   relations: { organization: true },
+    //   select: { id: true, title: true, organization: { id: true, name: true } },
+    // });
   }
 }

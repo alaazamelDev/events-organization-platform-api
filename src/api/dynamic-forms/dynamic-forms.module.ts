@@ -47,6 +47,7 @@ import { Attendee } from '../attendee/entities/attendee.entity';
       FormGroup,
       ValidationRule,
       Attendee,
+      Event,
     ]),
   ],
   controllers: [DynamicFormsController],
