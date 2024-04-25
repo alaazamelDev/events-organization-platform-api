@@ -3,7 +3,7 @@ import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { IsQueryOperatorSuitsTheFieldConstraint } from '../../validators/is_query_operator_suits_the_field_constraint';
 
 export class QueryFormConditionDto {
-  @IsInt()
+  @IsNotEmpty()
   @IsExist({ tableName: 'form_fields', column: 'id' })
   field_id: number;
 
