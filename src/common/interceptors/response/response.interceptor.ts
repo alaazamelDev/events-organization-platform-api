@@ -83,6 +83,11 @@ export class ResponseInterceptor implements NestInterceptor {
   private getEntityNameFromMessage(message: string) {
     const entity = message.match(/"([^"]+)"/);
 
-    return entity ? entity[1].toLowerCase().concat('s') : '';
+    return entity
+      ? entity[1]
+          .replace(/([a-z])([A-Z])/g, '$1_$2')
+          .toLowerCase()
+          .concat('s')
+      : '';
   }
 }
