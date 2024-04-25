@@ -1,4 +1,4 @@
-import { IsArray, IsInt, Validate, ValidateNested } from 'class-validator';
+import { IsArray, IsNotEmpty, Validate, ValidateNested } from 'class-validator';
 import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 import { FillFormFieldDto } from './fill-form-field.dto';
 import { Type } from 'class-transformer';
@@ -6,11 +6,11 @@ import { IsFieldBelongsToForm } from '../../validators/is_field_belongs_to_form_
 import { AreRequiredFieldsProvidedConstraint } from '../../validators/are_required_fields_provided_constraint';
 
 export class FillFormDto {
-  @IsInt()
+  @IsNotEmpty()
   @IsExist({ tableName: 'events', column: 'id' })
   event_id: number;
 
-  @IsInt()
+  @IsNotEmpty()
   @IsExist({ tableName: 'forms', column: 'id' })
   form_id: number;
 
