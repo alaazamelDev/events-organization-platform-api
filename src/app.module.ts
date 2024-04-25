@@ -40,6 +40,8 @@ import { AgeGroupModule } from './api/age-group/age-group.module';
 import { SlotStatusModule } from './api/slot-status/slot-status.module';
 import { AttendEventModule } from './api/attend-event/attend-event.module';
 import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
+import { StripeModule } from './api/stripe/stripe.module';
+import * as process from 'process';
 
 @Module({
   imports: [
@@ -98,6 +100,9 @@ import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
     SlotStatusModule,
     AttendEventModule,
     DynamicFormsModule,
+    StripeModule.forRoot(process.env.STRIPE_KEY ? process.env.STRIPE_KEY : '', {
+      apiVersion: '2024-04-10',
+    }),
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
