@@ -40,6 +40,7 @@ import { AgeGroupModule } from './api/age-group/age-group.module';
 import { SlotStatusModule } from './api/slot-status/slot-status.module';
 import { AttendEventModule } from './api/attend-event/attend-event.module';
 import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
+import { FeedModule } from './api/feed/feed.module';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
     SlotStatusModule,
     AttendEventModule,
     DynamicFormsModule,
+    FeedModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
