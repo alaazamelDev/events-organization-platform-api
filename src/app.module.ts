@@ -42,6 +42,7 @@ import { AttendEventModule } from './api/attend-event/attend-event.module';
 import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
 import { StripeModule } from './api/stripe/stripe.module';
 import * as process from 'process';
+import { PaymentModule } from './api/payment/payment.module';
 
 @Module({
   imports: [
@@ -103,6 +104,7 @@ import * as process from 'process';
     StripeModule.forRoot(process.env.STRIPE_KEY ? process.env.STRIPE_KEY : '', {
       apiVersion: '2024-04-10',
     }),
+    PaymentModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
