@@ -40,6 +40,10 @@ export class AuthService {
       user_id: user.id,
       username: user.username,
       user_role: user.userRole.id,
+      organization_id:
+        user.userRole.id == UserRole.EMPLOYEE
+          ? user.employee?.organization.id
+          : undefined,
       access_token: accessToken,
       refresh_token: refreshToken,
     };
