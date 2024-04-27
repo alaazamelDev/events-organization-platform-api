@@ -8,11 +8,13 @@ import {
   Res,
   Headers,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { STRIPE_CLIENT } from '../stripe/constants/stripe.constants';
 import { Stripe } from 'stripe';
 import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('payment')
 export class PaymentController {
@@ -56,6 +58,7 @@ export class PaymentController {
   }
 
   @Post('checkout')
+  @UseGuards(AuthGuard)
   checkout() {
     return this.paymentService.checkout();
   }
@@ -65,9 +68,9 @@ export class PaymentController {
     return this.paymentService.getProducts();
   }
 
-  @Get('success/checkout/session')
-  success(@Res({ passthrough: true }) res: any) {
-    // console.log('res', res);
-    console.log(res.req.query.session_id);
-  }
+  // @Get('success/checkout/session')
+  // success(@Res({ passthrough: true }) res: any) {
+  //   // console.log('res', res);
+  //   console.log(res.req.query.session_id);
+  // }
 }

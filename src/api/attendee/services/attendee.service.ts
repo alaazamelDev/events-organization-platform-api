@@ -214,6 +214,7 @@ export class AttendeeService {
         user_role: user.userRole,
         access_token: accessToken,
         refresh_token: refreshToken,
+        email: user.email,
       };
     } catch (e) {
       await queryRunner.rollbackTransaction();
