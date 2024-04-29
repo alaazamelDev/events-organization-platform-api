@@ -85,4 +85,9 @@ export class CreateEventDto {
   @IsOptional()
   @IsExist({ tableName: 'forms', column: 'id' })
   form_id: number;
+
+  // This parameter specify whether the chatting room available or not.
+  @IsOptional()
+  @IsBoolean()
+  is_chatting_enabled: boolean = false;
 }

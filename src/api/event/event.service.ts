@@ -182,6 +182,7 @@ export class EventService {
         addressNotes: payload.address_notes ?? undefined,
         capacity: payload.capacity ?? undefined,
         directRegister: payload.direct_register,
+        isChattingEnabled: payload.is_chatting_enabled,
         registrationStartDate: payload.registration_start_date
           ? moment(payload.registration_start_date).format(
               DEFAULT_DB_DATE_FORMAT,

@@ -1,5 +1,12 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { Organization } from '../../organization/entities/organization.entity';
 import { Address } from '../../address/entities/address.entity';
 import { EventType } from '../enums/event-type.enum';
@@ -12,6 +19,7 @@ import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity
 import { EventDay } from './event-day.entity';
 import { Form } from '../../dynamic-forms/entities/form.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
+import { ChatGroup } from '../../chat/entities/chat-group.entity';
 
 @Entity('events')
 export class Event extends BaseEntity {
@@ -97,6 +105,14 @@ export class Event extends BaseEntity {
   })
   registrationEndDate?: Date;
 
+  @Column({
+    name: 'is_chatting_enabled',
+    type: 'boolean',
+    default: 'false',
+    nullable: false,
+  })
+  isChattingEnabled?: boolean;
+
   // RELATED MODELS
   @OneToMany(() => EventTag, (tags) => tags.event, {
     eager: true,
@@ -141,4 +157,7 @@ export class Event extends BaseEntity {
 
   @OneToMany(() => FilledForm, (filledForm) => filledForm.event)
   filledForms: FilledForm[];
+
+  @OneToOne(() => ChatGroup, (group) => group.event, { nullable: true })
+  chatGroup?: ChatGroup;
 }

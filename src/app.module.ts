@@ -41,6 +41,7 @@ import { SlotStatusModule } from './api/slot-status/slot-status.module';
 import { AttendEventModule } from './api/attend-event/attend-event.module';
 import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
 import { FeedModule } from './api/feed/feed.module';
+import { ChatModule } from './api/chat/chat.module';
 
 @Module({
   imports: [
@@ -100,6 +101,7 @@ import { FeedModule } from './api/feed/feed.module';
     AttendEventModule,
     DynamicFormsModule,
     FeedModule,
+    ChatModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],
