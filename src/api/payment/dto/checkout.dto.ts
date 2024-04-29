@@ -8,6 +8,6 @@ export class CheckoutDto {
   @Min(1)
   quantity: number;
 
-  // to delete
-  user_id: number;
+  @IsNotEmpty({ message: 'could not proceed payment operation' })
+  stripe_id: string;
 }

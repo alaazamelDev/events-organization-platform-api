@@ -101,6 +101,15 @@ export class UserService {
     return this.userRepository.update(updateUserDto.id, updateUserDto);
   }
 
+  async getUserEmailByID(userID: number) {
+    return await this.userRepository
+      .findOneOrFail({
+        where: { id: userID },
+        select: { id: true, email: true },
+      })
+      .then((user) => user.email);
+  }
+
   private async findUserByEmail(email: string) {
     return await this.userRepository
       .createQueryBuilder('users')

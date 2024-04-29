@@ -7,6 +7,7 @@ import { Event } from '../event/entities/event.entity';
 import { IsEventInRegisterPeriodConstraint } from './validators/is_event_in_register_period_constraint';
 import { Attendee } from '../attendee/entities/attendee.entity';
 import { ManageAttendEventService } from './manage-attend-event.service';
+import { IsEventCapacityCanHoldConstraint } from './validators/is_event_capacity_can_hold_constraint';
 
 @Module({
   imports: [TypeOrmModule.forFeature([AttendeeEvent, Event, Attendee])],
@@ -15,6 +16,7 @@ import { ManageAttendEventService } from './manage-attend-event.service';
     AttendEventService,
     ManageAttendEventService,
     IsEventInRegisterPeriodConstraint,
+    IsEventCapacityCanHoldConstraint,
   ],
 })
 export class AttendEventModule {}

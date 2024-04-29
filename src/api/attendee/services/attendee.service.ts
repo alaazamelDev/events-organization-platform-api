@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Attendee } from '../entities/attendee.entity';
 import { UserService } from '../../user/services/user.service';
 import { hash } from 'bcrypt';
@@ -114,17 +110,9 @@ export class AttendeeService {
   }
 
   async getAttendeeByUserId(userId: number): Promise<Attendee> {
-    const attendee = await this.attendeeRepository.findOneBy({
+    return await this.attendeeRepository.findOneByOrFail({
       user: { id: userId },
     });
-
-    if (!attendee) {
-      throw new BadRequestException(
-        'The given userId does not represent an attendee!',
-      );
-    }
-
-    return attendee;
   }
 
   async createAttendee(payload: RegisterAttendeeDto): Promise<any | null> {
@@ -319,5 +307,15 @@ export class AttendeeService {
         event: true,
       },
     });
+  }
+
+  async getAttendeeIdByEmail(email: string) {
+    return await this.dataSource
+      .getRepository(Attendee)
+      .createQueryBuilder('attendee')
+      .innerJoinAndSelect('attendee.user', 'user')
+      .where('user.email = :userEmail', { userEmail: email })
+      .select(['attendee.id'])
+      .getOneOrFail();
   }
 }
