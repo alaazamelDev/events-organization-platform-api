@@ -8,9 +8,20 @@ import { IsEventInRegisterPeriodConstraint } from './validators/is_event_in_regi
 import { Attendee } from '../attendee/entities/attendee.entity';
 import { ManageAttendEventService } from './manage-attend-event.service';
 import { IsEventCapacityCanHoldConstraint } from './validators/is_event_capacity_can_hold_constraint';
+import { AttendeesTickets } from '../payment/entities/attendees.tickets';
+import { PaymentModule } from '../payment/payment.module';
+import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/check-attendee-balance-against-event-fees.interceptor';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AttendeeEvent, Event, Attendee])],
+  imports: [
+    TypeOrmModule.forFeature([
+      AttendeeEvent,
+      Event,
+      Attendee,
+      AttendeesTickets,
+    ]),
+    PaymentModule,
+  ],
   controllers: [AttendEventController],
   providers: [
     AttendEventService,

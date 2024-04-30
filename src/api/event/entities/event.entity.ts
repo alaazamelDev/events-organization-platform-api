@@ -141,4 +141,7 @@ export class Event extends BaseEntity {
 
   @OneToMany(() => FilledForm, (filledForm) => filledForm.event)
   filledForms: FilledForm[];
+
+  @Column({ type: 'bigint', nullable: true })
+  fees: number | null;
 }

@@ -16,6 +16,7 @@ import { CheckEventFormIfSubmittedInterceptor } from './interceptors/check-event
 import { RoleGuard } from '../../common/guards/role/role.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../userRole/enums/user-role.enum';
+import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/check-attendee-balance-against-event-fees.interceptor';
 
 @Controller('attend-event')
 export class AttendEventController {
@@ -28,6 +29,7 @@ export class AttendEventController {
   @Roles(UserRoleEnum.ATTENDEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
   @UseInterceptors(CheckEventFormIfSubmittedInterceptor)
+  @UseInterceptors(CheckAttendeeBalanceAgainstEventFeesInterceptor)
   attendEvent(@Body() attendEventDto: AttendEventDto, @Req() req: Request) {
     const user: any = req.user;
     return this.attendEventService.attendEvent(attendEventDto, +user['sub']);
@@ -36,6 +38,7 @@ export class AttendEventController {
   @Post('manage')
   // @Roles(UserRoleEnum.EMPLOYEE)
   // @UseGuards(AccessTokenGuard, RoleGuard)
+  @UseInterceptors(CheckAttendeeBalanceAgainstEventFeesInterceptor)
   changeAttendEventStatus(
     @Body() changeAttendEventStatusDto: ChangeAttendEventStatusDto,
   ) {

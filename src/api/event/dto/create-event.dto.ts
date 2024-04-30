@@ -10,6 +10,7 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { CreateEventDayDto } from './create-event-day.dto';
@@ -81,4 +82,8 @@ export class CreateEventDto {
   @IsOptional()
   @IsBoolean()
   direct_register: boolean = true;
+
+  @IsOptional()
+  @Min(1)
+  fees: number;
 }

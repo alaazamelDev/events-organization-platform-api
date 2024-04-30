@@ -151,6 +151,7 @@ export class EventService {
 
     try {
       // create a transaction
+      await queryRunner.connect();
       await queryRunner.startTransaction();
 
       const userId: number = +payload.user['sub'];
@@ -178,6 +179,7 @@ export class EventService {
         addressNotes: payload.address_notes ?? undefined,
         capacity: payload.capacity ?? undefined,
         directRegister: payload.direct_register,
+        fees: payload.fees,
         registrationStartDate: payload.registration_start_date
           ? moment(payload.registration_start_date).format(
               DEFAULT_DB_DATE_FORMAT,
@@ -352,6 +354,7 @@ export class EventService {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.startTransaction();
+      await queryRunner.connect();
 
       // update the entry
       await queryRunner.manager.update(

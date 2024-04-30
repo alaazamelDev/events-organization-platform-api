@@ -73,7 +73,7 @@ export class PaymentService {
     const ticket = this.attendeeTickets.create({
       value: Number(quantity) * Number(value),
       attendee: attendee,
-      data: {},
+      data: { product: product.id },
       event: { id: TicketsEventTypes.BUY },
     });
 

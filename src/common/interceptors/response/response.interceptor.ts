@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Injectable,
   NestInterceptor,
+  NotFoundException,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -64,9 +65,7 @@ export class ResponseInterceptor implements NestInterceptor {
       if (exc.code === '23505') {
         const messageStart = exc.table.split('_').join(' ') + ' with';
 
-        return new BadRequestException([
-          exc.detail.replace('Key', messageStart),
-        ]);
+        return new NotFoundException([exc.detail.replace('Key', messageStart)]);
       }
 
       return exception;

@@ -63,7 +63,6 @@ export class PaymentController {
             email ? email : '',
             items ? items : [],
           );
-
           break;
         default:
           console.log('unsupported event type');
