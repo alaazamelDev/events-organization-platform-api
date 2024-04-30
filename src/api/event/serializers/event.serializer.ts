@@ -10,6 +10,7 @@ import { EventDaySerializer } from './event-day.serializer';
 import { EventPhotoSerializer } from './event-photo.serializer';
 import { EventAttachmentSerializer } from './event-attachment.serializer';
 import { EventApprovalStatusSerializer } from './event-approval-status.serializer';
+import { ChatGroupSerializer } from '../../chat/serializers/chat-group.serializer';
 
 export class EventSerializer {
   static serialize(
@@ -48,6 +49,8 @@ export class EventSerializer {
       approval_statuses: EventApprovalStatusSerializer.serializeList(
         data.approvalStatuses,
       ),
+      is_chatting_enabled: data.isChattingEnabled,
+      chat_group: ChatGroupSerializer.serialize(data.chatGroup),
     };
   }
 

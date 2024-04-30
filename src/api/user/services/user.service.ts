@@ -33,6 +33,15 @@ export class UserService {
     });
   }
 
+  async getUserRoleId(id: number): Promise<number> {
+    return await this.userRepository
+      .findOneOrFail({
+        where: { id },
+        loadRelationIds: true,
+      })
+      .then((user) => user.userRoleId);
+  }
+
   async findById(id: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },

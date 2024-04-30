@@ -6,9 +6,11 @@ import { AttendeeModule } from '../attendee/attendee.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GroupMessage } from './entities/group-message.entity';
 import { ChatGroup } from './entities/chat-group.entity';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
+    UserModule,
     AttendeeModule,
     TypeOrmModule.forFeature([GroupMessage, ChatGroup]),
   ],

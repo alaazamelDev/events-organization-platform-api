@@ -29,4 +29,6 @@ export class ChatGroup extends BaseEntity {
 
   @OneToMany(() => GroupMessage, (type) => type.group, { eager: true })
   messages: GroupMessage[];
+
+  memberCount?: number;
 }

@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-status.enum';
 import { Event } from '../../event/entities/event.entity';
 import { ChatGroup } from '../entities/chat-group.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
+import { ChatGroupFilter } from '../dto/chat-group.filter';
+import { GroupMessage } from '../entities/group-message.entity';
 
 /**
  * In this class we will provide the needed endpoint functions
@@ -68,5 +70,30 @@ export class ChatApiService {
       ])
       .distinctOn(['chat_group_id'])
       .getRawMany();
+  }
+
+  async getChatGroupById(params: ChatGroupFilter, groupId: number) {
+    // first get group details
+    const group = await this.dataSource
+      .getRepository(ChatGroup)
+      .findOne({ where: { id: groupId }, relations: { event: true } });
+
+    if (!group) {
+      throw new NotFoundException('The Given groupId was not exist');
+    }
+
+    const messages = await this.dataSource
+      .getRepository(GroupMessage)
+      .createQueryBuilder()
+      .where('chat_group_id = :groupId')
+      .setParameter('groupId', groupId)
+      .skip((params.page - 1) * params.pageSize)
+      .take(params.pageSize)
+      .getMany();
+
+    return {
+      ...group,
+      messages,
+    };
   }
 }
