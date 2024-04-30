@@ -92,12 +92,4 @@ export class PaymentController {
   getAttendeeTicketsBalance(@Param('id') id: string) {
     return this.paymentAttendeeService.getAttendeeTicketsBalance(+id);
   }
-
-  @Get('test')
-  testFill() {
-    return this.paymentService.fulfillTicketsOrder(
-      'alaa.11z111111a11111m11el10@gmail.com',
-      [],
-    );
-  }
 }
