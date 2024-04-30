@@ -8,6 +8,8 @@ import { EntityManager } from 'typeorm';
 import { Event } from '../../event/entities/event.entity';
 import { AttendeeEvent } from '../entities/attendee-event.entity';
 import { AttendeeEventStatus } from '../enums/attendee-event-status.enum';
+import { AttendEventDto } from '../dto/attend-event.dto';
+import { ChangeAttendEventStatusDto } from '../dto/change-attend-event-status.dto';
 
 @ValidatorConstraint({ name: 'IsEventCapacityCanHoldConstraint', async: true })
 @Injectable()
@@ -17,13 +19,15 @@ export class IsEventCapacityCanHoldConstraint
   constructor(private readonly entityManager: EntityManager) {}
 
   async validate(value: any, _args?: ValidationArguments): Promise<boolean> {
+    const object = _args?.object as AttendEventDto & ChangeAttendEventStatusDto;
+
     const event = await this.entityManager
       .getRepository(Event)
       .createQueryBuilder()
       .where('id = :eventID', { eventID: value })
       .getOneOrFail();
 
-    const registered = await this.entityManager
+    const registeredNum = await this.entityManager
       .getRepository(AttendeeEvent)
       .createQueryBuilder('attendeeEvent')
       .select([])
@@ -33,12 +37,13 @@ export class IsEventCapacityCanHoldConstraint
       })
       .groupBy('attendeeEvent.event')
       .addSelect('COUNT(*)', 'attendees')
-      .getRawOne();
+      .getRawOne()
+      .then((obj) => Number(obj.attendees));
 
-    // TODO continue implementing, if not direct register return true else check capacity
-    console.log(registered);
-
-    return !event.directRegister ? true : true;
+    return (!event.directRegister && !object.status) ||
+      (object.status && object.status !== AttendeeEventStatus.accepted)
+      ? true
+      : registeredNum < event.capacity;
   }
 
   defaultMessage(_validationArguments?: ValidationArguments): string {
