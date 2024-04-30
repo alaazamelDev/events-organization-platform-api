@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { IsExist } from '../../../common/decorators/is_exist.decorator';
@@ -69,6 +70,10 @@ export class UpdateEventDto {
   @IsExist({ tableName: 'forms', column: 'id' })
   form_id: number;
 
+  @IsOptional()
+  @Min(1)
+  fees: number;
+
   static toModel(dto: UpdateEventDto) {
     let map: LooseObject = {};
     if (dto.form_id) {
@@ -76,6 +81,10 @@ export class UpdateEventDto {
     }
     if (dto.event_type) {
       map.eventType = dto.event_type;
+    }
+
+    if (dto.fees) {
+      map.fees = dto.fees;
     }
 
     if (dto.address_id == null) {

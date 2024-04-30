@@ -63,7 +63,6 @@ export class PaymentController {
             email ? email : '',
             items ? items : [],
           );
-
           break;
         default:
           console.log('unsupported event type');
@@ -92,13 +91,5 @@ export class PaymentController {
   @Get('attendee/balance/:id')
   getAttendeeTicketsBalance(@Param('id') id: string) {
     return this.paymentAttendeeService.getAttendeeTicketsBalance(+id);
-  }
-
-  @Get('test')
-  testFill() {
-    return this.paymentService.fulfillTicketsOrder(
-      'alaa.11z111111a11111m11el10@gmail.com',
-      [],
-    );
   }
 }

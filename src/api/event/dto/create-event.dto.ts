@@ -12,6 +12,7 @@ import {
   IsString,
   MaxLength,
   ValidateIf,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { CreateEventDayDto } from './create-event-day.dto';
@@ -85,6 +86,10 @@ export class CreateEventDto {
   @Type(() => Boolean)
   @IsBoolean()
   direct_register: boolean = true;
+
+  @IsOptional()
+  @Min(1)
+  fees: number;
 
   @IsOptional()
   @IsExist({ tableName: 'forms', column: 'id' })

@@ -160,4 +160,7 @@ export class Event extends BaseEntity {
 
   @OneToOne(() => ChatGroup, (group) => group.event, { nullable: true })
   chatGroup?: ChatGroup;
+
+  @Column({ type: 'bigint', nullable: true })
+  fees: number | null;
 }

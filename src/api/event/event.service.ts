@@ -177,6 +177,7 @@ export class EventService {
 
     try {
       // create a transaction
+      await queryRunner.connect();
       await queryRunner.startTransaction();
 
       const userId: number = +payload.user['sub'];
@@ -205,6 +206,7 @@ export class EventService {
         capacity: payload.capacity ?? undefined,
         directRegister: payload.direct_register,
         isChattingEnabled: payload.is_chatting_enabled,
+        fees: payload.fees,
         registrationStartDate: payload.registration_start_date
           ? moment(payload.registration_start_date).format(
               DEFAULT_DB_DATE_FORMAT,
@@ -398,6 +400,7 @@ export class EventService {
 
     try {
       await queryRunner.startTransaction();
+      await queryRunner.connect();
 
       // update the entry
       await queryRunner.manager.update(

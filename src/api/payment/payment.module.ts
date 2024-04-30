@@ -16,5 +16,6 @@ import { PaymentAttendeeService } from './services/payment-attendee.service';
   ],
   controllers: [PaymentController],
   providers: [PaymentService, PaymentAttendeeService],
+  exports: [PaymentAttendeeService],
 })
 export class PaymentModule {}
