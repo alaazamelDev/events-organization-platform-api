@@ -6,10 +6,12 @@ import {
   IsDate,
   IsDefined,
   IsEnum,
+  IsNotEmpty,
   IsNumberString,
   IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { CreateEventDayDto } from './create-event-day.dto';
@@ -17,6 +19,7 @@ import { Type } from 'class-transformer';
 import { EventTagDto } from './event-tag.dto';
 import { EventAgeGroupDto } from './event-age-group.dto';
 import { CreateLocationDto } from './create-location.dto';
+import { CreateEventChatGroupDto } from './create-event-chat-group.dto';
 
 export class CreateEventDto {
   organization_id?: number;
@@ -79,6 +82,7 @@ export class CreateEventDto {
   age_groups: EventAgeGroupDto[];
 
   @IsOptional()
+  @Type(() => Boolean)
   @IsBoolean()
   direct_register: boolean = true;
 
@@ -88,6 +92,14 @@ export class CreateEventDto {
 
   // This parameter specify whether the chatting room available or not.
   @IsOptional()
+  @Type(() => Boolean)
   @IsBoolean()
   is_chatting_enabled: boolean = false;
+
+  // Custom validation function for chat_group based on is_chatting_enabled
+  @ValidateIf((dto: CreateEventDto) => dto.is_chatting_enabled)
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => CreateEventChatGroupDto)
+  chat_group?: CreateEventChatGroupDto;
 }

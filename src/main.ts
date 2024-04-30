@@ -15,7 +15,7 @@ import { TimeoutInterceptor } from './common/interceptors/timeout/timeout.interc
 const logger = new Logger('MAIN');
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   const appConfig: AppConfigService = app.get(AppConfigService);
   const sentryConfig: LoggerConfigService = app.get(LoggerConfigService);

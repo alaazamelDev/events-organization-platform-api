@@ -14,6 +14,7 @@ import { AttendeeContact } from './attendee-contact.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
+import { AttendeesTickets } from '../../payment/entities/attendees.tickets';
 
 @Entity('attendees')
 export class Attendee extends BaseEntity {
@@ -96,4 +97,10 @@ export class Attendee extends BaseEntity {
     (followingAttendee) => followingAttendee.attendee,
   )
   followingOrganizations: FollowingAttendee[];
+
+  @OneToMany(
+    () => AttendeesTickets,
+    (attendeeTickets) => attendeeTickets.attendee,
+  )
+  ticketsEvents: AttendeesTickets[];
 }

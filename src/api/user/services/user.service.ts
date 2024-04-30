@@ -33,6 +33,15 @@ export class UserService {
     });
   }
 
+  async getUserRoleId(id: number): Promise<number> {
+    return await this.userRepository
+      .findOneOrFail({
+        where: { id },
+        loadRelationIds: true,
+      })
+      .then((user) => user.userRoleId);
+  }
+
   async findById(id: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
@@ -99,6 +108,15 @@ export class UserService {
     }
 
     return this.userRepository.update(updateUserDto.id, updateUserDto);
+  }
+
+  async getUserEmailByID(userID: number) {
+    return await this.userRepository
+      .findOneOrFail({
+        where: { id: userID },
+        select: { id: true, email: true },
+      })
+      .then((user) => user.email);
   }
 
   private async findUserByEmail(email: string) {

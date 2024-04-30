@@ -34,6 +34,8 @@ import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
 import { EventDay } from './entities/event-day.entity';
 import { Form } from '../dynamic-forms/entities/form.entity';
+import { MessageGroupStatus } from '../chat/enums/message-group-status.enum';
+import { ChatGroup } from '../chat/entities/chat-group.entity';
 
 @Injectable()
 export class EventService {
@@ -53,10 +55,30 @@ export class EventService {
   }
 
   async findEvent(id: number): Promise<Event | null> {
-    return this.dataSource.manager.findOne(Event, {
-      where: { id },
-      relations: { organization: true },
-    });
+    return this.eventRepository
+      .findOneOrFail({
+        where: { id },
+        relations: { organization: true, chatGroup: true },
+      })
+      .then(async (event: Event | null) => {
+        // query group member count if exist
+        if (!event) {
+          return null;
+        }
+
+        let chatGroupMembers: number = 0;
+        if (event.isChattingEnabled) {
+          chatGroupMembers = await this.dataSource.manager
+            .getRepository(AttendeeEvent)
+            .count({ where: { event: { id } } });
+
+          if (event.chatGroup) {
+            event.chatGroup.memberCount = chatGroupMembers;
+          }
+        }
+
+        return event;
+      });
   }
 
   async updateEventTags(eventId: number, payload: UpdateEventTagsDto) {
@@ -315,6 +337,24 @@ export class EventService {
         }
       }
 
+      // create a chatting group if chatting is enabled.
+      if (payload.is_chatting_enabled) {
+        const eventChatGroup = {
+          event: { id: savedEvent.id },
+          status: MessageGroupStatus.disabled,
+          groupTitle: payload.chat_group.group_title,
+        };
+
+        // create entity
+        const createdGroup: ChatGroup = queryRunner.manager.create(
+          ChatGroup,
+          eventChatGroup,
+        );
+
+        // store it.
+        await queryRunner.manager.save(ChatGroup, createdGroup);
+      }
+
       // create a default approval status entity
       const eventApprovalStatusData = {
         approvalStatus: { id: ApprovalStatus.IN_REVIEW },
@@ -335,9 +375,7 @@ export class EventService {
       // commit the transaction
       await queryRunner.commitTransaction();
 
-      const newEntity = await queryRunner.manager.findOne(Event, {
-        where: { id: savedEvent.id },
-      });
+      const newEntity = await this.findEvent(savedEvent.id);
 
       await queryRunner.release();
       return newEntity;

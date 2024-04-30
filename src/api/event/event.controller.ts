@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   Req,
@@ -47,11 +46,6 @@ export class EventController {
   @Get('/show/:id')
   async showEvent(@Param('id') eventId: number) {
     const event = await this.eventService.findEvent(eventId);
-
-    if (!event) {
-      throw new NotFoundException(`Event with Id=${eventId} was not found!`);
-    }
-
     return EventSerializer.serialize(this.fileUtilityService, event);
   }
 
