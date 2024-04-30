@@ -24,6 +24,7 @@ import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CheckoutInterceptor } from './interceptors/checkout.interceptor';
 import { PaymentAttendeeService } from './services/payment-attendee.service';
+import * as process from 'process';
 
 @Controller('payment')
 export class PaymentController {
@@ -41,13 +42,15 @@ export class PaymentController {
     @Res() res: Response,
   ) {
     try {
-      const ws =
+      const local_ws =
         'whsec_cc93fc5e334d04df1b259c66ed98ec6d32425ec8bf0dd888ff1a7033673e12fb';
 
       const event = this.stripe.webhooks.constructEvent(
         req.rawBody ? req.rawBody : '',
         signature,
-        ws,
+        process.env.STRIPE_WEBHOOK_KEY
+          ? process.env.STRIPE_WEBHOOK_KEY
+          : local_ws,
       );
 
       switch (event.type) {
