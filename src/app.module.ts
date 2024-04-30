@@ -40,6 +40,9 @@ import { AgeGroupModule } from './api/age-group/age-group.module';
 import { SlotStatusModule } from './api/slot-status/slot-status.module';
 import { AttendEventModule } from './api/attend-event/attend-event.module';
 import { DynamicFormsModule } from './api/dynamic-forms/dynamic-forms.module';
+import { StripeModule } from './api/stripe/stripe.module';
+import * as process from 'process';
+import { PaymentModule } from './api/payment/payment.module';
 import { FeedModule } from './api/feed/feed.module';
 import { ChatModule } from './api/chat/chat.module';
 
@@ -102,6 +105,10 @@ import { ChatModule } from './api/chat/chat.module';
     DynamicFormsModule,
     FeedModule,
     ChatModule,
+    StripeModule.forRoot(process.env.STRIPE_KEY ? process.env.STRIPE_KEY : '', {
+      apiVersion: '2024-04-10',
+    }),
+    PaymentModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

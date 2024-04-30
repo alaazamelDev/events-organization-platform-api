@@ -31,6 +31,7 @@ import { Request } from 'express';
 import { OrganizationFollowingDto } from './dto/organization-following.dto';
 import { FollowingAttendeeSerializer } from '../organization/serializers/following-attendee.serializer';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
+import { RegisterAttendeeInStripeInterceptor } from '../payment/interceptors/register-attendee.in.stripe.interceptor';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -55,6 +56,7 @@ export class AttendeeController {
   }
 
   @Post('/register')
+  @UseInterceptors(RegisterAttendeeInStripeInterceptor)
   @UseInterceptors(
     FileFieldsInterceptor(
       [
