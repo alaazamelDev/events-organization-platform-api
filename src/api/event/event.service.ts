@@ -54,11 +54,14 @@ export class EventService {
     this.employeeService = employeeService;
   }
 
-  async findEvent(id: number): Promise<Event | null> {
+  async findEvent(
+    id: number,
+    includeChatGroup: boolean = false,
+  ): Promise<Event | null> {
     return this.eventRepository
       .findOneOrFail({
         where: { id },
-        relations: { organization: true, chatGroup: true },
+        relations: { organization: true, chatGroup: includeChatGroup },
       })
       .then(async (event: Event | null) => {
         // query group member count if exist
@@ -67,7 +70,8 @@ export class EventService {
         }
 
         let chatGroupMembers: number = 0;
-        if (event.isChattingEnabled) {
+        if (event.isChattingEnabled && event.chatGroup) {
+          console.log('Fetched');
           chatGroupMembers = await this.dataSource.manager
             .getRepository(AttendeeEvent)
             .count({ where: { event: { id } } });
@@ -120,7 +124,7 @@ export class EventService {
       await this.dataSource.manager.save(EventTag, addedTags);
     }
 
-    return this.findEvent(eventId);
+    return this.findEvent(eventId, true);
   }
 
   async updateEventAgeGroups(
