@@ -173,7 +173,6 @@ export class EventService {
   // create new event
   async createEvent(payload: any) {
     const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
 
     try {
       // create a transaction
