@@ -38,7 +38,7 @@ export class IsEventCapacityCanHoldConstraint
       .groupBy('attendeeEvent.event')
       .addSelect('COUNT(*)', 'attendees')
       .getRawOne()
-      .then((obj) => Number(obj.attendees));
+      .then((obj) => (obj ? Number(obj.attendees) : 0));
 
     return (!event.directRegister && !object.status) ||
       (object.status && object.status !== AttendeeEventStatus.accepted)

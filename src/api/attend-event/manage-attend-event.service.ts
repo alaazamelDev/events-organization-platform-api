@@ -37,8 +37,6 @@ export class ManageAttendEventService {
 
       attendEvent.status = manageAttendEventDto.status;
 
-      await queryRunner.manager.save(attendEvent);
-
       if (
         manageAttendEventDto.status === AttendeeEventStatus.accepted &&
         attendEvent.event.fees
@@ -51,8 +49,33 @@ export class ManageAttendEventService {
         });
 
         await queryRunner.manager.save(ticketsEvent);
+      } else if (
+        manageAttendEventDto.status === AttendeeEventStatus.rejected &&
+        attendEvent.event.fees
+      ) {
+        const toDelete = await this.dataSource
+          .getRepository(AttendeesTickets)
+          .createQueryBuilder('tickets')
+          .where('tickets.attendee = :attendeeID', {
+            attendeeID: manageAttendEventDto.attendee_id,
+          })
+          .andWhere('tickets.event = :eventID', {
+            eventID: TicketsEventTypes.REGISTER_IN_EVENT,
+          })
+          .andWhere(
+            `tickets.data ::jsonb @> \'{"event_id":"${manageAttendEventDto.event_id}"} \'`,
+          )
+          .getOneOrFail();
+
+        await queryRunner.manager
+          .createQueryBuilder()
+          .delete()
+          .from(AttendeesTickets)
+          .where('id = :id', { id: toDelete.id })
+          .execute();
       }
 
+      await queryRunner.manager.save(attendEvent);
       await queryRunner.commitTransaction();
       return attendEvent.status;
     } catch (e) {

@@ -65,7 +65,9 @@ export class ResponseInterceptor implements NestInterceptor {
       if (exc.code === '23505') {
         const messageStart = exc.table.split('_').join(' ') + ' with';
 
-        return new NotFoundException([exc.detail.replace('Key', messageStart)]);
+        return new BadRequestException([
+          exc.detail.replace('Key', messageStart),
+        ]);
       }
 
       return exception;

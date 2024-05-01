@@ -28,7 +28,7 @@ export class AttendeesTickets {
   })
   value: number;
 
-  @Column({ type: 'jsonb' })
+  @Column({ type: 'jsonb', nullable: false, default: {} })
   data: {};
 
   @ManyToOne(() => Attendee)

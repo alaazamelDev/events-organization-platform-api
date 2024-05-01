@@ -18,7 +18,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   const appConfig: AppConfigService = app.get(AppConfigService);
-  const sentryConfig: LoggerConfigService = app.get(LoggerConfigService);
+  // const sentryConfig: LoggerConfigService = app.get(LoggerConfigService);
   const swaggerConfig: SwaggerConfigService = app.get(SwaggerConfigService);
 
   app.setGlobalPrefix('api');
@@ -40,12 +40,12 @@ async function bootstrap(): Promise<void> {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   });
 
-  Sentry.init({
-    dsn: sentryConfig.dns,
-    enabled: sentryConfig.enable,
-    release: sentryConfig.release,
-    environment: appConfig.env,
-  });
+  // Sentry.init({
+  //   dsn: sentryConfig.dns,
+  //   enabled: sentryConfig.enable,
+  //   release: sentryConfig.release,
+  //   environment: appConfig.env,
+  // });
 
   if (appConfig.env == 'development') {
     const swagger: SwaggerConfigModule = new SwaggerConfigModule(swaggerConfig);
