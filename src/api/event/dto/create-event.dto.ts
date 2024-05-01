@@ -16,7 +16,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CreateEventDayDto } from './create-event-day.dto';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { EventTagDto } from './event-tag.dto';
 import { EventAgeGroupDto } from './event-age-group.dto';
 import { CreateLocationDto } from './create-location.dto';
@@ -88,6 +88,7 @@ export class CreateEventDto {
   direct_register: boolean = true;
 
   @IsOptional()
+  @Transform(({ value }) => Number(value))
   @Min(1)
   fees: number;
 
