@@ -395,7 +395,6 @@ export class EventService {
     }
 
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
 
     try {
       await queryRunner.startTransaction();
