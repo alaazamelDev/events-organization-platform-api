@@ -237,6 +237,7 @@ export class OrganizationService {
       await queryRunner.manager.save(organization);
       await queryRunner.manager.save(contacts);
       await queryRunner.manager.save(addresses);
+
       await queryRunner.commitTransaction();
       await queryRunner.release();
 

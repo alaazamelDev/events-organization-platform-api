@@ -63,8 +63,7 @@ export class AttendEventService {
           : AttendeeEventStatus.waiting,
       });
 
-      await queryRunner.manager.save(attendEvent, { reload: true });
-
+      await queryRunner.manager.save(attendEvent);
       await queryRunner.commitTransaction();
 
       return attendEvent.status;

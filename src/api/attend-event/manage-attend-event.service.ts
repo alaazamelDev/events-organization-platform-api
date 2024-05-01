@@ -34,6 +34,7 @@ export class ManageAttendEventService {
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
+
       attendEvent.status = manageAttendEventDto.status;
 
       await queryRunner.manager.save(attendEvent);
