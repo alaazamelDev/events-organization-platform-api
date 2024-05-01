@@ -45,7 +45,7 @@ export class EventController {
 
   @Get('/show/:id')
   async showEvent(@Param('id') eventId: number) {
-    const event = await this.eventService.findEvent(eventId);
+    const event = await this.eventService.findEvent(eventId, true);
     return EventSerializer.serialize(this.fileUtilityService, event);
   }
 
