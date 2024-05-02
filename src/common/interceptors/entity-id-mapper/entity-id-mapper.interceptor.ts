@@ -32,7 +32,6 @@ export class EntityIdMapperInterceptor implements NestInterceptor {
 
     // Check User Role
     const userRoleId: number = await this.userService.getUserRoleId(userID);
-    console.log('Role: ' + userRoleId);
 
     let entityId: null | number = null;
 

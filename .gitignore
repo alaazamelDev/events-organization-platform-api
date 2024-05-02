@@ -29,7 +29,8 @@ lerna-debug.log*
 
 .env
 
-/uploads
+uploads/*
+!uploads/assets/
 
 # IDE - VSCode
 .vscode/*
@@ -37,6 +38,3 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# upload folders
-uploads/attendee_profiles
