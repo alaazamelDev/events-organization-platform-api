@@ -20,12 +20,6 @@ export class PaymentService {
     private readonly attendeeService: AttendeeService,
   ) {}
 
-  async getProducts() {
-    return this.stripe.products
-      .list({ expand: ['data.default_price'] })
-      .then((products) => products.data);
-  }
-
   async checkout(checkoutDto: CheckoutDto) {
     return await this.stripe.checkout.sessions.create({
       line_items: [
