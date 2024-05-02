@@ -78,7 +78,13 @@ export class ResponseInterceptor implements NestInterceptor {
           `The provided id ${exception?.criteria?.where?.id} was not found in ${entityName}`,
         ]);
       } else {
-        `The can not match criteria ${exception?.criteria} in ${entityName}`;
+        let criteria: string = '';
+        for (const key in exception.criteria) {
+          criteria = criteria.concat(`${key}: ${exception.criteria[key]}, `);
+        }
+        return new BadRequestException([
+          `Can not match criteria ${criteria}in ${entityName}`,
+        ]);
       }
     }
 
