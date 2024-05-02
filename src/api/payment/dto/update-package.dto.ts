@@ -24,6 +24,10 @@ export class UpdatePackageDto {
   @IsBoolean()
   active?: boolean;
 
+  @IsOptional()
+  @IsString()
+  default_price: string;
+
   [key: string]: any;
 
   static toObject(updatePackageDto: UpdatePackageDto) {

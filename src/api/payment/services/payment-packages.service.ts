@@ -3,6 +3,7 @@ import { STRIPE_CLIENT } from '../../stripe/constants/stripe.constants';
 import { Stripe } from 'stripe';
 import { CreatePackageDto } from '../dto/create-package.dto';
 import { UpdatePackageDto } from '../dto/update-package.dto';
+import { AddPriceToPackageDto } from '../dto/add-price-to-package.dto';
 
 @Injectable()
 export class PaymentPackagesService {
@@ -38,5 +39,22 @@ export class PaymentPackagesService {
       updatePackageDto.package_id,
       UpdatePackageDto.toObject(updatePackageDto),
     );
+  }
+
+  async addPriceToPackage(addPriceToPackageDto: AddPriceToPackageDto) {
+    console.log(addPriceToPackageDto);
+    return await this.stripe.prices.create({
+      product: addPriceToPackageDto.package_id,
+      currency: 'usd',
+      unit_amount: addPriceToPackageDto.price * 100,
+    });
+  }
+
+  async getPackagePrices(packageID: string) {
+    return this.stripe.prices
+      .list({
+        product: packageID,
+      })
+      .then((obj) => obj.data);
   }
 }

@@ -35,6 +35,7 @@ import * as path from 'path';
 import { of } from 'rxjs';
 import * as process from 'process';
 import { UpdatePackageDto } from './dto/update-package.dto';
+import { AddPriceToPackageDto } from './dto/add-price-to-package.dto';
 
 @Controller('payment')
 export class PaymentController {
@@ -135,6 +136,16 @@ export class PaymentController {
   @Patch('packages/update')
   updatePackage(@Body() updatePackageDto: UpdatePackageDto) {
     return this.paymentPackagesService.updatePackage(updatePackageDto);
+  }
+
+  @Post('packages/addPrice')
+  addPriceToPackage(@Body() addPriceToPackageDto: AddPriceToPackageDto) {
+    return this.paymentPackagesService.addPriceToPackage(addPriceToPackageDto);
+  }
+
+  @Get('packages/:id/prices')
+  getPackagePrices(@Param('id') packageID: string) {
+    return this.paymentPackagesService.getPackagePrices(packageID);
   }
 
   @Get('attendee/balance/:id')
