@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AttendeesTickets } from './entities/attendees.tickets';
 import { TicketEventType } from './entities/ticket-event-type.entity';
 import { PaymentAttendeeService } from './services/payment-attendee.service';
+import { PaymentPackagesService } from './services/payment-packages.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { PaymentAttendeeService } from './services/payment-attendee.service';
     TypeOrmModule.forFeature([AttendeesTickets, TicketEventType]),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, PaymentAttendeeService],
+  providers: [PaymentService, PaymentAttendeeService, PaymentPackagesService],
   exports: [PaymentAttendeeService],
 })
 export class PaymentModule {}

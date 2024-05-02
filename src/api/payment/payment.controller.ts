@@ -6,17 +6,19 @@ import {
   Headers,
   Inject,
   Param,
+  Patch,
   Post,
   RawBodyRequest,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { PaymentService } from './services/payment.service';
 import { STRIPE_CLIENT } from '../stripe/constants/stripe.constants';
 import { Stripe } from 'stripe';
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import { CheckoutDto } from './dto/checkout.dto';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { RoleGuard } from '../../common/guards/role/role.guard';
@@ -24,13 +26,22 @@ import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CheckoutInterceptor } from './interceptors/checkout.interceptor';
 import { PaymentAttendeeService } from './services/payment-attendee.service';
+import { CreatePackageDto } from './dto/create-package.dto';
+import { PaymentPackagesService } from './services/payment-packages.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
+import { of } from 'rxjs';
 import * as process from 'process';
+import { UpdatePackageDto } from './dto/update-package.dto';
 
 @Controller('payment')
 export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
     private readonly paymentAttendeeService: PaymentAttendeeService,
+    private readonly paymentPackagesService: PaymentPackagesService,
     @Inject(STRIPE_CLIENT)
     private readonly stripe: Stripe,
   ) {}
@@ -86,13 +97,60 @@ export class PaymentController {
     return this.paymentService.checkout(checkoutDto);
   }
 
-  @Get('products')
-  getProducts() {
-    return this.paymentService.getProducts();
+  @Get('packages')
+  getPackages() {
+    return this.paymentPackagesService.getPackages();
+  }
+
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/packages/images',
+        filename(
+          _req: e.Request,
+          file: Express.Multer.File,
+          callback: (error: Error | null, filename: string) => void,
+        ) {
+          const filename =
+            path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+
+          const extension = path.parse(file.originalname).ext;
+
+          callback(null, `${filename}${extension}`);
+        },
+      }),
+    }),
+  )
+  @Post('packages/create')
+  createPackage(
+    @Body() createPackageDto: CreatePackageDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.paymentPackagesService.createPackage(
+      createPackageDto,
+      file ? file.filename : null,
+    );
+  }
+
+  @Patch('packages/update')
+  updatePackage(@Body() updatePackageDto: UpdatePackageDto) {
+    return this.paymentPackagesService.updatePackage(updatePackageDto);
   }
 
   @Get('attendee/balance/:id')
   getAttendeeTicketsBalance(@Param('id') id: string) {
     return this.paymentAttendeeService.getAttendeeTicketsBalance(+id);
+  }
+
+  @Get('packagePicture/:imageName')
+  getOrganizationCoverPicture(
+    @Param('imageName') imageName: string,
+    @Res() res: any,
+  ) {
+    return of(
+      res.sendFile(
+        path.join(process.cwd(), 'uploads/packages/images/' + imageName),
+      ),
+    );
   }
 }
