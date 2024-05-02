@@ -27,7 +27,7 @@ export class ChatGroup extends BaseEntity {
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
-  @OneToMany(() => GroupMessage, (type) => type.group, { eager: true })
+  @OneToMany(() => GroupMessage, (type) => type.group)
   messages: GroupMessage[];
 
   memberCount?: number;

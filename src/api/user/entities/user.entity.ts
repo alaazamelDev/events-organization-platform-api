@@ -58,10 +58,10 @@ export class User extends BaseEntity {
   })
   refreshToken?: string;
 
-  @OneToOne(() => Employee, (type) => type.user)
+  @OneToOne(() => Employee, (type) => type.user, { eager: true })
   employee?: Employee;
 
-  @OneToOne(() => Attendee, (type) => type.user)
+  @OneToOne(() => Attendee, (type) => type.user, { eager: true })
   attendee?: Attendee;
 
   @OneToOne(() => Admin, (type) => type.user)

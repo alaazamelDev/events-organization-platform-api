@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Req,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from '../../../auth/guards/access-token.guard';
 import { AttendeeService } from '../../attendee/services/attendee.service';
 import { ChatApiService } from '../services/chat-api.service';
@@ -14,17 +7,22 @@ import { Roles } from '../../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../../userRole/enums/user-role.enum';
 import { RoleGuard } from '../../../common/guards/role/role.guard';
 import { ChatGroupFilter } from '../dto/chat-group.filter';
-import { EntityIdMapperInterceptor } from '../../../common/interceptors/entity-id-mapper/entity-id-mapper.interceptor';
+import { GetChatGroupDto } from '../dto/get-chat-group.dto';
+import { GroupDetailsSerializer } from '../serializers/group-details.serializer';
+import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
 
 @Controller('chat')
 export class ChatController {
   private readonly attendeeService: AttendeeService;
   private readonly chatApiService: ChatApiService;
+  private readonly fileUtilityService: FileUtilityService;
 
   constructor(
     attendeeService: AttendeeService,
     chatApiService: ChatApiService,
+    fileUtilityService: FileUtilityService,
   ) {
+    this.fileUtilityService = fileUtilityService;
     this.attendeeService = attendeeService;
     this.chatApiService = chatApiService;
   }
@@ -45,11 +43,19 @@ export class ChatController {
   }
 
   @Get('group')
-  @Roles(UserRoleEnum.ATTENDEE)
+  @Roles(UserRoleEnum.ATTENDEE, UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
-  @UseInterceptors(EntityIdMapperInterceptor)
-  async getChatGroup(@Req() req: any, @Query() params: ChatGroupFilter) {
-    console.log(req, params);
-    return '';
+  async getChatGroup(
+    @Req() req: any,
+    @Query() params: ChatGroupFilter,
+    @Body() payload: GetChatGroupDto,
+  ) {
+    const user = req.user;
+    const result = await this.chatApiService.getChatGroupById(
+      params,
+      user,
+      payload,
+    );
+    return GroupDetailsSerializer.serialize(this.fileUtilityService, result);
   }
 }

@@ -1,8 +1,16 @@
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, RelationId } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  RelationId,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { MessageSenderType } from '../enums/message-sender-type.enum';
 import { ChatGroup } from './chat-group.entity';
+import { MessageReaction } from './message-reaction.entity';
 
 @Entity('group_messages')
 export class GroupMessage extends BaseEntity {
@@ -20,7 +28,7 @@ export class GroupMessage extends BaseEntity {
   })
   content: string;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User, { cascade: true, eager: true })
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 
@@ -34,4 +42,7 @@ export class GroupMessage extends BaseEntity {
     type: 'enum',
   })
   senderType: MessageSenderType;
+
+  @OneToMany(() => MessageReaction, (type) => type.message, { eager: true })
+  reactions: MessageReaction[];
 }
