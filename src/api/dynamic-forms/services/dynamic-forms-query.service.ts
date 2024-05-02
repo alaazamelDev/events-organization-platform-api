@@ -38,7 +38,7 @@ export class DynamicFormsQueryService {
 
     const result = await query.getRawMany();
 
-    return await Promise.all(
+    const results = await Promise.all(
       result.map(async (res) => {
         const filledForm = await this.dataSource
           .getRepository(FilledForm)
@@ -62,25 +62,31 @@ export class DynamicFormsQueryService {
             'attendees',
             'attendees.attendee = filled.attendee AND attendees.event = filled.event',
           )
-          .getOneOrFail();
-
-        const registerStatus = await this.dataSource
-          .getRepository(AttendeeEvent)
-          .createQueryBuilder('attendee_event')
-          .where('attendee_event.attendee = :attendeeID', {
-            attendeeID: filledForm.attendee.id,
-          })
-          .andWhere('attendee_event.event = :eventID', {
-            eventID: filledForm.event.id,
-          })
           .getOne();
 
-        return {
-          ...this.formatObject(filledForm),
-          status: registerStatus ? registerStatus.status : 'not registered',
-        };
+        if (filledForm) {
+          const registerStatus = await this.dataSource
+            .getRepository(AttendeeEvent)
+            .createQueryBuilder('attendee_event')
+            .where('attendee_event.attendee = :attendeeID', {
+              attendeeID: filledForm.attendee.id,
+            })
+            .andWhere('attendee_event.event = :eventID', {
+              eventID: filledForm.event.id,
+            })
+            .getOne();
+
+          return {
+            ...this.formatObject(filledForm),
+            status: registerStatus ? registerStatus.status : 'not registered',
+          };
+        } else {
+          return;
+        }
       }),
-    );
+    ).then((results) => results.filter((r) => r));
+
+    return results;
   }
 
   private formatObject(filledForm: FilledForm) {
