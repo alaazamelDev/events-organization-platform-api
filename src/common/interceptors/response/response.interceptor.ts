@@ -74,7 +74,7 @@ export class ResponseInterceptor implements NestInterceptor {
     } else if (exception instanceof EntityNotFoundError) {
       const entityName = this.getEntityNameFromMessage(exception.message);
       return new BadRequestException([
-        `The provided id was not found in ${entityName}`,
+        `The provided id ${exception?.criteria?.where?.id} was not found in ${entityName}`,
       ]);
     }
 

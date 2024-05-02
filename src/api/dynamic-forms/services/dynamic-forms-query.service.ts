@@ -64,7 +64,7 @@ export class DynamicFormsQueryService {
           )
           .getOneOrFail();
 
-        const register = await this.dataSource
+        const registerStatus = await this.dataSource
           .getRepository(AttendeeEvent)
           .createQueryBuilder('attendee_event')
           .where('attendee_event.attendee = :attendeeID', {
@@ -77,7 +77,7 @@ export class DynamicFormsQueryService {
 
         return {
           ...this.formatObject(filledForm),
-          status: register ? register.status : 'not registered',
+          status: registerStatus ? registerStatus.status : 'not registered',
         };
       }),
     );
