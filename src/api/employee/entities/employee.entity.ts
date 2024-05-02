@@ -4,9 +4,9 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
-  JoinTable,
   OneToMany,
+  OneToOne,
+  RelationId,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Organization } from '../../organization/entities/organization.entity';
@@ -32,6 +32,9 @@ export class Employee extends BaseEntity {
   @ManyToOne(() => Organization, (organization) => organization.employees)
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
+
+  @RelationId((employee: Employee) => employee.organization, 'organization_id')
+  organizationId?: number;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })

@@ -17,6 +17,7 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<User | null> {
     const user: User | null =
       await this.usersService.findOneByEmailOrUsername(username);
+    console.log(user);
     if (user) {
       const passwordMatch = await compare(pass, user.password);
 
@@ -42,7 +43,7 @@ export class AuthService {
       user_role: user.userRole.id,
       organization_id:
         user.userRole.id == UserRole.EMPLOYEE
-          ? user.employee?.organization.id
+          ? user.employee?.organizationId
           : undefined,
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -82,7 +83,7 @@ export class AuthService {
     let payload;
     if (user.userRole.id == UserRole.EMPLOYEE) {
       payload = {
-        organization_id: user.employee!.organization.id,
+        organization_id: user.employee!.organizationId,
         role_id: user.userRole.id,
         username: user.username,
         sub: user.id,
