@@ -10,5 +10,5 @@ export class QueryFormDto {
 
   @Type(() => QueryFormGroupDto)
   @ValidateNested({ each: true })
-  groups: QueryFormGroupDto[];
+  groups: QueryFormGroupDto[] = [];
 }

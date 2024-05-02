@@ -73,9 +73,12 @@ export class DynamicFormsQueryService {
           .andWhere('attendee_event.event = :eventID', {
             eventID: filledForm.event.id,
           })
-          .getOneOrFail();
+          .getOne();
 
-        return { ...this.formatObject(filledForm), status: register.status };
+        return {
+          ...this.formatObject(filledForm),
+          status: register ? register.status : 'not registered',
+        };
       }),
     );
   }
