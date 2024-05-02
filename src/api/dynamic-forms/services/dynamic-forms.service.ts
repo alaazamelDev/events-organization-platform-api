@@ -101,14 +101,9 @@ export class DynamicFormsService {
       .getRepository(Event)
       .createQueryBuilder('event')
       .where('event.form = :formID', { formID: formID })
-      .select(['event.id', 'event.title'])
+      .select(['event.id', 'event.title', 'event.createdAt'])
       .leftJoin('event.organization', 'organization')
       .addSelect(['organization.id', 'organization.name'])
       .getMany();
-    // return await this.eventRepository.find({
-    //   where: { form: { id: formID } },
-    //   relations: { organization: true },
-    //   select: { id: true, title: true, organization: { id: true, name: true } },
-    // });
   }
 }
