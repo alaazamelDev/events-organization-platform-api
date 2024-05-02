@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AccessTokenGuard } from '../../../auth/guards/access-token.guard';
 import { AttendeeService } from '../../attendee/services/attendee.service';
 import { ChatApiService } from '../services/chat-api.service';
@@ -42,7 +52,8 @@ export class ChatController {
     return ChatListItemSerializer.serializeList(result);
   }
 
-  @Get('group')
+  @Post('group')
+  @HttpCode(HttpStatus.OK)
   @Roles(UserRoleEnum.ATTENDEE, UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
   async getChatGroup(
