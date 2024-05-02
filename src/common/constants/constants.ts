@@ -8,3 +8,5 @@ export const REGION = 'SY';
 export const DEFAULT_DATE_FORMAT = 'DD-MM-YYYY';
 export const DEFAULT_DB_DATE_FORMAT = 'YYYY-MM-DD';
 export const DEFAULT_DB_DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
+export const DEFAULT_AVATAR_IMAGE_URL = '/assets/user-avatar.png';
