@@ -9,19 +9,21 @@ export class FeedService {
   constructor(private readonly dataSource: DataSource) {}
 
   async getSoonEvents(query: GenericFilter) {
+    const events = await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('e')
+      .innerJoin('e.days', 'ed')
+      .groupBy('e.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .orderBy('start_day')
+      .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
+      .skip((query.page - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getManyAndCount();
+
     return {
-      data: await this.dataSource
-        .getRepository(Event)
-        .createQueryBuilder('e')
-        .innerJoin('e.days', 'ed')
-        .groupBy('e.id')
-        .addSelect('MIN(ed.dayDate)', 'start_day')
-        .orderBy('start_day')
-        .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
-        .skip((query.page - 1) * query.pageSize)
-        .take(query.pageSize)
-        .getMany(),
-      count: await this.dataSource.getRepository(Event).count(),
+      data: events[0],
+      count: events[1],
     };
   }
 
