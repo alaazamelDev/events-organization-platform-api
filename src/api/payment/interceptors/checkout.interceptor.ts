@@ -26,7 +26,11 @@ export class CheckoutInterceptor implements NestInterceptor {
     try {
       const request = context.switchToHttp().getRequest();
       const userID = request.user.sub;
+
+      console.log(userID);
       const userEmail = await this.userService.getUserEmailByID(userID);
+
+      console.log(userEmail);
       const stripeCustomer =
         await this.paymentAttendeeService.getAttendeeStripeIdByEmail(userEmail);
 
@@ -36,9 +40,9 @@ export class CheckoutInterceptor implements NestInterceptor {
         });
 
         request.body.stripe_id = newCustomer.id;
+      } else {
+        request.body.stripe_id = stripeCustomer.id;
       }
-
-      request.body.stripe_id = stripeCustomer.id;
     } catch (e) {
       throw e;
     }

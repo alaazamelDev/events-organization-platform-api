@@ -17,6 +17,7 @@ import { RoleGuard } from '../../common/guards/role/role.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/check-attendee-balance-against-event-fees.interceptor';
+import { HandleTicketsPaymentInEventRegisterInterceptor } from './interceptors/handle-tickets-payment-in-event-register.interceptor';
 
 @Controller('attend-event')
 export class AttendEventController {
@@ -30,6 +31,7 @@ export class AttendEventController {
   @UseGuards(AccessTokenGuard, RoleGuard)
   @UseInterceptors(CheckEventFormIfSubmittedInterceptor)
   @UseInterceptors(CheckAttendeeBalanceAgainstEventFeesInterceptor)
+  // @UseInterceptors(HandleTicketsPaymentInEventRegisterInterceptor)
   attendEvent(@Body() attendEventDto: AttendEventDto, @Req() req: Request) {
     const user: any = req.user;
     return this.attendEventService.attendEvent(attendEventDto, +user['sub']);

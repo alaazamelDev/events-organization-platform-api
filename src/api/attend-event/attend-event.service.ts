@@ -38,6 +38,7 @@ export class AttendEventService {
         id: attendEventDto.event_id,
       },
     });
+
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
