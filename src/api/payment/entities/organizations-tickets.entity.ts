@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Organization } from '../../organization/entities/organization.entity';
 
-@Entity({ name: 'organizers_tickets' })
+@Entity({ name: 'organizations_tickets' })
 export class OrganizationsTickets {
   @PrimaryGeneratedColumn({
     name: 'id',
