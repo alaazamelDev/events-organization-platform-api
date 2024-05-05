@@ -17,7 +17,11 @@ import { RoleGuard } from '../../common/guards/role/role.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/check-attendee-balance-against-event-fees.interceptor';
-import { HandleTicketsPaymentInEventRegisterInterceptor } from './interceptors/handle-tickets-payment-in-event-register.interceptor';
+import { TransactionInterceptor } from '../../common/interceptors/transaction/transaction.interceptor';
+import { HandleRegisterInEventsPaymentInterceptor } from './interceptors/handle-register-in-events-payment.interceptor';
+import { QueryRunnerParam } from '../../common/decorators/query-runner-param.decorator';
+import { QueryRunner } from 'typeorm';
+import { HandleChangeAttendeeEventStatusPaymentInterceptor } from './interceptors/handle-change-attendee-event-status-payment.interceptor';
 
 @Controller('attend-event')
 export class AttendEventController {
@@ -29,23 +33,41 @@ export class AttendEventController {
   @Post()
   @Roles(UserRoleEnum.ATTENDEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
-  @UseInterceptors(CheckEventFormIfSubmittedInterceptor)
-  @UseInterceptors(CheckAttendeeBalanceAgainstEventFeesInterceptor)
-  // @UseInterceptors(HandleTicketsPaymentInEventRegisterInterceptor)
-  attendEvent(@Body() attendEventDto: AttendEventDto, @Req() req: Request) {
+  @UseInterceptors(
+    TransactionInterceptor,
+    CheckEventFormIfSubmittedInterceptor,
+    CheckAttendeeBalanceAgainstEventFeesInterceptor,
+    HandleRegisterInEventsPaymentInterceptor,
+  )
+  attendEvent(
+    @QueryRunnerParam() queryRunner: QueryRunner,
+    @Body() attendEventDto: AttendEventDto,
+    @Req() req: Request,
+  ) {
+    // console.log(queryRunner);
     const user: any = req.user;
-    return this.attendEventService.attendEvent(attendEventDto, +user['sub']);
+    return this.attendEventService.attendEvent(
+      attendEventDto,
+      +user['sub'],
+      queryRunner,
+    );
   }
 
   @Post('manage')
   // @Roles(UserRoleEnum.EMPLOYEE)
   // @UseGuards(AccessTokenGuard, RoleGuard)
-  @UseInterceptors(CheckAttendeeBalanceAgainstEventFeesInterceptor)
+  @UseInterceptors(
+    TransactionInterceptor,
+    CheckAttendeeBalanceAgainstEventFeesInterceptor,
+    HandleChangeAttendeeEventStatusPaymentInterceptor,
+  )
   changeAttendEventStatus(
     @Body() changeAttendEventStatusDto: ChangeAttendEventStatusDto,
+    @QueryRunnerParam() queryRunner: QueryRunner,
   ) {
     return this.manageAttendEventService.changeAttendEventStatus(
       changeAttendEventStatusDto,
+      queryRunner,
     );
   }
 }

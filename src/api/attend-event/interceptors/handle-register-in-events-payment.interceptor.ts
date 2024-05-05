@@ -4,42 +4,44 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable, throwError } from 'rxjs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
-import { DataSource, Repository } from 'typeorm';
-import { Event } from '../../event/entities/event.entity';
-import { AttendeeEvent } from '../entities/attendee-event.entity';
-import { Attendee } from '../../attendee/entities/attendee.entity';
-import { User } from '../../user/entities/user.entity';
-import { AttendEventDto } from '../dto/attend-event.dto';
-import { catchError, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { QueryRunner, Repository } from 'typeorm';
 import { TicketsEventTypes } from '../../payment/constants/tickets-event-types.constant';
 import { TicketEventType } from '../../payment/entities/ticket-event-type.entity';
+import { User } from '../../user/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Event } from '../../event/entities/event.entity';
+import { Attendee } from '../../attendee/entities/attendee.entity';
+import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
+import { AttendEventDto } from '../dto/attend-event.dto';
+import { OrganizationsTickets } from '../../payment/entities/organizations-tickets.entity';
 
 @Injectable()
-export class HandleTicketsPaymentInEventRegisterInterceptor
+export class HandleRegisterInEventsPaymentInterceptor
   implements NestInterceptor
 {
   constructor(
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
-    @InjectRepository(AttendeeEvent)
-    private readonly attendeeEventRepository: Repository<AttendeeEvent>,
     @InjectRepository(Attendee)
     private readonly attendeeRepository: Repository<Attendee>,
     @InjectRepository(AttendeesTickets)
     private readonly attendeesTickets: Repository<AttendeesTickets>,
-    private readonly dataSource: DataSource,
+    @InjectRepository(OrganizationsTickets)
+    private readonly organizationsTickets: Repository<OrganizationsTickets>,
   ) {}
 
   async intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest();
-    const userID = request.user.sub;
-    const body = request.body as AttendEventDto;
+    const httpContext = context.switchToHttp();
+    const req = httpContext.getRequest();
+
+    const queryRunner: QueryRunner = req.queryRunner;
+
+    const body: AttendEventDto = req.body;
+    const userID = req.user.sub;
 
     const attendee = await this.attendeeRepository.findOneOrFail({
       where: { user: { id: userID } as User },
@@ -49,13 +51,10 @@ export class HandleTicketsPaymentInEventRegisterInterceptor
       where: {
         id: body.event_id,
       },
+      relations: {
+        organization: true,
+      },
     });
-
-    const queryRunner = this.dataSource.createQueryRunner();
-    request.queryRunner = queryRunner;
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
 
     if (event.fees && event.directRegister) {
       const ticketsEvent = this.attendeesTickets.create({
@@ -65,20 +64,16 @@ export class HandleTicketsPaymentInEventRegisterInterceptor
         value: -1 * event.fees,
       });
 
+      const organizationTickets = this.organizationsTickets.create({
+        organization: event.organization,
+        value: event.fees,
+        data: { event_id: event.id, attendee_id: attendee.id },
+      });
+
+      await queryRunner.manager.save(organizationTickets);
       await queryRunner.manager.save(ticketsEvent);
     }
 
-    return next.handle().pipe(
-      tap(async () => {
-        await queryRunner.commitTransaction();
-        await queryRunner.release();
-      }),
-      catchError(async (err) => {
-        await queryRunner.rollbackTransaction();
-        await queryRunner.release();
-
-        return throwError(err);
-      }),
-    );
+    return next.handle();
   }
 }

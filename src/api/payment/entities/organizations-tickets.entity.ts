@@ -6,7 +6,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Attendee } from '../../attendee/entities/attendee.entity';
 import { Organization } from '../../organization/entities/organization.entity';
 
 @Entity({ name: 'organizers_tickets' })

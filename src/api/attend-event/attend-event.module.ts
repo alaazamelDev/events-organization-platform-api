@@ -10,7 +10,8 @@ import { ManageAttendEventService } from './manage-attend-event.service';
 import { IsEventCapacityCanHoldConstraint } from './validators/is_event_capacity_can_hold_constraint';
 import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
 import { PaymentModule } from '../payment/payment.module';
-import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/check-attendee-balance-against-event-fees.interceptor';
+import { IsAttendeeEventStatusSameConstraint } from './validators/is_attendee_event_status_same_constraint';
+import { OrganizationsTickets } from '../payment/entities/organizations-tickets.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/
       Event,
       Attendee,
       AttendeesTickets,
+      OrganizationsTickets,
     ]),
     PaymentModule,
   ],
@@ -28,6 +30,7 @@ import { CheckAttendeeBalanceAgainstEventFeesInterceptor } from './interceptors/
     ManageAttendEventService,
     IsEventInRegisterPeriodConstraint,
     IsEventCapacityCanHoldConstraint,
+    IsAttendeeEventStatusSameConstraint,
   ],
 })
 export class AttendEventModule {}
