@@ -35,6 +35,7 @@ export class PaymentPackagesService {
   }
 
   async updatePackage(updatePackageDto: UpdatePackageDto) {
+    console.log(UpdatePackageDto.toObject(updatePackageDto));
     return await this.stripe.products.update(
       updatePackageDto.package_id,
       UpdatePackageDto.toObject(updatePackageDto),

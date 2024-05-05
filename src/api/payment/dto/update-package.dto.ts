@@ -35,7 +35,7 @@ export class UpdatePackageDto {
     for (const key in updatePackageDto) {
       if (key === 'value' && updatePackageDto[key]) {
         obj.metadata = { value: updatePackageDto[key] };
-      } else if (key !== 'package_id' && updatePackageDto[key]) {
+      } else if (key !== 'package_id' && updatePackageDto[key] !== null) {
         obj[key] = updatePackageDto[key];
       }
     }

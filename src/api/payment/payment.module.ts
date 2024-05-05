@@ -9,6 +9,7 @@ import { TicketEventType } from './entities/ticket-event-type.entity';
 import { PaymentAttendeeService } from './services/payment-attendee.service';
 import { PaymentPackagesService } from './services/payment-packages.service';
 import { OrganizationsTickets } from './entities/organizations-tickets.entity';
+import { PaymentOrganizationService } from './services/payment-organization.service';
 
 @Module({
   imports: [
@@ -21,7 +22,12 @@ import { OrganizationsTickets } from './entities/organizations-tickets.entity';
     ]),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, PaymentAttendeeService, PaymentPackagesService],
+  providers: [
+    PaymentService,
+    PaymentAttendeeService,
+    PaymentPackagesService,
+    PaymentOrganizationService,
+  ],
   exports: [PaymentAttendeeService],
 })
 export class PaymentModule {}

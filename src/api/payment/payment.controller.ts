@@ -36,6 +36,7 @@ import { of } from 'rxjs';
 import * as process from 'process';
 import { UpdatePackageDto } from './dto/update-package.dto';
 import { AddPriceToPackageDto } from './dto/add-price-to-package.dto';
+import { PaymentOrganizationService } from './services/payment-organization.service';
 
 @Controller('payment')
 export class PaymentController {
@@ -43,6 +44,7 @@ export class PaymentController {
     private readonly paymentService: PaymentService,
     private readonly paymentAttendeeService: PaymentAttendeeService,
     private readonly paymentPackagesService: PaymentPackagesService,
+    private readonly paymentOrganizationService: PaymentOrganizationService,
     @Inject(STRIPE_CLIENT)
     private readonly stripe: Stripe,
   ) {}
@@ -151,6 +153,11 @@ export class PaymentController {
   @Get('attendee/balance/:id')
   getAttendeeTicketsBalance(@Param('id') id: string) {
     return this.paymentAttendeeService.getAttendeeTicketsBalance(+id);
+  }
+
+  @Get('organization/balance/:id')
+  getOrganizationTicketsBalance(@Param('id') id: string) {
+    return this.paymentOrganizationService.getOrganizationTicketsBalance(+id);
   }
 
   @Get('packagePicture/:imageName')
