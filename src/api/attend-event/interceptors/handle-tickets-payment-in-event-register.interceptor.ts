@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AttendeesTickets } from '../../payment/entities/attendees.tickets';
+import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Event } from '../../event/entities/event.entity';
 import { AttendeeEvent } from '../entities/attendee-event.entity';

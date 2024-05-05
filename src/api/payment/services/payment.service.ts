@@ -5,7 +5,7 @@ import { CheckoutDto } from '../dto/checkout.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { Attendee } from '../../attendee/entities/attendee.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AttendeesTickets } from '../entities/attendees.tickets';
+import { AttendeesTickets } from '../entities/attendees-tickets.entity';
 import { TicketsEventTypes } from '../constants/tickets-event-types.constant';
 import { AttendeeService } from '../../attendee/services/attendee.service';
 

@@ -27,10 +27,8 @@ export class CheckoutInterceptor implements NestInterceptor {
       const request = context.switchToHttp().getRequest();
       const userID = request.user.sub;
 
-      console.log(userID);
       const userEmail = await this.userService.getUserEmailByID(userID);
 
-      console.log(userEmail);
       const stripeCustomer =
         await this.paymentAttendeeService.getAttendeeStripeIdByEmail(userEmail);
 

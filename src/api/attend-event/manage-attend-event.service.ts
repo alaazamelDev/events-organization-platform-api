@@ -7,7 +7,7 @@ import { Attendee } from '../attendee/entities/attendee.entity';
 import { AttendeeEventStatus } from './enums/attendee-event-status.enum';
 import { TicketsEventTypes } from '../payment/constants/tickets-event-types.constant';
 import { TicketEventType } from '../payment/entities/ticket-event-type.entity';
-import { AttendeesTickets } from '../payment/entities/attendees.tickets';
+import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
 
 export class ManageAttendEventService {
   constructor(

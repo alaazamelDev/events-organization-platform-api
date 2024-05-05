@@ -7,7 +7,7 @@ import { AttendEventDto } from './dto/attend-event.dto';
 import { Attendee } from '../attendee/entities/attendee.entity';
 import { User } from '../user/entities/user.entity';
 import { AttendeeEventStatus } from './enums/attendee-event-status.enum';
-import { AttendeesTickets } from '../payment/entities/attendees.tickets';
+import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
 import { TicketsEventTypes } from '../payment/constants/tickets-event-types.constant';
 import { TicketEventType } from '../payment/entities/ticket-event-type.entity';
 

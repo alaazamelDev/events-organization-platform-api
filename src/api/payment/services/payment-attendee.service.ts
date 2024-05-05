@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { STRIPE_CLIENT } from '../../stripe/constants/stripe.constants';
 import { Stripe } from 'stripe';
-import { AttendeesTickets } from '../entities/attendees.tickets';
+import { AttendeesTickets } from '../entities/attendees-tickets.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()

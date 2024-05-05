@@ -14,7 +14,7 @@ import { AttendeeContact } from './attendee-contact.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
-import { AttendeesTickets } from '../../payment/entities/attendees.tickets';
+import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
 
 @Entity('attendees')
 export class Attendee extends BaseEntity {
