@@ -155,9 +155,19 @@ export class PaymentController {
     return this.paymentAttendeeService.getAttendeeTicketsBalance(+id);
   }
 
+  @Get('attendee/:id/ticketsHistory')
+  getAttendeeTicketsHistory(@Param('id') id: string) {
+    return this.paymentAttendeeService.getAttendeeTicketsHistory(+id);
+  }
+
   @Get('organization/balance/:id')
   getOrganizationTicketsBalance(@Param('id') id: string) {
     return this.paymentOrganizationService.getOrganizationTicketsBalance(+id);
+  }
+
+  @Get('organization/:id/ticketsHistory')
+  getOrganizationTicketsHistory(@Param('id') id: string) {
+    return this.paymentOrganizationService.getOrganizationTicketsHistory(+id);
   }
 
   @Get('packagePicture/:imageName')

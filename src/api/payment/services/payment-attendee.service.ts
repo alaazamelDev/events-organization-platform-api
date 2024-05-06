@@ -32,4 +32,14 @@ export class PaymentAttendeeService {
         .getRawOne()) || { balance: '0' }
     );
   }
+
+  async getAttendeeTicketsHistory(attendeeID: number) {
+    return this.dataSource
+      .getRepository(AttendeesTickets)
+      .createQueryBuilder('attendeeTickets')
+      .where('attendeeTickets.attendee = :attendeeID', {
+        attendeeID: attendeeID,
+      })
+      .getMany();
+  }
 }

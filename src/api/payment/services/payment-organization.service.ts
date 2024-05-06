@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { AttendeesTickets } from '../entities/attendees-tickets.entity';
 import { DataSource } from 'typeorm';
 import { OrganizationsTickets } from '../entities/organizations-tickets.entity';
 
@@ -20,5 +19,13 @@ export class PaymentOrganizationService {
         .addSelect('SUM(orgTickets.value)', 'balance')
         .getRawOne()) || { balance: '0' }
     );
+  }
+
+  async getOrganizationTicketsHistory(organizationID: number) {
+    return this.dataSource
+      .getRepository(OrganizationsTickets)
+      .createQueryBuilder('orgTickets')
+      .where('orgTickets.organization = :orgID', { orgID: organizationID })
+      .getMany();
   }
 }
