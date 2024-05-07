@@ -30,7 +30,8 @@ export class PaymentService {
       payment_intent_data: {
         setup_future_usage: 'on_session',
       },
-      success_url: 'https://www.google.com/',
+      success_url:
+        'https://5th-year-graduation-project-web-attendee.vercel.app/payment/success',
     });
   }
 
