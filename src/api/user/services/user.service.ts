@@ -29,7 +29,11 @@ export class UserService {
   async findOneByEmailOrUsername(username: string): Promise<User | null> {
     return this.dataSource.manager.getRepository(User).findOne({
       where: [{ username }, { email: username }],
-      relations: { userRole: true, employee: { organization: true } },
+      relations: {
+        userRole: true,
+        employee: { organization: true },
+        attendee: true,
+      },
       loadRelationIds: { relations: ['employee.organization'] },
       loadEagerRelations: true,
     });
