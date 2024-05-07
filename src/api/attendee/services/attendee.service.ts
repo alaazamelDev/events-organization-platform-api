@@ -199,6 +199,7 @@ export class AttendeeService {
       return {
         user_id: user.id,
         username: user.username,
+        attendee_id: attendee.id,
         user_role: user.userRole,
         access_token: accessToken,
         refresh_token: refreshToken,
