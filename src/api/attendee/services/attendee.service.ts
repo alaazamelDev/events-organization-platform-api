@@ -19,6 +19,11 @@ import { Contact } from '../../contact/entities/contact.entity';
 import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 import { BlockedAttendee } from '../../organization/entities/blocked-attendee.entity';
 import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
+import * as moment from 'moment';
+import {
+  DEFAULT_DATE_FORMAT,
+  DEFAULT_DB_DATE_FORMAT,
+} from '../../../common/constants/constants';
 
 @Injectable()
 export class AttendeeService {
@@ -140,11 +145,16 @@ export class AttendeeService {
         queryRunner,
       );
 
+      console.log(payload.birth_date);
       // create the attendee entity
       const attendeeData = {
         firstName: payload.first_name,
         lastName: payload.last_name,
-        birthDate: payload.birth_date,
+        birthDate: payload.birth_date
+          ? moment(payload.birth_date, DEFAULT_DATE_FORMAT).format(
+              DEFAULT_DB_DATE_FORMAT,
+            )
+          : undefined,
         phoneNumber: payload.phone_number,
         bio: payload.bio,
         job: payload.job_id ? ({ id: payload.job_id } as Job) : undefined,
