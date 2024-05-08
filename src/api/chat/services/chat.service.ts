@@ -8,6 +8,8 @@ import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-sta
 import { MessageGroupStatus } from '../enums/message-group-status.enum';
 import { GroupChannelType } from '../types/group-channel.type';
 import { Employee } from '../../employee/entities/employee.entity';
+import { GroupMessageType } from '../types/group-message.type';
+import { GroupMessage } from '../entities/group-message.entity';
 
 @Injectable()
 export class ChatService {
@@ -65,15 +67,34 @@ export class ChatService {
         .select('cg.id as group_id')
         .getRawMany()
         .then((items) => items.map((item) => item.group_id));
-
-      console.log(groups);
     }
 
     groupsMetaData = groups.map((groupId) => ({
       group_id: groupId,
-      channel: `groups/${groupId}`,
+      channel: `group-${groupId}`,
     }));
 
     return groupsMetaData;
+  }
+
+  async storeMessage(payload: GroupMessageType) {
+    // create the new message
+    const repository = this.dataSource.getRepository(GroupMessage);
+    const created = repository.create({
+      content: payload.content,
+      senderType: payload.senderType,
+      group: { id: payload.group_id },
+      sender: { id: payload.sender_id },
+    });
+
+    // store it.
+    const stored = await repository.save(created);
+
+    // load fully detailed message.
+    return await repository.findOne({
+      where: { id: stored.id },
+      relations: { sender: true, reactions: { reactedBy: true } },
+      loadEagerRelations: true,
+    });
   }
 }
