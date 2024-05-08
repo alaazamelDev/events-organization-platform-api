@@ -145,7 +145,6 @@ export class AttendeeService {
         queryRunner,
       );
 
-      console.log(payload.birth_date);
       // create the attendee entity
       const attendeeData = {
         firstName: payload.first_name,

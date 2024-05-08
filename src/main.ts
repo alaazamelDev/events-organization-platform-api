@@ -1,11 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import * as Sentry from '@sentry/node';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { AppConfigService } from './config/app/config.service';
-import { LoggerConfigService } from './config/logger/sentryio/config.service';
 import { SwaggerConfigModule } from './config/openapi/swagger/config.module';
 import { SwaggerConfigService } from './config/openapi/swagger/config.service';
 import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';

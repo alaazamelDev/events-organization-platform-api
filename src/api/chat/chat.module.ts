@@ -10,6 +10,9 @@ import { UserModule } from '../user/user.module';
 import { Reaction } from './entities/reaction.entity';
 import { MessageReaction } from './entities/message-reaction.entity';
 import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
+import { ChatGateway } from './gateways/chat.gateway';
+import { AuthModule } from '../../auth/auth.module';
+import { JwtConfigModule } from '../../config/secrets/jwt/config.module';
 
 @Module({
   imports: [
@@ -22,8 +25,10 @@ import { FileUtilityModule } from '../../config/files/utility/file-utility.modul
       MessageReaction,
     ]),
     FileUtilityModule,
+    AuthModule,
+    JwtConfigModule,
   ],
-  providers: [ChatService, ChatApiService],
+  providers: [ChatService, ChatApiService, ChatGateway],
   controllers: [ChatController],
 })
 export class ChatModule {}
