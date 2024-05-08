@@ -19,7 +19,7 @@ export class GroupMessage extends BaseEntity {
   group: ChatGroup;
 
   @RelationId((groupMessage: GroupMessage) => groupMessage.group, 'group_id')
-  groupId: number;
+  groupId?: number;
 
   @Column({
     name: 'text',
@@ -33,7 +33,7 @@ export class GroupMessage extends BaseEntity {
   sender: User;
 
   @RelationId((groupMessage: GroupMessage) => groupMessage.sender, 'sender_id')
-  senderId: number;
+  senderId?: number;
 
   @Column({
     enum: MessageSenderType,
