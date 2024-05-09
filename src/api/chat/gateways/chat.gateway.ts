@@ -22,9 +22,9 @@ import { GroupMessageSerializer } from '../serializers/group-message.serializer'
 import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
 
 @WebSocketGateway(3001, {
-  cors: '*',
   namespace: 'chat',
   transports: ['websocket'],
+  cors: { origin: '*', methods: ['GET', 'POST'] },
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
