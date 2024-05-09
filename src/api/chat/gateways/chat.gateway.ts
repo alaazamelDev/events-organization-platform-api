@@ -23,7 +23,6 @@ import { FileUtilityService } from '../../../config/files/utility/file-utility.s
 
 @WebSocketGateway(3001, {
   namespace: 'chat',
-  transports: ['websocket'],
   cors: { origin: '*', methods: ['GET', 'POST'] },
 })
 export class ChatGateway
