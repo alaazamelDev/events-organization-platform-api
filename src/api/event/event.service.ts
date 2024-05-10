@@ -61,7 +61,11 @@ export class EventService {
     return this.eventRepository
       .findOneOrFail({
         where: { id },
-        relations: { organization: true, chatGroup: includeChatGroup },
+        relations: {
+          organization: true,
+          chatGroup: includeChatGroup,
+          form: true,
+        },
       })
       .then(async (event: Event | null) => {
         // query group member count if exist

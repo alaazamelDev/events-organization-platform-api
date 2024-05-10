@@ -51,6 +51,8 @@ export class EventSerializer {
       ),
       is_chatting_enabled: data.isChattingEnabled,
       chat_group: ChatGroupSerializer.serialize(data.chatGroup),
+      fees: data.fees,
+      form: data.form,
     };
   }
 
