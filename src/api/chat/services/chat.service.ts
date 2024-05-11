@@ -10,6 +10,7 @@ import { GroupChannelType } from '../types/group-channel.type';
 import { Employee } from '../../employee/entities/employee.entity';
 import { GroupMessageType } from '../types/group-message.type';
 import { GroupMessage } from '../entities/group-message.entity';
+import { ChatGroup } from '../entities/chat-group.entity';
 
 @Injectable()
 export class ChatService {
@@ -75,6 +76,53 @@ export class ChatService {
     }));
 
     return groupsMetaData;
+  }
+
+  async getMessageReceiverUserIds(groupId: number) {
+    let userIds: number[] = [];
+
+    // query attendees
+    const attendeeUsers = await this.dataSource
+      .getRepository(AttendeeEvent)
+      .createQueryBuilder('ae')
+      .innerJoin('ae.event', 'event')
+      .innerJoin('event.chatGroup', 'cg')
+      .innerJoin('event.organization', 'org')
+      // TODO: ADD CHECK TO EXCLUDE BLOCKED ATTENDEES
+      .innerJoin('ae.attendee', 'attendee')
+      .innerJoin('attendee.user', 'user')
+      .where('event.is_chatting_enabled = :isEnabled')
+      .andWhere('cg.group_status = :status')
+      .setParameters({
+        isEnabled: true,
+        status: MessageGroupStatus.enabled,
+      })
+      .select('user.id as user_id')
+      .getRawMany()
+      .then((users) => users.map((item) => +item.user_id));
+
+    // add them to the array
+    userIds = [...userIds, ...attendeeUsers];
+
+    // query employees
+    const employeeUsers = await this.dataSource
+      .getRepository(ChatGroup)
+      .createQueryBuilder('cg')
+      .where('cg.id = :groupId', { groupId })
+      .andWhere('cg.group_status = :status')
+      .innerJoin('cg.event', 'event')
+      .innerJoin('event.organization', 'org')
+      .leftJoin('org.employees', 'employees')
+      .innerJoin('employees.user', 'user')
+      .select('DISTINCT(user.id) as user_id')
+      .setParameters({ status: MessageGroupStatus.enabled })
+      .getRawMany()
+      .then((users) => users.map((item) => +item.user_id));
+
+    // add them to the array
+    userIds = [...userIds, ...employeeUsers];
+
+    return [...new Set(userIds)];
   }
 
   async storeMessage(payload: GroupMessageType) {

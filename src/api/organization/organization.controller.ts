@@ -44,7 +44,7 @@ import { RoleGuard } from '../../common/guards/role/role.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 import { User } from '../../common/decorators/user.decorator';
-import { UserToken } from '../user/interfaces/user-token.interface';
+import { AuthUserType } from '../../common/types/auth-user.type';
 
 @Controller('organization')
 export class OrganizationController {
@@ -58,14 +58,14 @@ export class OrganizationController {
   @Get('events')
   @Roles(UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
-  getOrganizationEvents(@User() user: UserToken) {
+  getOrganizationEvents(@User() user: AuthUserType) {
     return this.organizationService.getOrganizationEvents(user.sub);
   }
 
   @Get('attendees')
   @Roles(UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
-  getOrganizationAttendees(@User() user: UserToken) {
+  getOrganizationAttendees(@User() user: AuthUserType) {
     return this.organizationService.getOrganizationAttendees(user.sub);
   }
 
