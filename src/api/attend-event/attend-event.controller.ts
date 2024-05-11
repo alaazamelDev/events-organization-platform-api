@@ -6,12 +6,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AttendEventService } from './attend-event.service';
+import { AttendEventService } from './services/attend-event.service';
 import { AttendEventDto } from './dto/attend-event.dto';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { Request } from 'express';
 import { ChangeAttendEventStatusDto } from './dto/change-attend-event-status.dto';
-import { ManageAttendEventService } from './manage-attend-event.service';
+import { ManageAttendEventService } from './services/manage-attend-event.service';
 import { CheckEventFormIfSubmittedInterceptor } from './interceptors/check-event-form-if-submitted.interceptor';
 import { RoleGuard } from '../../common/guards/role/role.guard';
 import { Roles } from '../../common/decorators/roles.decorator';

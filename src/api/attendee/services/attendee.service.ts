@@ -24,6 +24,9 @@ import {
   DEFAULT_DATE_FORMAT,
   DEFAULT_DB_DATE_FORMAT,
 } from '../../../common/constants/constants';
+import { DidAttendeeFillEventFormDto } from '../dto/did-attendee-fill-event-form.dto';
+import { Event } from '../../event/entities/event.entity';
+import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 
 @Injectable()
 export class AttendeeService {
@@ -327,5 +330,33 @@ export class AttendeeService {
       .where('user.email = :userEmail', { userEmail: email })
       .select(['attendee.id'])
       .getOneOrFail();
+  }
+
+  async didAttendeeFilledEventForm(dto: DidAttendeeFillEventFormDto) {
+    return await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .where('event.id = :eventID', { eventID: dto.event_id })
+      .leftJoinAndSelect('event.form', 'form')
+      .getOneOrFail()
+      .then(async (event) => {
+        if (event.form) {
+          const filledForm = await this.dataSource
+            .getRepository(FilledForm)
+            .createQueryBuilder('filledForm')
+            .where('filledForm.form = :formID', { formID: event.form.id })
+            .andWhere('filledForm.attendee = :attendeeID', {
+              attendeeID: dto.attendee_id,
+            })
+            .andWhere('filledForm.event = :eventID', { eventID: event.id })
+            .getOne();
+
+          if (!filledForm) {
+            return false;
+          }
+        }
+
+        return true;
+      });
   }
 }

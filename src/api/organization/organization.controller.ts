@@ -40,6 +40,11 @@ import { EmployeeService } from '../employee/employee.service';
 import { AttendeeService } from '../attendee/services/attendee.service';
 import { FollowingAttendeeSerializer } from './serializers/following-attendee.serializer';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
+import { RoleGuard } from '../../common/guards/role/role.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRoleEnum } from '../userRole/enums/user-role.enum';
+import { User } from '../../common/decorators/user.decorator';
+import { UserToken } from '../user/interfaces/user-token.interface';
 
 @Controller('organization')
 export class OrganizationController {
@@ -49,6 +54,20 @@ export class OrganizationController {
     private readonly employeeService: EmployeeService,
     private readonly fileUtilityService: FileUtilityService,
   ) {}
+
+  @Get('events')
+  @Roles(UserRoleEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  getOrganizationEvents(@User() user: UserToken) {
+    return this.organizationService.getOrganizationEvents(user.sub);
+  }
+
+  @Get('attendees')
+  @Roles(UserRoleEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  getOrganizationAttendees(@User() user: UserToken) {
+    return this.organizationService.getOrganizationAttendees(user.sub);
+  }
 
   @Get('blacklist')
   @UseGuards(AccessTokenGuard)

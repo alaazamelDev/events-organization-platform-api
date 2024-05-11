@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   RawBodyRequest,
   Req,
   Res,
@@ -37,6 +38,7 @@ import * as process from 'process';
 import { UpdatePackageDto } from './dto/update-package.dto';
 import { AddPriceToPackageDto } from './dto/add-price-to-package.dto';
 import { PaymentOrganizationService } from './services/payment-organization.service';
+import { DidAttendeePayedForTheEventDto } from './dto/did-attendee-payed-for-the-event.dto';
 
 @Controller('payment')
 export class PaymentController {
@@ -148,6 +150,11 @@ export class PaymentController {
   @Get('packages/:id/prices')
   getPackagePrices(@Param('id') packageID: string) {
     return this.paymentPackagesService.getPackagePrices(packageID);
+  }
+
+  @Get('attendee/payed-for-event')
+  didAttendeePayedForEvent(@Query() query: DidAttendeePayedForTheEventDto) {
+    return this.paymentAttendeeService.didAttendeePayedForTheEvent(query);
   }
 
   @Get('attendee/balance/:id')

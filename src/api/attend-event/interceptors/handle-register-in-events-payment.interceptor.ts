@@ -58,7 +58,7 @@ export class HandleRegisterInEventsPaymentInterceptor
 
     if (event.fees && event.directRegister) {
       const ticketsEvent = this.attendeesTickets.create({
-        event: { id: TicketsEventTypes.REGISTER_IN_EVENT } as TicketEventType,
+        event: { id: TicketsEventTypes.CONSUME } as TicketEventType,
         data: { event_id: event.id },
         attendee: attendee,
         value: -1 * event.fees,

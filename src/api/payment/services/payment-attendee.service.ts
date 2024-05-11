@@ -3,6 +3,8 @@ import { STRIPE_CLIENT } from '../../stripe/constants/stripe.constants';
 import { Stripe } from 'stripe';
 import { AttendeesTickets } from '../entities/attendees-tickets.entity';
 import { DataSource } from 'typeorm';
+import { DidAttendeePayedForTheEventDto } from '../dto/did-attendee-payed-for-the-event.dto';
+import { TicketsEventTypes } from '../constants/tickets-event-types.constant';
 
 @Injectable()
 export class PaymentAttendeeService {
@@ -41,5 +43,24 @@ export class PaymentAttendeeService {
         attendeeID: attendeeID,
       })
       .getMany();
+  }
+
+  async didAttendeePayedForTheEvent(dto: DidAttendeePayedForTheEventDto) {
+    return await this.dataSource
+      .getRepository(AttendeesTickets)
+      .createQueryBuilder('attendeeTickets')
+      .leftJoinAndSelect('attendeeTickets.event', 'event')
+      .where('attendeeTickets.attendee = :attendeeID', {
+        attendeeID: dto.attendee_id,
+      })
+      .andWhere(
+        `attendeeTickets.data ::jsonb @> \'{"event_id":"${dto.event_id}"}\'`,
+      )
+      .orderBy('attendeeTickets.createdAt', 'DESC')
+      .limit(1)
+      .getOne()
+      .then((obj) =>
+        !obj ? false : +obj.event.id === +TicketsEventTypes.CONSUME,
+      );
   }
 }

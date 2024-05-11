@@ -30,6 +30,10 @@ import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { BlockedAttendeeSerializer } from './serializers/blocked-attendee.serializer';
 import { FollowingAttendee } from './entities/following-attendee.entity';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
+import { Event } from '../event/entities/event.entity';
+import { OrganizationsTickets } from '../payment/entities/organizations-tickets.entity';
+import { Attendee } from '../attendee/entities/attendee.entity';
+import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -388,6 +392,92 @@ export class OrganizationService {
     await this.organizationRepository.save(organization);
 
     return organization;
+  }
+
+  async getOrganizationAttendees(userID: number) {
+    const employee = await this.employeeRepository.findOneOrFail({
+      where: { user: { id: userID } as User },
+    });
+
+    const attendees = await this.dataSource
+      .getRepository(Attendee)
+      .createQueryBuilder('attendee')
+      .select(['attendee.id', 'attendee.firstName', 'attendee.lastName'])
+      .leftJoin('attendee.events', 'attendEvent')
+      .addSelect(['attendEvent.id'])
+      .leftJoin('attendEvent.event', 'event')
+      .addSelect(['event.id', 'event.title', 'event.description'])
+      .leftJoin('event.organization', 'org')
+      .addSelect(['org.id'])
+      .where('org.id = :orgID', { orgID: employee.organizationId })
+      .getMany();
+
+    const attendeesWithEvents = await Promise.all(
+      attendees.map(async (attendee) => {
+        return {
+          ...attendee,
+          events: await Promise.all(
+            attendee.events.map(async (event) => {
+              const eventID = event.event.id;
+              const payedFees = await this.dataSource
+                .getRepository(AttendeesTickets)
+                .createQueryBuilder('tickets')
+                .where('tickets.attendee = :attendeeID', {
+                  attendeeID: attendee.id,
+                })
+                .andWhere(`tickets.data::jsonb ->> 'event_id' = :eventId`, {
+                  eventId: eventID,
+                })
+                .getOne()
+                .then((obj) => (obj ? Number(obj.value) * -1 : 0));
+
+              return { ...event.event, payedFees: payedFees };
+            }),
+          ),
+        };
+      }),
+    );
+
+    return attendeesWithEvents.map((attendee) => {
+      const totalFees = attendee.events.reduce(
+        (acc, event) => acc + Number(event.payedFees),
+        0,
+      );
+
+      return { ...attendee, totalFees: totalFees };
+    });
+  }
+
+  async getOrganizationEvents(userID: number) {
+    const employee = await this.employeeRepository.findOneOrFail({
+      where: { user: { id: userID } as User },
+    });
+
+    const orgEvents = await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .select(['event.id', 'event.title'])
+      .where('event.organization = :orgID', { orgID: employee.organizationId })
+      .getMany();
+
+    return await Promise.all(
+      orgEvents.map(async (event) => {
+        const tickets = await this.dataSource
+          .getRepository(OrganizationsTickets)
+          .createQueryBuilder('tickets')
+          .where(`tickets.data::jsonb ->> 'event_id' = :eventId`, {
+            eventId: event.id,
+          })
+          .getMany();
+
+        const sum = tickets.reduce(
+          (accumulator, ticket) => accumulator + Number(ticket.value),
+          0,
+        );
+
+        return { ...event, tickets: sum };
+      }),
+    );
   }
 
   async blockAttendee(payload: any, employee: Employee) {

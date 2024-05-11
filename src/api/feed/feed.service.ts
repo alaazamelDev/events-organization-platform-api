@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Event } from '../event/entities/event.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { GenericFilter } from '../../common/interfaces/query.interface';
 import { Organization } from '../organization/entities/organization.entity';
+import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
+import { AttendeeEventStatus } from '../attend-event/enums/attendee-event-status.enum';
 
 @Injectable()
 export class FeedService {
@@ -45,5 +47,66 @@ export class FeedService {
         .getRawMany(),
       count: await this.dataSource.getRepository(Organization).count(),
     };
+  }
+
+  async getPopularEvents(query: GenericFilter) {
+    const events = await this.getFutureEvents();
+
+    const eventsWithRanks = await Promise.all(
+      events.map(async (event) => {
+        const rank =
+          (await this.getEventPopularity(event)) +
+          this.getEventRecentness(event);
+
+        return { ...event, rank: rank };
+      }),
+    );
+
+    return {
+      events: eventsWithRanks
+        .sort((eventA, eventB) => eventB.rank - eventA.rank)
+        .slice((query.page - 1) * query.pageSize, query.page * query.pageSize),
+      count: eventsWithRanks.length,
+    };
+  }
+
+  private async getFutureEvents() {
+    return await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .innerJoin('event.days', 'ed')
+      .groupBy('event.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .orderBy('start_day')
+      .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
+      .getRawMany();
+  }
+
+  private async getEventPopularity(event: any) {
+    const capacity = event['event_capacity'];
+    const attendees = await this.dataSource
+      .getRepository(AttendeeEvent)
+      .createQueryBuilder('attendeeEvent')
+      .where('attendeeEvent.event = :eventID', { eventID: event.event_id })
+      .andWhere('attendeeEvent.status = :status', {
+        status: AttendeeEventStatus.accepted,
+      })
+      .getCount();
+
+    return attendees / capacity;
+  }
+
+  private getEventRecentness(event: any) {
+    const currentDate: Date = new Date();
+    const eventDate = new Date(event['start_day']);
+
+    const timeDifference: number = eventDate.getTime() - currentDate.getTime();
+
+    const normalizedTimeDifference: number =
+      timeDifference /
+      (Math.max(eventDate.getTime(), currentDate.getTime()) -
+        Math.min(eventDate.getTime(), currentDate.getTime()));
+
+    return Math.min(Math.max(normalizedTimeDifference, 0), 1);
   }
 }

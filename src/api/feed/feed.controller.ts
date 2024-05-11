@@ -15,4 +15,9 @@ export class FeedController {
   getOrganizations(@Query() query: GenericFilter) {
     return this.feedService.getOrganizations(query);
   }
+
+  @Get('popularEvents')
+  async getPopularEvents(@Query() query: GenericFilter) {
+    return this.feedService.getPopularEvents(query);
+  }
 }

@@ -70,7 +70,7 @@ export class PaymentService {
       value: Number(quantity) * Number(value),
       attendee: attendee,
       data: { product: product.id },
-      event: { id: TicketsEventTypes.BUY },
+      event: { id: TicketsEventTypes.PURCHASE },
     });
 
     await queryRunner.manager.save(ticket);

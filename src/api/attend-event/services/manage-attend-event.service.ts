@@ -1,9 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChangeAttendEventStatusDto } from './dto/change-attend-event-status.dto';
-import { AttendeeEvent } from './entities/attendee-event.entity';
+import { ChangeAttendEventStatusDto } from '../dto/change-attend-event-status.dto';
+import { AttendeeEvent } from '../entities/attendee-event.entity';
 import { QueryRunner, Repository } from 'typeorm';
-import { Event } from '../event/entities/event.entity';
-import { Attendee } from '../attendee/entities/attendee.entity';
+import { Event } from '../../event/entities/event.entity';
+import { Attendee } from '../../attendee/entities/attendee.entity';
 
 export class ManageAttendEventService {
   constructor(

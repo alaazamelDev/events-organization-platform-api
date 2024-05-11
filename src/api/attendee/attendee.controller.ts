@@ -7,6 +7,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
+  Query,
   Req,
   UploadedFile,
   UploadedFiles,
@@ -32,6 +33,7 @@ import { OrganizationFollowingDto } from './dto/organization-following.dto';
 import { FollowingAttendeeSerializer } from '../organization/serializers/following-attendee.serializer';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { RegisterAttendeeInStripeInterceptor } from '../payment/interceptors/register-attendee.in.stripe.interceptor';
+import { DidAttendeeFillEventFormDto } from './dto/did-attendee-fill-event-form.dto';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -291,5 +293,10 @@ export class AttendeeController {
     const user: any = req.user;
 
     return this.attendeeService.getAttendeeEvents(+user['sub']);
+  }
+
+  @Get('filled-event-form')
+  didAttendeeFilledEventForm(@Query() query: DidAttendeeFillEventFormDto) {
+    return this.attendeeService.didAttendeeFilledEventForm(query);
   }
 }

@@ -1,4 +1,4 @@
 export enum TicketsEventTypes {
-  BUY = 1,
-  REGISTER_IN_EVENT = 2,
+  PURCHASE = 1,
+  CONSUME = 2,
 }

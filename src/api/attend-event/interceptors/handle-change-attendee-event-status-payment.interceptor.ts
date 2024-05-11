@@ -58,7 +58,7 @@ export class HandleChangeAttendeeEventStatusPaymentInterceptor
 
     if (body.status === AttendeeEventStatus.accepted && event.fees) {
       const ticketsEvent = this.attendeesTickets.create({
-        event: { id: TicketsEventTypes.REGISTER_IN_EVENT } as TicketEventType,
+        event: { id: TicketsEventTypes.CONSUME } as TicketEventType,
         data: { event_id: event.id },
         attendee: attendee,
         value: -1 * event.fees,
@@ -80,7 +80,7 @@ export class HandleChangeAttendeeEventStatusPaymentInterceptor
           attendeeID: body.attendee_id,
         })
         .andWhere('tickets.event = :eventID', {
-          eventID: TicketsEventTypes.REGISTER_IN_EVENT,
+          eventID: TicketsEventTypes.CONSUME,
         })
         .andWhere(
           `tickets.data ::jsonb @> \'{"event_id":"${body.event_id}"} \'`,
