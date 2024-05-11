@@ -20,21 +20,27 @@ import { ChatGroupFilter } from '../dto/chat-group.filter';
 import { GetChatGroupDto } from '../dto/get-chat-group.dto';
 import { GroupDetailsSerializer } from '../serializers/group-details.serializer';
 import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
+import { ChatService } from '../services/chat.service';
+import { User } from '../../../common/decorators/user.decorator';
+import { AuthUserType } from '../../../common/types/auth-user.type';
 
 @Controller('chat')
 export class ChatController {
   private readonly attendeeService: AttendeeService;
   private readonly chatApiService: ChatApiService;
+  private readonly chatService: ChatService;
   private readonly fileUtilityService: FileUtilityService;
 
   constructor(
     attendeeService: AttendeeService,
     chatApiService: ChatApiService,
+    chatService: ChatService,
     fileUtilityService: FileUtilityService,
   ) {
     this.fileUtilityService = fileUtilityService;
     this.attendeeService = attendeeService;
     this.chatApiService = chatApiService;
+    this.chatService = chatService;
   }
 
   @Get('attendee')
@@ -50,6 +56,13 @@ export class ChatController {
     // return the list.
     const result = await this.chatApiService.getChattingList(attendee.id);
     return ChatListItemSerializer.serializeList(result);
+  }
+
+  @Get('joined-groups')
+  @Roles(UserRoleEnum.ATTENDEE, UserRoleEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  async getJoinedGroups(@User() user: AuthUserType) {
+    return this.chatService.getListOfChannels(user);
   }
 
   @Post('group')

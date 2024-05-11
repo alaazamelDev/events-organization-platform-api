@@ -20,6 +20,8 @@ import { MessageSenderType } from '../enums/message-sender-type.enum';
 import { GroupMessageType } from '../types/group-message.type';
 import { GroupMessageSerializer } from '../serializers/group-message.serializer';
 import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
+import { Notification } from '../../../common/types/notification.type';
+import { NotificationTypeEnum } from '../../../common/entities/notification-type.enum';
 
 @WebSocketGateway(3001, {
   namespace: 'chat',
@@ -52,10 +54,36 @@ export class ChatGateway
   async handleConnection(socket: AuthenticatedSocketType): Promise<void> {
     // add the socket to the map of active participants
     ChatGateway.participants.set(socket.user.sub, socket);
+  }
 
-    // send the list of events that user have to listen to.
-    const groups = await this.chatService.getListOfChannels(socket.user);
-    socket.emit('groups-joined', { groups });
+  async emitGroupJoinedEvent(
+    userId: number,
+    group: { group_id: number; channel: string },
+  ) {
+    if (ChatGateway.participants.has(userId)) {
+      const socket = ChatGateway.participants.get(userId);
+      socket!.emit('group-joined', { group });
+    }
+  }
+
+  async emitNotificationReceivedEvent(
+    userId: number,
+    notification: Notification,
+  ) {
+    if (ChatGateway.participants.has(userId)) {
+      const socket = ChatGateway.participants.get(userId);
+      socket!.emit('notification-received', { ...notification });
+    }
+  }
+
+  async emitUserKickedOffEvent(
+    userId: number,
+    group: { group_id: number; channel: string },
+  ) {
+    if (ChatGateway.participants.has(userId)) {
+      const socket = ChatGateway.participants.get(userId);
+      socket!.emit('user-kicked-off', { group });
+    }
   }
 
   @SubscribeMessage('message-sent')
@@ -77,6 +105,22 @@ export class ChatGateway
 
     // then, store the message. and multicast it
     const stored = await this.chatService.storeMessage(completeData);
+
+    // notify the list of receivers that are active.
+    await this.chatService
+      .getMessageReceiverUserIds(data.group_id)
+      .then((ids) =>
+        ids.forEach((userId: number) => {
+          const notification: Notification = {
+            type: NotificationTypeEnum.message_received,
+            data: GroupMessageSerializer.serialize(
+              this.fileUtilityService,
+              stored!,
+            ),
+          };
+          this.emitNotificationReceivedEvent(userId, notification);
+        }),
+      );
 
     // broadcast the message to the same group.
     client.broadcast.emit(`group-${data.group_id}`, {
