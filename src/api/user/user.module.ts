@@ -10,9 +10,10 @@ import { DataSource } from 'typeorm';
 import { userRepository } from './repositories/user.repository';
 import { UserController } from './user.controller';
 import { MenuItem } from './entities/menu-item.entity';
+import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, MenuItem])],
+  imports: [TypeOrmModule.forFeature([User, MenuItem]), FileUtilityModule],
   exports: [UserService],
   providers: [
     UserService,

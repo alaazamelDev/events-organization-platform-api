@@ -28,6 +28,10 @@ export class AuthService {
     return null;
   }
 
+  async logout(userId: number) {
+    return this.usersService.revokeToken(userId);
+  }
+
   async login(user: User) {
     const accessToken = await this.createAccessToken(user);
     const refreshToken = await this.createRefreshToken(user);

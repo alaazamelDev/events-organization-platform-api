@@ -56,7 +56,7 @@ export class User extends BaseEntity {
     nullable: true,
     type: 'varchar',
   })
-  refreshToken?: string;
+  refreshToken?: string | null;
 
   @OneToOne(() => Employee, (type) => type.user, { eager: true })
   employee?: Employee;
