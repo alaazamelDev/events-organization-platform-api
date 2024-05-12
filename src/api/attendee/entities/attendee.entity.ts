@@ -75,14 +75,19 @@ export class Attendee extends BaseEntity {
   @OneToMany(
     () => AttendeeContact,
     (attendeeContact) => attendeeContact.attendee,
+    { eager: true },
   )
   contacts: AttendeeContact[];
 
-  @ManyToOne(() => Address, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Address, {
+    nullable: true,
+    onDelete: 'SET NULL',
+    eager: true,
+  })
   @JoinColumn({ name: 'address_id', referencedColumnName: 'id' })
   address?: Address;
 
-  @ManyToOne(() => Job, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Job, { nullable: true, onDelete: 'SET NULL', eager: true })
   @JoinColumn({ name: 'job_id', referencedColumnName: 'id' })
   job?: Job;
 

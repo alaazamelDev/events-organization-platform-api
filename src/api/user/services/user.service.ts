@@ -1,9 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUserRepository } from '../interfaces/user_repo.interface';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { DataSource, QueryRunner } from 'typeorm';
+import { DataSource, IsNull, Not, QueryRunner } from 'typeorm';
 import { UserRole } from '../../userRole/entities/user_role.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserRoleMenuItem } from '../../userRole/entities/user-role-menu-item.entity';
@@ -16,6 +21,18 @@ export class UserService {
     private readonly dataSource: DataSource,
   ) {}
 
+  async getUserWithCompleteData(userId: number) {
+    return this.userRepository.findOne({
+      where: { id: userId, refreshToken: Not(IsNull()) },
+      relations: {
+        userRole: true,
+        employee: { organization: true },
+        attendee: { address: true, job: true, contacts: true },
+        admin: true,
+      },
+    });
+  }
+
   async loadUserMenu(user: User): Promise<UserRoleMenuItem[]> {
     const userRoleId = user.userRole.id;
 
@@ -24,6 +41,18 @@ export class UserService {
       relations: { menuItem: { subMenuItems: true } },
       relationLoadStrategy: 'query',
     });
+  }
+
+  async revokeToken(userId: number): Promise<boolean> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (user?.refreshToken == null) {
+      throw new UnauthorizedException();
+    }
+
+    const updated = await this.userRepository.update(userId, {
+      refreshToken: null,
+    });
+    return updated.affected != undefined && updated.affected > 0;
   }
 
   async findOneByEmailOrUsername(username: string): Promise<User | null> {
