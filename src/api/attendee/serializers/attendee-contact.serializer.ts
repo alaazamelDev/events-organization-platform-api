@@ -4,7 +4,7 @@ export class AttendeeContactSerializer {
   static serialize(attendeeContact: AttendeeContact) {
     return {
       id: attendeeContact.id,
-      contact_name: attendeeContact.contact.name,
+      contact_name: attendeeContact.contact?.name,
       contact_link: attendeeContact.content,
     };
   }
