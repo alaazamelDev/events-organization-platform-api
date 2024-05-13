@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { UserService } from '../../api/user/services/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../../api/user/entities/user.entity';
@@ -14,10 +18,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<User | null> {
+  async validateUser(
+    username: string,
+    pass: string,
+    roleId?: number,
+  ): Promise<User | null> {
+    if (!roleId) {
+      throw new BadRequestException('Role Id is required');
+    }
     const user: User | null =
       await this.usersService.findOneByEmailOrUsername(username);
-    if (user) {
+    if (user && +user.userRole.id == roleId) {
       const passwordMatch = await compare(pass, user.password);
 
       if (passwordMatch) {
