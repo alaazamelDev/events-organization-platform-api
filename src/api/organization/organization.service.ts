@@ -86,7 +86,12 @@ export class OrganizationService {
   getListOfOrganizationFollowers(organizationId: number) {
     return this.dataSource.manager.find(FollowingAttendee, {
       where: { organization: { id: organizationId } },
-      relations: { attendee: true },
+      relations: {
+        attendee: {
+          address: { city: true, state: true },
+          contacts: { contact: true },
+        },
+      },
     });
   }
 
