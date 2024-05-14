@@ -480,6 +480,23 @@ export class OrganizationService {
     );
   }
 
+  async getOrganizationFutureUnFeaturedEvents(orgID: number) {
+    return await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .where('event.organization = :orgID', { orgID: orgID })
+      .andWhere(
+        'NOT EXISTS (SELECT 1 FROM featured_events fe WHERE fe.event_id = event.id AND fe.end_date >= :nowDATE)',
+        { nowDATE: new Date() },
+      )
+      .innerJoin('event.days', 'ed')
+      .groupBy('event.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .orderBy('start_day')
+      .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
+      .getRawMany();
+  }
+
   async blockAttendee(payload: any, employee: Employee) {
     if (!employee.organization) {
       throw new BadRequestException(

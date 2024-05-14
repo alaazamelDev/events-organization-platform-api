@@ -45,6 +45,7 @@ import * as process from 'process';
 import { PaymentModule } from './api/payment/payment.module';
 import { FeedModule } from './api/feed/feed.module';
 import { ChatModule } from './api/chat/chat.module';
+import { FeaturedEventsModule } from './api/featured-events/featured-events.module';
 
 @Module({
   imports: [
@@ -109,6 +110,7 @@ import { ChatModule } from './api/chat/chat.module';
       apiVersion: '2024-04-10',
     }),
     PaymentModule,
+    FeaturedEventsModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint],
   controllers: [HealthController],

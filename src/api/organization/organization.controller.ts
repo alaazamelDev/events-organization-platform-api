@@ -62,6 +62,13 @@ export class OrganizationController {
     return this.organizationService.getOrganizationEvents(user.sub);
   }
 
+  @Get('future-un-featured-events/:id')
+  getFutureEvents(@Param('id') orgID: string) {
+    return this.organizationService.getOrganizationFutureUnFeaturedEvents(
+      +orgID,
+    );
+  }
+
   @Get('attendees')
   @Roles(UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
