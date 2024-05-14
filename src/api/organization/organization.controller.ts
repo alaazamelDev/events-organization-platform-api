@@ -177,7 +177,7 @@ export class OrganizationController {
   }
 
   @Get()
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
   findAll() {
     return this.organizationService.findAll();
   }

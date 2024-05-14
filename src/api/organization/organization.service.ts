@@ -156,13 +156,12 @@ export class OrganizationService {
   }
 
   async findAll() {
-    const organizations = await this.organizationRepository.find({
+    return await this.organizationRepository.find({
       relations: {
         employees: { user: true },
+        events: true,
       },
     });
-
-    return organizations.map((org) => new AllOrganizationsAdminSerializer(org));
   }
 
   async findOne(id: number) {
