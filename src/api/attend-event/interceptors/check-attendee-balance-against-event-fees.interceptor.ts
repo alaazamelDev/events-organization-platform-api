@@ -12,7 +12,6 @@ import { Attendee } from '../../attendee/entities/attendee.entity';
 import { PaymentAttendeeService } from '../../payment/services/payment-attendee.service';
 import { AttendEventDto } from '../dto/attend-event.dto';
 import { ChangeAttendEventStatusDto } from '../dto/change-attend-event-status.dto';
-import { AttendeeEventStatus } from '../enums/attendee-event-status.enum';
 
 @Injectable()
 export class CheckAttendeeBalanceAgainstEventFeesInterceptor
@@ -37,10 +36,7 @@ export class CheckAttendeeBalanceAgainstEventFeesInterceptor
       .where('event.id = :eventID', { eventID: eventID })
       .getOneOrFail()
       .then(async (event) => {
-        if (
-          (event.directRegister && event.fees) ||
-          (event.fees && body.status === AttendeeEventStatus.accepted)
-        ) {
+        if (event.fees) {
           const getAttendeeQuery = this.dataSource
             .getRepository(Attendee)
             .createQueryBuilder('attendee');

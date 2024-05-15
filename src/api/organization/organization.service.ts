@@ -156,13 +156,12 @@ export class OrganizationService {
   }
 
   async findAll() {
-    const organizations = await this.organizationRepository.find({
+    return await this.organizationRepository.find({
       relations: {
         employees: { user: true },
+        events: true,
       },
     });
-
-    return organizations.map((org) => new AllOrganizationsAdminSerializer(org));
   }
 
   async findOne(id: number) {
@@ -461,9 +460,12 @@ export class OrganizationService {
     const orgEvents = await this.dataSource
       .getRepository(Event)
       .createQueryBuilder('event')
-      .select(['event.id', 'event.title'])
+      .select(['event.id', 'event.title', 'event.coverPictureUrl'])
       .where('event.organization = :orgID', { orgID: employee.organizationId })
-      .getMany();
+      .leftJoin('event.days', 'ed')
+      .groupBy('event.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .getRawMany();
 
     return await Promise.all(
       orgEvents.map(async (event) => {
@@ -471,7 +473,7 @@ export class OrganizationService {
           .getRepository(OrganizationsTickets)
           .createQueryBuilder('tickets')
           .where(`tickets.data::jsonb ->> 'event_id' = :eventId`, {
-            eventId: event.id,
+            eventId: event.event_id,
           })
           .getMany();
 
@@ -483,6 +485,23 @@ export class OrganizationService {
         return { ...event, tickets: sum };
       }),
     );
+  }
+
+  async getOrganizationFutureUnFeaturedEvents(orgID: number) {
+    return await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .where('event.organization = :orgID', { orgID: orgID })
+      .andWhere(
+        'NOT EXISTS (SELECT 1 FROM featured_events fe WHERE fe.event_id = event.id AND fe.end_date >= :nowDATE)',
+        { nowDATE: new Date() },
+      )
+      .innerJoin('event.days', 'ed')
+      .groupBy('event.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .orderBy('start_day')
+      .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
+      .getRawMany();
   }
 
   async blockAttendee(payload: any, employee: Employee) {

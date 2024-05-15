@@ -359,4 +359,21 @@ export class AttendeeService {
         return true;
       });
   }
+
+  async getAttendees() {
+    return this.dataSource
+      .getRepository(Attendee)
+      .createQueryBuilder('attendee')
+      .innerJoin('attendee.user', 'user')
+      .leftJoin(
+        'attendee.ticketsEvents',
+        'tickets',
+        `jsonb_exists(tickets.data, 'cs')`,
+      )
+      .addSelect(['user.id', 'user.username', 'user.email'])
+      .addSelect('SUM(tickets.value)', 'tickets_purchased')
+      .groupBy('attendee.id')
+      .addGroupBy('user.id')
+      .getRawMany();
+  }
 }

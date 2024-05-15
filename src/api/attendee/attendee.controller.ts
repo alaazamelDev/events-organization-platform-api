@@ -43,6 +43,11 @@ export class AttendeeController {
     private readonly attendeeService: AttendeeService,
   ) {}
 
+  @Get()
+  getAttendees() {
+    return this.attendeeService.getAttendees();
+  }
+
   @Get('/is-following/:id')
   @UseGuards(AccessTokenGuard)
   async isFollowing(@Req() req: any, @Param('id') organizationId: number) {
