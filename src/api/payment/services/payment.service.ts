@@ -57,6 +57,15 @@ export class PaymentService {
     }
   }
 
+  async getBalanceTransactions() {
+    const balanceTransactions = await this.stripe.balanceTransactions.list({
+      limit: 10,
+      // expand: ['data.source'],
+    });
+
+    return balanceTransactions;
+  }
+
   private async fulfillLineItem(
     item: Stripe.LineItem,
     attendee: Attendee,

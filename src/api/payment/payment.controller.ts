@@ -51,6 +51,11 @@ export class PaymentController {
     private readonly stripe: Stripe,
   ) {}
 
+  // @Get('balance')
+  // async getBalance() {
+  //   return this.paymentService.getBalanceTransactions();
+  // }
+
   @Post('stripe/webhook')
   async stripeEvents(
     @Headers('stripe-signature') signature: string,

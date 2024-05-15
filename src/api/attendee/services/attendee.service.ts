@@ -368,7 +368,7 @@ export class AttendeeService {
       .leftJoin(
         'attendee.ticketsEvents',
         'tickets',
-        `jsonb_exists(tickets.data, 'cs')`,
+        `jsonb_exists(tickets.data, 'product')`,
       )
       .addSelect(['user.id', 'user.username', 'user.email'])
       .addSelect('SUM(tickets.value)', 'tickets_purchased')
