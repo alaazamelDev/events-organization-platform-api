@@ -8,14 +8,17 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../../api/user/entities/user.entity';
 import * as uuid from 'uuid';
 import { compare, hash } from 'bcrypt';
-import { QueryRunner } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { UserRole } from '../../api/userRole/entities/user_role.entity';
+import { AuthUserType } from '../../common/types/auth-user.type';
+import { UpdateUsernameOrEmailDto } from '../dto/update-username-or-email.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UserService,
-    private jwtService: JwtService,
+    private readonly usersService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly datasource: DataSource,
   ) {}
 
   async validateUser(
@@ -64,6 +67,65 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
+  }
+
+  async updateUsernameOrEmail(
+    userAuth: AuthUserType,
+    payload: UpdateUsernameOrEmailDto,
+  ) {
+    if (!payload.new_username && !payload.new_email) {
+      throw new BadRequestException(
+        'You must specify the new email or username',
+      );
+    }
+
+    //
+    const roleId = payload.role_id;
+
+    // Query the user.
+    const user: User | null = await this.datasource
+      .getRepository(User)
+      .findOne({
+        where: {
+          id: +userAuth.sub,
+        },
+        relations: {
+          userRole: true,
+        },
+      });
+
+    if (+user?.userRole.id! != +roleId) {
+      throw new BadRequestException('role_id is not matching');
+    }
+
+    // Check if the password is matching.
+    const passwordMatch = await compare(payload.password, user!.password);
+    if (!passwordMatch) {
+      throw new BadRequestException('Wrong password was provided!');
+    }
+
+    let updatedUser = null;
+    if (payload.new_username) {
+      // update the username
+      await this.datasource
+        .getRepository(User)
+        .update(userAuth.sub, { username: payload.new_username });
+      updatedUser = await this.usersService.findOneByEmailOrUsername(
+        payload.new_username,
+      );
+    }
+
+    if (payload.new_email) {
+      // update the email
+      await this.datasource
+        .getRepository(User)
+        .update(userAuth.sub, { email: payload.new_email });
+      updatedUser = await this.usersService.findOneByEmailOrUsername(
+        payload.new_email,
+      );
+    }
+
+    return this.login(updatedUser!);
   }
 
   async refreshTokens(userId: string, refreshToken: string) {
