@@ -12,6 +12,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 import { UserRole } from '../../api/userRole/entities/user_role.entity';
 import { AuthUserType } from '../../common/types/auth-user.type';
 import { UpdateUsernameOrEmailDto } from '../dto/update-username-or-email.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -67,6 +68,45 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
+  }
+
+  async changePassword(userAuth: AuthUserType, payload: ChangePasswordDto) {
+    // get the given role id
+    const roleId = payload.role_id;
+
+    // Query the user.
+    const user: User | null = await this.datasource
+      .getRepository(User)
+      .findOne({
+        where: {
+          id: +userAuth.sub,
+        },
+        relations: {
+          userRole: true,
+        },
+      });
+
+    if (+user?.userRole.id! != +roleId) {
+      throw new BadRequestException('role_id is not matching');
+    }
+
+    // Check if the password is matching.
+    const passwordMatch = await compare(payload.old_password, user!.password);
+    if (!passwordMatch) {
+      throw new BadRequestException('Wrong password was provided!');
+    }
+
+    // hash the password
+    const hashedPassword = await hash(payload.new_password, 10);
+
+    // update the password
+    await this.datasource
+      .getRepository(User)
+      .update(userAuth.sub, { password: hashedPassword });
+    const updatedUser = await this.usersService.findOneByEmailOrUsername(
+      user?.username!,
+    );
+    return this.login(updatedUser!);
   }
 
   async updateUsernameOrEmail(
