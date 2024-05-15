@@ -11,9 +11,7 @@ import { Event } from '../../event/entities/event.entity';
 import { DataSource, Repository } from 'typeorm';
 import { AttendeeEventStatus } from '../enums/attendee-event-status.enum';
 import { TicketsEventTypes } from '../../payment/constants/tickets-event-types.constant';
-import { TicketEventType } from '../../payment/entities/ticket-event-type.entity';
 import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
-import { Attendee } from '../../attendee/entities/attendee.entity';
 import { OrganizationsTickets } from '../../payment/entities/organizations-tickets.entity';
 
 @Injectable()
@@ -23,12 +21,6 @@ export class HandleChangeAttendeeEventStatusPaymentInterceptor
   constructor(
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
-    @InjectRepository(Attendee)
-    private readonly attendeeRepository: Repository<Attendee>,
-    @InjectRepository(AttendeesTickets)
-    private readonly attendeesTickets: Repository<AttendeesTickets>,
-    @InjectRepository(OrganizationsTickets)
-    private readonly organizationsTickets: Repository<OrganizationsTickets>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -50,29 +42,7 @@ export class HandleChangeAttendeeEventStatusPaymentInterceptor
       },
     });
 
-    const attendee = await this.attendeeRepository.findOneOrFail({
-      where: {
-        id: body.attendee_id,
-      },
-    });
-
-    if (body.status === AttendeeEventStatus.accepted && event.fees) {
-      const ticketsEvent = this.attendeesTickets.create({
-        event: { id: TicketsEventTypes.CONSUME } as TicketEventType,
-        data: { event_id: event.id },
-        attendee: attendee,
-        value: -1 * event.fees,
-      });
-
-      const organizationTickets = this.organizationsTickets.create({
-        organization: event.organization,
-        value: event.fees,
-        data: { event_id: event.id, attendee_id: attendee.id },
-      });
-
-      await queryRunner.manager.save(organizationTickets);
-      await queryRunner.manager.save(ticketsEvent);
-    } else if (body.status === AttendeeEventStatus.rejected && event.fees) {
+    if (body.status === AttendeeEventStatus.rejected && event.fees) {
       const attendeeTickets = await this.dataSource
         .getRepository(AttendeesTickets)
         .createQueryBuilder('tickets')

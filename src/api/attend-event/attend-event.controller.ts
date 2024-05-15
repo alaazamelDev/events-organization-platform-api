@@ -2,14 +2,12 @@ import {
   Body,
   Controller,
   Post,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AttendEventService } from './services/attend-event.service';
 import { AttendEventDto } from './dto/attend-event.dto';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
-import { Request } from 'express';
 import { ChangeAttendEventStatusDto } from './dto/change-attend-event-status.dto';
 import { ManageAttendEventService } from './services/manage-attend-event.service';
 import { CheckEventFormIfSubmittedInterceptor } from './interceptors/check-event-form-if-submitted.interceptor';
@@ -22,6 +20,8 @@ import { HandleRegisterInEventsPaymentInterceptor } from './interceptors/handle-
 import { QueryRunnerParam } from '../../common/decorators/query-runner-param.decorator';
 import { QueryRunner } from 'typeorm';
 import { HandleChangeAttendeeEventStatusPaymentInterceptor } from './interceptors/handle-change-attendee-event-status-payment.interceptor';
+import { User } from '../../common/decorators/user.decorator';
+import { AuthUserType } from '../../common/types/auth-user.type';
 
 @Controller('attend-event')
 export class AttendEventController {
@@ -42,13 +42,11 @@ export class AttendEventController {
   attendEvent(
     @QueryRunnerParam() queryRunner: QueryRunner,
     @Body() attendEventDto: AttendEventDto,
-    @Req() req: Request,
+    @User() user: AuthUserType,
   ) {
-    // console.log(queryRunner);
-    const user: any = req.user;
     return this.attendEventService.attendEvent(
       attendEventDto,
-      +user['sub'],
+      +user.sub,
       queryRunner,
     );
   }
@@ -58,7 +56,6 @@ export class AttendEventController {
   // @UseGuards(AccessTokenGuard, RoleGuard)
   @UseInterceptors(
     TransactionInterceptor,
-    CheckAttendeeBalanceAgainstEventFeesInterceptor,
     HandleChangeAttendeeEventStatusPaymentInterceptor,
   )
   changeAttendEventStatus(

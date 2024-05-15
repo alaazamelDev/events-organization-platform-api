@@ -56,7 +56,7 @@ export class HandleRegisterInEventsPaymentInterceptor
       },
     });
 
-    if (event.fees && event.directRegister) {
+    if (event.fees && event.fees > 0) {
       const ticketsEvent = this.attendeesTickets.create({
         event: { id: TicketsEventTypes.CONSUME } as TicketEventType,
         data: { event_id: event.id },
