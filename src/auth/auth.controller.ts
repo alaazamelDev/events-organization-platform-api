@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -14,6 +15,7 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { User } from '../common/decorators/user.decorator';
 import { AuthUserType } from '../common/types/auth-user.type';
 import { AccessTokenGuard } from './guards/access-token.guard';
+import { UpdateUsernameOrEmailDto } from './dto/update-username-or-email.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +25,16 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   async login(@Request() request: any) {
     return this.authService.login(request.user);
+  }
+
+  @Post('update-username-or-email')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async updateUsernameOrEmail(
+    @User() user: AuthUserType,
+    @Body() payload: UpdateUsernameOrEmailDto,
+  ) {
+    return this.authService.updateUsernameOrEmail(user, payload);
   }
 
   @Post('logout')
