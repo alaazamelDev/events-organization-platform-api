@@ -460,9 +460,12 @@ export class OrganizationService {
     const orgEvents = await this.dataSource
       .getRepository(Event)
       .createQueryBuilder('event')
-      .select(['event.id', 'event.title'])
+      .select(['event.id', 'event.title', 'event.coverPictureUrl'])
       .where('event.organization = :orgID', { orgID: employee.organizationId })
-      .getMany();
+      .leftJoin('event.days', 'ed')
+      .groupBy('event.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .getRawMany();
 
     return await Promise.all(
       orgEvents.map(async (event) => {
@@ -470,7 +473,7 @@ export class OrganizationService {
           .getRepository(OrganizationsTickets)
           .createQueryBuilder('tickets')
           .where(`tickets.data::jsonb ->> 'event_id' = :eventId`, {
-            eventId: event.id,
+            eventId: event.event_id,
           })
           .getMany();
 
