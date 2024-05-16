@@ -10,6 +10,7 @@ import { JwtConfigService } from '../config/secrets/jwt/config.service';
 import { ConfigModule } from '@nestjs/config';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { FileUtilityModule } from '../config/files/utility/file-utility.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
       inject: [JwtConfigService],
       global: true,
     } as JwtModuleAsyncOptions),
+    FileUtilityModule,
   ],
   exports: [AuthService],
   providers: [

@@ -151,7 +151,10 @@ export class Event extends BaseEntity {
   @OneToMany(() => AttendeeEvent, (attendeeEvent) => attendeeEvent.event)
   attendees: AttendeeEvent[];
 
-  @ManyToOne(() => Form, (form) => form.events, { nullable: true })
+  @ManyToOne(() => Form, (form) => form.events, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'form_id' })
   form: Form | null;
 
