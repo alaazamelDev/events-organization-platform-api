@@ -36,6 +36,7 @@ import { EventDay } from './entities/event-day.entity';
 import { Form } from '../dynamic-forms/entities/form.entity';
 import { MessageGroupStatus } from '../chat/enums/message-group-status.enum';
 import { ChatGroup } from '../chat/entities/chat-group.entity';
+import { AuthUserType } from '../../common/types/auth-user.type';
 
 @Injectable()
 export class EventService {
@@ -498,6 +499,38 @@ export class EventService {
         attendee: true,
       },
     });
+  }
+
+  public async deleteEvent(
+    user: AuthUserType,
+    id: number,
+  ): Promise<{ message: string }> {
+    // make sure the employee belongs to the same org
+    const isExist: boolean = await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('ev')
+      .innerJoin('ev.organization', 'org')
+      .innerJoin('org.employees', 'employees')
+      .where('ev.id = :event_id', { event_id: id })
+      .where('employees.user_id = :user_id', { user_id: user.sub })
+      .getExists();
+
+    if (!isExist) {
+      throw new NotFoundException(
+        'Event was not found in your organization events!',
+      );
+    }
+
+    // delete the event
+    const deleted = await this.eventRepository.softDelete(id);
+    const hasBeenDeleted: boolean = +deleted.affected! > 0;
+
+    if (!hasBeenDeleted) {
+      throw new BadRequestException('Event has not been deleted');
+    }
+    return {
+      message: 'Event has been deleted',
+    };
   }
 
   private async checkEventExistence(id: number): Promise<boolean> {
