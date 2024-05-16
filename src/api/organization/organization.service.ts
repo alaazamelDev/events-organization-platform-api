@@ -406,7 +406,12 @@ export class OrganizationService {
     const attendees = await this.dataSource
       .getRepository(Attendee)
       .createQueryBuilder('attendee')
-      .select(['attendee.id', 'attendee.firstName', 'attendee.lastName'])
+      .select([
+        'attendee.id',
+        'attendee.firstName',
+        'attendee.lastName',
+        'attendee.profilePictureUrl',
+      ])
       .leftJoin('attendee.events', 'attendEvent')
       .addSelect(['attendEvent.id'])
       .leftJoin('attendEvent.event', 'event')
