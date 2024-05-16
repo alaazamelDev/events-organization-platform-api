@@ -5,6 +5,7 @@ import { AttendeesTickets } from '../entities/attendees-tickets.entity';
 import { DataSource } from 'typeorm';
 import { DidAttendeePayedForTheEventDto } from '../dto/did-attendee-payed-for-the-event.dto';
 import { TicketsEventTypes } from '../constants/tickets-event-types.constant';
+import { Event } from '../../event/entities/event.entity';
 
 @Injectable()
 export class PaymentAttendeeService {
@@ -62,5 +63,25 @@ export class PaymentAttendeeService {
       .then((obj) =>
         !obj ? false : +obj.event.id === +TicketsEventTypes.CONSUME,
       );
+  }
+
+  async getTicketsUsage() {
+    const tickets = await this.dataSource
+      .getRepository(AttendeesTickets)
+      .createQueryBuilder('tickets')
+      .where(`jsonb_exists(tickets.data, 'event_id')`)
+      .andWhere('tickets.event = :eventID', {
+        eventID: TicketsEventTypes.CONSUME,
+      })
+      .leftJoinAndSelect('tickets.attendee', 'attendee')
+      .leftJoinAndSelect(
+        Event,
+        'event',
+        `event.id = CAST(JSONB_EXTRACT_PATH_TEXT(tickets.data, 'event_id') AS BIGINT)`,
+      )
+      .leftJoinAndSelect('event.organization', 'organization')
+      .getRawMany();
+
+    return tickets;
   }
 }
