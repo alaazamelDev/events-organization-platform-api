@@ -13,10 +13,12 @@ import { UserRole } from '../../api/userRole/entities/user_role.entity';
 import { AuthUserType } from '../../common/types/auth-user.type';
 import { UpdateUsernameOrEmailDto } from '../dto/update-username-or-email.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
+import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly fileUtilityService: FileUtilityService,
     private readonly usersService: UserService,
     private readonly jwtService: JwtService,
     private readonly datasource: DataSource,
@@ -54,6 +56,13 @@ export class AuthService {
     // update the refresh token.
     await this.updateUserRefreshToken(user.id, refreshToken);
 
+    const profilePicture: string | undefined | null =
+      user.userRole.id == +UserRole.ATTENDEE
+        ? user.attendee?.profilePictureUrl
+        : user.userRole.id == +UserRole.EMPLOYEE
+        ? user.employee?.profile_picture
+        : user.admin?.profilePictureUrl;
+
     // return the result
     return {
       user_id: user.id,
@@ -65,6 +74,7 @@ export class AuthService {
         user.userRole.id == UserRole.EMPLOYEE
           ? user.employee?.organizationId
           : undefined,
+      profile_picture: this.fileUtilityService.getFileUrl(profilePicture),
       access_token: accessToken,
       refresh_token: refreshToken,
     };

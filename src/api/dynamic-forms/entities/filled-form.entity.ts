@@ -16,7 +16,7 @@ export class FilledForm extends BaseEntity {
   @JoinColumn({ name: 'form_id' })
   form: Form;
 
-  @ManyToOne(() => Event, (event) => event.filledForms)
+  @ManyToOne(() => Event, (event) => event.filledForms, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
