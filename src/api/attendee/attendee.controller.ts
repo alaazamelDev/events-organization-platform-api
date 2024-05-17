@@ -34,6 +34,8 @@ import { FollowingAttendeeSerializer } from '../organization/serializers/followi
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { RegisterAttendeeInStripeInterceptor } from '../payment/interceptors/register-attendee.in.stripe.interceptor';
 import { DidAttendeeFillEventFormDto } from './dto/did-attendee-fill-event-form.dto';
+import { User } from '../../common/decorators/user.decorator';
+import { AuthUserType } from '../../common/types/auth-user.type';
 
 @Controller('attendee')
 export class AttendeeController {
@@ -133,9 +135,9 @@ export class AttendeeController {
   @Post('/follow-org')
   async followOrganization(
     @Body() payload: OrganizationFollowingDto,
-    @Req() req: any,
+    @User() user: AuthUserType,
   ) {
-    const userId = req.user.sub;
+    const userId = user.sub;
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
     return this.attendeeService.followOrganization(
       payload.organization_id,
@@ -148,9 +150,9 @@ export class AttendeeController {
   @Post('/unfollow-org')
   async unfollowOrganization(
     @Body() payload: OrganizationFollowingDto,
-    @Req() req: any,
+    @User() user: AuthUserType,
   ) {
-    const userId = req.user.sub;
+    const userId = user.sub;
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
     return this.attendeeService.unfollowOrganization(
       payload.organization_id,
@@ -160,8 +162,8 @@ export class AttendeeController {
 
   @UseGuards(AccessTokenGuard)
   @Get('/followed-organizations')
-  async getListOfFollowedOrganizations(@Req() req: any) {
-    const userId = req.user.sub;
+  async getListOfFollowedOrganizations(@User() user: AuthUserType) {
+    const userId = user.sub;
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
 
     // get the result
@@ -264,8 +266,8 @@ export class AttendeeController {
 
   @Get('my-profile')
   @UseGuards(AccessTokenGuard)
-  async getMyProfileDetails(@Req() req: any) {
-    const userId = req.user.sub;
+  async getMyProfileDetails(@User() user: AuthUserType) {
+    const userId = user.sub;
     const attendee = await this.attendeeService.getAttendeeByUserId(userId);
     return this.attendeeService.getAttendeeDetails(attendee.id);
   }

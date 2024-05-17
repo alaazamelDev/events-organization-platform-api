@@ -19,7 +19,8 @@ export class EventAgeGroupSerializer {
     };
   }
 
-  static serializeList(eventAgeGroups: EventAgeGroup[]) {
+  static serializeList(eventAgeGroups?: EventAgeGroup[]) {
+    if (!eventAgeGroups) return [];
     return eventAgeGroups.map((ageGroup) => this.serialize(ageGroup));
   }
 }
