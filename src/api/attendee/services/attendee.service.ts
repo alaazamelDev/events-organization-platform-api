@@ -3,7 +3,7 @@ import { Attendee } from '../entities/attendee.entity';
 import { UserService } from '../../user/services/user.service';
 import { hash } from 'bcrypt';
 import { User } from '../../user/entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { IAttendeeRepository } from '../interfaces/attendee_repo.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRole } from '../../userRole/entities/user_role.entity';
@@ -27,6 +27,7 @@ import {
 import { DidAttendeeFillEventFormDto } from '../dto/did-attendee-fill-event-form.dto';
 import { Event } from '../../event/entities/event.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
+import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-status.enum';
 
 @Injectable()
 export class AttendeeService {
@@ -289,10 +290,59 @@ export class AttendeeService {
   }
 
   async getAttendeeDetails(attendeeId: number) {
-    const attendee = await this.attendeeRepository.findOne({
-      relations: { address: true, contacts: true, job: true, user: true },
-      where: { id: attendeeId },
-    });
+    const attendee = await this.attendeeRepository
+      .findOne({
+        relations: { address: true, contacts: true, job: true, user: true },
+        where: { id: attendeeId },
+      })
+      .then(async (attendee) => {
+        if (!attendee) {
+          return attendee;
+        }
+
+        let eventIds = await this.dataSource
+          .getRepository(Event)
+          .createQueryBuilder('event')
+          .innerJoin('event.attendees', 'ae')
+          .innerJoin('ae.attendee', 'attendee')
+          .innerJoin('event.days', 'ed')
+          .groupBy('event.id')
+          .where('attendee.id = :attendeeId', { attendeeId: attendee.id })
+          .andWhere('ae.status = :status', {
+            status: AttendeeEventStatus.accepted,
+          })
+          .addSelect('MIN(ed.dayDate)', 'start_day')
+          .addSelect('event.id as event_id')
+          .orderBy('start_day', 'DESC')
+          .having('MIN(ed.dayDate) < :nowDATE', { nowDATE: new Date() })
+          .getRawMany()
+          .then((events) => events.map((event) => +event.event_id));
+
+        if (eventIds.length != 0) {
+          eventIds = eventIds.slice(0, Math.min(3, eventIds.length));
+
+          attendee.events = await this.dataSource
+            .getRepository(AttendeeEvent)
+            .find({
+              where: {
+                status: AttendeeEventStatus.accepted,
+                event: { id: In(eventIds) },
+                attendee: { id: attendeeId },
+              },
+              order: { event: { days: { dayDate: 'DESC' } } },
+              relations: {
+                event: {
+                  approvalStatuses: { approvalStatus: true },
+                  targetedAgrGroups: { ageGroup: true },
+                  tags: { tag: true },
+                },
+              },
+            });
+        }
+        // console.log(attendee.events);
+
+        return attendee;
+      });
 
     if (!attendee) {
       throw new NotFoundException(

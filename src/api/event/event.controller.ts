@@ -25,6 +25,11 @@ import { ConfigurationListsService } from '../configurationLists/configuration-l
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventTagsDto } from './dto/update-event-tags.dto';
 import { UpdateEventAgeGroupsDto } from './dto/update-event-age-groups.dto';
+import { RoleGuard } from '../../common/guards/role/role.guard';
+import { User } from '../../common/decorators/user.decorator';
+import { AuthUserType } from '../../common/types/auth-user.type';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 
 @UseGuards(AccessTokenGuard)
 @Controller('event')
@@ -132,5 +137,12 @@ export class EventController {
   @Delete('/:id/form')
   deleteEventForm(@Param('id') eventID: string) {
     return this.eventService.deleteEventForm(+eventID);
+  }
+
+  @Delete('/:id')
+  @Roles(UserRoleEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  deleteEvent(@User() user: AuthUserType, @Param('id') id: number) {
+    return this.eventService.deleteEvent(user, id);
   }
 }

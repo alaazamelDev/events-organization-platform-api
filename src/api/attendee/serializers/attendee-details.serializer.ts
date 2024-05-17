@@ -5,6 +5,8 @@ import { FileUtilityService } from '../../../config/files/utility/file-utility.s
 import { JobSerializer } from '../../job/serializers/job.serializer';
 import { AddressSerializer } from '../../address/serializers/address.serializer';
 import { AttendeeContactSerializer } from './attendee-contact.serializer';
+import { EventSerializer } from '../../event/serializers/event.serializer';
+import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
 
 export class AttendeeDetailsSerializer {
   static serialize(
@@ -28,6 +30,20 @@ export class AttendeeDetailsSerializer {
       job: JobSerializer.serialize(attendee.job),
       address: AddressSerializer.serialize(attendee.address),
       contacts: AttendeeContactSerializer.serializeList(attendee.contacts),
+      events: attendee.events
+        ? attendee.events
+            .filter(
+              (attendeeEvent) =>
+                attendeeEvent.event !== null &&
+                attendeeEvent.event !== undefined,
+            )
+            .map((attendeeEvent: AttendeeEvent) => {
+              return EventSerializer.serialize(
+                fileUtilityService!,
+                attendeeEvent.event,
+              );
+            })
+        : undefined,
     };
   }
 }
