@@ -159,6 +159,18 @@ export class FeedService {
     };
   }
 
+  private async getEventsWithRank(events: any[]) {
+    return await Promise.all(
+      events.map(async (event) => {
+        const rank =
+          (await this.getEventPopularity(event)) +
+          this.getEventRecentness(event);
+
+        return { ...event, rank: rank };
+      }),
+    );
+  }
+
   private async getFutureEvents() {
     return await this.dataSource
       .getRepository(Event)
