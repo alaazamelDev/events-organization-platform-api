@@ -56,6 +56,16 @@ export class PaymentController {
   //   return this.paymentService.getBalanceTransactions();
   // }
 
+  @Get('packages-history')
+  async getPackagesHistory() {
+    return this.paymentPackagesService.getBoughtPackages();
+  }
+
+  @Get('tickets-usage')
+  async getTicketsUsage() {
+    return this.paymentAttendeeService.getTicketsUsage();
+  }
+
   @Post('stripe/webhook')
   async stripeEvents(
     @Headers('stripe-signature') signature: string,

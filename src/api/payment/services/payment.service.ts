@@ -57,14 +57,14 @@ export class PaymentService {
     }
   }
 
-  async getBalanceTransactions() {
-    const balanceTransactions = await this.stripe.balanceTransactions.list({
-      limit: 10,
-      // expand: ['data.source'],
-    });
-
-    return balanceTransactions;
-  }
+  // async getBalanceTransactions() {
+  //   const balanceTransactions = await this.stripe.balanceTransactions.list({
+  //     limit: 10,
+  //     // expand: ['data.source'],
+  //   });
+  //
+  //   return balanceTransactions;
+  // }
 
   private async fulfillLineItem(
     item: Stripe.LineItem,
@@ -78,7 +78,7 @@ export class PaymentService {
     const ticket = this.attendeeTickets.create({
       value: Number(quantity) * Number(value),
       attendee: attendee,
-      data: { product: product.id },
+      data: { product: product.id, price: item.price?.id },
       event: { id: TicketsEventTypes.PURCHASE },
     });
 

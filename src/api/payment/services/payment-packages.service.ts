@@ -4,10 +4,16 @@ import { Stripe } from 'stripe';
 import { CreatePackageDto } from '../dto/create-package.dto';
 import { UpdatePackageDto } from '../dto/update-package.dto';
 import { AddPriceToPackageDto } from '../dto/add-price-to-package.dto';
+import { DataSource } from 'typeorm';
+import { AttendeesTickets } from '../entities/attendees-tickets.entity';
+import { TicketsEventTypes } from '../constants/tickets-event-types.constant';
 
 @Injectable()
 export class PaymentPackagesService {
-  constructor(@Inject(STRIPE_CLIENT) private readonly stripe: Stripe) {}
+  constructor(
+    @Inject(STRIPE_CLIENT) private readonly stripe: Stripe,
+    private readonly dataSource: DataSource,
+  ) {}
 
   async getPackages() {
     return this.stripe.products
@@ -57,5 +63,26 @@ export class PaymentPackagesService {
         product: packageID,
       })
       .then((obj) => obj.data);
+  }
+
+  async getBoughtPackages() {
+    const packages = await this.getPackages();
+
+    const ticketsBought = await this.dataSource
+      .getRepository(AttendeesTickets)
+      .createQueryBuilder('tickets')
+      .where(`jsonb_exists(tickets.data, 'product')`)
+      .andWhere('tickets.event = :eventID', {
+        eventID: TicketsEventTypes.PURCHASE,
+      })
+      .leftJoinAndSelect('tickets.attendee', 'attendee')
+      .getMany();
+
+    return ticketsBought.map((ticket: any) => {
+      return {
+        ...ticket,
+        package: packages.find((pack) => pack.id === ticket.data.product),
+      };
+    });
   }
 }
