@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Event } from '../event/entities/event.entity';
-import { DataSource, In } from 'typeorm';
+import { DataSource, In, MoreThan } from 'typeorm';
 import { GenericFilter } from '../../common/interfaces/query.interface';
 import { Organization } from '../organization/entities/organization.entity';
 import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
@@ -9,10 +9,17 @@ import { AuthUserType } from '../../common/types/auth-user.type';
 import { Attendee } from '../attendee/entities/attendee.entity';
 import { FollowingAttendee } from '../organization/entities/following-attendee.entity';
 import { BlockedAttendee } from '../organization/entities/blocked-attendee.entity';
+import { EventQueryFilter } from '../event/interfaces/event-query.filter';
+import * as moment from 'moment';
+import { OrganizationSerializer } from '../organization/serializers/organization.serializer';
+import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 
 @Injectable()
 export class FeedService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly fileUtilityService: FileUtilityService,
+  ) {}
 
   async getEventsOfFollowedOrganizations(
     user: AuthUserType,
@@ -159,6 +166,67 @@ export class FeedService {
     };
   }
 
+  public async getEvents(filters: EventQueryFilter) {
+    // get the upcoming events
+    const events = await this.getFutureEvents();
+
+    // get event ids that match the given locations
+    const addressIds: number[] = filters.addresses?.map((add) => +add) ?? [];
+    const matchingLocationEvents =
+      await this.getEventsIdsInGivenAddresses(addressIds);
+
+    function _filterAddress(event: any): boolean {
+      return matchingLocationEvents.includes(+event.event_id);
+    }
+
+    function _sortByPopularity(ev1: any, ev2: any) {
+      return filters.most_popular ? ev1.rank - ev2.rank : ev2.rank - ev1.rank;
+    }
+
+    // filter to get only events that match the given address
+    const filteredEvents = events
+      .filter(_filterAddress)
+      .filter((event) =>
+        this._filterDateRange(filters.start_date, filters.end_date, event),
+      );
+
+    const unsortedResult = await this.getEventsWithRank(filteredEvents);
+    const sortedResult = unsortedResult
+      .sort(_sortByPopularity)
+      .slice(
+        (filters.page - 1) * filters.pageSize,
+        filters.page * filters.pageSize,
+      );
+    return this.lazyLoadAdditionalData(sortedResult);
+  }
+
+  private async getEventsIdsInGivenAddresses(addressIds: number[]) {
+    return await this.dataSource
+      .getRepository(Event)
+      .find({
+        where: {
+          address: {
+            id: addressIds.length > 0 ? In(addressIds) : MoreThan(0),
+          },
+        },
+        select: { id: true },
+        loadEagerRelations: false,
+      })
+      .then((events) => events.map((ev) => +ev.id));
+  }
+
+  private async getEventsWithRank(events: any[]) {
+    return await Promise.all(
+      events.map(async (event) => {
+        const rank =
+          (await this.getEventPopularity(event)) +
+          this.getEventRecentness(event);
+
+        return { ...event, rank: rank };
+      }),
+    );
+  }
+
   private async getFutureEvents() {
     return await this.dataSource
       .getRepository(Event)
@@ -197,5 +265,64 @@ export class FeedService {
         Math.min(eventDate.getTime(), currentDate.getTime()));
 
     return Math.min(Math.max(normalizedTimeDifference, 0), 1);
+  }
+
+  private _filterDateRange(
+    start_date: Date | undefined,
+    end_date: Date | undefined,
+    event: any,
+  ): boolean {
+    // specified date range
+    if (start_date && end_date) {
+      return moment(event.start_day).isBetween(
+        start_date,
+        end_date,
+        undefined,
+        '[]',
+      );
+    }
+
+    // greater than specific start date
+    if (start_date) {
+      return moment(event.start_day).isSameOrAfter(start_date);
+    }
+
+    // less than a specific end date
+    if (end_date) {
+      return moment(event.start_day).isSameOrBefore(end_date);
+    }
+
+    return true;
+  }
+
+  private async lazyLoadAdditionalData(events: any[]) {
+    // load organizations.
+    // 1. get orgIds.
+    const orgIds = new Set(
+      events.map((ev) => {
+        return +ev.event_organization_id;
+      }),
+    );
+
+    // 2. load org entries
+    const organizations = await this.dataSource
+      .getRepository(Organization)
+      .find({ where: { id: In(Array.from(orgIds.values())) } });
+
+    return events.map((event) => {
+      const organization = organizations.find(
+        (org) => org.id == +event.event_organization_id,
+      );
+      return {
+        ...event,
+        event_cover_picture_url: this.fileUtilityService.getFileUrl(
+          event.event_cover_picture_url,
+        ),
+        organization: OrganizationSerializer.serialize(
+          organization,
+          this.fileUtilityService,
+        ),
+      };
+    });
   }
 }
