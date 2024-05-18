@@ -74,7 +74,7 @@ export class ResponseInterceptor implements NestInterceptor {
     } else if (exception instanceof EntityNotFoundError) {
       const entityName = this.getEntityNameFromMessage(exception.message);
       if (exception?.criteria?.where?.id) {
-        return new BadRequestException([
+        return new NotFoundException([
           `The provided id ${exception?.criteria?.where?.id} was not found in ${entityName}`,
         ]);
       } else {
@@ -82,7 +82,7 @@ export class ResponseInterceptor implements NestInterceptor {
         for (const key in exception.criteria) {
           criteria = criteria.concat(`${key}: ${exception.criteria[key]}, `);
         }
-        return new BadRequestException([
+        return new NotFoundException([
           `Can not match criteria ${criteria}in ${entityName}`,
         ]);
       }
