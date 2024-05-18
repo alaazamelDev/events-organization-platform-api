@@ -10,6 +10,8 @@ import { AuthUserType } from '../../common/types/auth-user.type';
 import { EventSerializer } from '../event/serializers/event.serializer';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { Event } from '../event/entities/event.entity';
+import { ArrayParamPipe } from '../../common/pipes/array-param.pipe';
+import { EventQueryFilter } from '../event/interfaces/event-query.filter';
 
 @Controller('feed')
 export class FeedController {
@@ -17,6 +19,16 @@ export class FeedController {
     private readonly feedService: FeedService,
     private readonly fileUtilityService: FileUtilityService,
   ) {}
+
+  @Get('events')
+  getEvents(
+    @Query() query: EventQueryFilter,
+    @Query('addresses', ArrayParamPipe) addresses?: string[],
+  ) {
+    // Assign the transformed addresses to the DTO
+    query.addresses = addresses;
+    return this.feedService.getEvents(query);
+  }
 
   @Get('soonEvents')
   getSoonEvents(@Query() query: GenericFilter) {
