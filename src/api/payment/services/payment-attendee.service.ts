@@ -66,7 +66,7 @@ export class PaymentAttendeeService {
   }
 
   async getTicketsUsage() {
-    const tickets = await this.dataSource
+    return await this.dataSource
       .getRepository(AttendeesTickets)
       .createQueryBuilder('tickets')
       .where(`jsonb_exists(tickets.data, 'event_id')`)
@@ -74,6 +74,8 @@ export class PaymentAttendeeService {
         eventID: TicketsEventTypes.CONSUME,
       })
       .leftJoinAndSelect('tickets.attendee', 'attendee')
+      .leftJoin('attendee.user', 'user')
+      .addSelect(['user.id', 'user.username', 'user.email'])
       .leftJoinAndSelect(
         Event,
         'event',
@@ -81,7 +83,5 @@ export class PaymentAttendeeService {
       )
       .leftJoinAndSelect('event.organization', 'organization')
       .getRawMany();
-
-    return tickets;
   }
 }

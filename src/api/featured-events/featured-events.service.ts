@@ -1,12 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FeaturedEvent } from './entities/featured-event.entity';
-import {
-  Repository,
-  LessThanOrEqual,
-  DataSource,
-  MoreThanOrEqual,
-} from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { CreateFeaturedEventDto } from './dto/create-featured-event.dto';
 import { Event } from '../event/entities/event.entity';
 import { FeaturedEventType } from './entities/featured-event-type.entity';
@@ -16,7 +11,6 @@ export class FeaturedEventsService {
   constructor(
     @InjectRepository(FeaturedEvent)
     private readonly featuredEventRepository: Repository<FeaturedEvent>,
-    private readonly dataSource: DataSource,
   ) {}
 
   async getFeaturedEvents() {
@@ -24,7 +18,7 @@ export class FeaturedEventsService {
       where: {
         endDate: MoreThanOrEqual(new Date()),
       },
-      relations: { event: { organization: true } },
+      relations: { event: { organization: true }, type: true },
     });
   }
 
@@ -42,6 +36,6 @@ export class FeaturedEventsService {
   }
 
   async deleteFeaturedEvent(featuredEventID: number) {
-    return this.featuredEventRepository.softDelete(featuredEventID);
+    return this.featuredEventRepository.delete(featuredEventID);
   }
 }

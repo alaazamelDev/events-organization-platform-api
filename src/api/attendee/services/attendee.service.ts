@@ -28,6 +28,7 @@ import { DidAttendeeFillEventFormDto } from '../dto/did-attendee-fill-event-form
 import { Event } from '../../event/entities/event.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-status.enum';
+import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
 
 @Injectable()
 export class AttendeeService {
@@ -422,6 +423,25 @@ export class AttendeeService {
       )
       .addSelect(['user.id', 'user.username', 'user.email'])
       .addSelect('SUM(tickets.value)', 'tickets_purchased')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('SUM(tickets_all.value)', 'tickets_balance')
+          .from(AttendeesTickets, 'tickets_all')
+          .where('tickets_all.attendee = attendee.id');
+      }, 'total_tickets_value')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('MAX("sub"."minDayDate")', 'last_attended_event_date')
+          .from((subSubQuery) => {
+            return subSubQuery
+              .select('MIN(eventDay.dayDate)', 'minDayDate')
+              .from(AttendeeEvent, 'attendeeEvent')
+              .leftJoin('attendeeEvent.event', 'event')
+              .leftJoin('event.days', 'eventDay')
+              .where('attendeeEvent.attendee = attendee.id')
+              .groupBy('event.id');
+          }, 'sub');
+      })
       .groupBy('attendee.id')
       .addGroupBy('user.id')
       .getRawMany();

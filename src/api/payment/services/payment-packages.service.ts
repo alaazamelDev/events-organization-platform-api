@@ -76,6 +76,8 @@ export class PaymentPackagesService {
         eventID: TicketsEventTypes.PURCHASE,
       })
       .leftJoinAndSelect('tickets.attendee', 'attendee')
+      .leftJoin('attendee.user', 'user')
+      .addSelect(['user.id', 'user.username', 'user.email'])
       .getMany();
 
     return ticketsBought.map((ticket: any) => {
