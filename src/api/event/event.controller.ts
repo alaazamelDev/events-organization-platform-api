@@ -30,6 +30,11 @@ import { User } from '../../common/decorators/user.decorator';
 import { AuthUserType } from '../../common/types/auth-user.type';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../userRole/enums/user-role.enum';
+import { CheckEventIfStartedBeforeDeleteInterceptor } from './interceptors/check-event-if-started-before-delete.interceptor';
+import { TransactionInterceptor } from '../../common/interceptors/transaction/transaction.interceptor';
+import { HandleTicketsPaymentWhenEventDeletedInterceptor } from './interceptors/handle-tickets-payment-when-event-deleted.intercetpor';
+import { QueryRunnerParam } from '../../common/decorators/query-runner-param.decorator';
+import { QueryRunner } from 'typeorm';
 
 @UseGuards(AccessTokenGuard)
 @Controller('event')
@@ -142,7 +147,16 @@ export class EventController {
   @Delete('/:id')
   @Roles(UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
-  deleteEvent(@User() user: AuthUserType, @Param('id') id: number) {
-    return this.eventService.deleteEvent(user, id);
+  @UseInterceptors(
+    CheckEventIfStartedBeforeDeleteInterceptor,
+    TransactionInterceptor,
+    HandleTicketsPaymentWhenEventDeletedInterceptor,
+  )
+  deleteEvent(
+    @User() user: AuthUserType,
+    @QueryRunnerParam() queryRunner: QueryRunner,
+    @Param('id') id: number,
+  ) {
+    return this.eventService.deleteEvent(queryRunner, user, id);
   }
 }

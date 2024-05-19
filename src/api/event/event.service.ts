@@ -502,6 +502,7 @@ export class EventService {
   }
 
   public async deleteEvent(
+    queryRunner: QueryRunner,
     user: AuthUserType,
     id: number,
   ): Promise<{ message: string }> {
@@ -522,7 +523,13 @@ export class EventService {
     }
 
     // delete the event
-    const deleted = await this.eventRepository.softDelete(id);
+    const deleted = await queryRunner.manager
+      .createQueryBuilder()
+      .softDelete()
+      .from(Event)
+      .where('id = :eventID', { eventID: id })
+      .execute();
+
     const hasBeenDeleted: boolean = +deleted.affected! > 0;
 
     if (!hasBeenDeleted) {
