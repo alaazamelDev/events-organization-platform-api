@@ -182,7 +182,7 @@ export class OrganizationController {
   }
 
   @Get(':id')
-  @UseGuards(AccessTokenGuard)
+  // @UseGuards(AccessTokenGuard)
   async findOne(@Param('id') id: string) {
     return this.organizationService.findOne(+id);
   }
