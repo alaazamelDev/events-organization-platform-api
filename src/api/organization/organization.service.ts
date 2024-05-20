@@ -170,7 +170,7 @@ export class OrganizationService {
       relations: {
         addresses: { address: true },
         contacts: { contact: true },
-        employees: { user: true },
+        employees: { user: true, permissions: { permission: true } },
       },
     });
 

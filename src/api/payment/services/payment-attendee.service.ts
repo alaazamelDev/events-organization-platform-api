@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { DidAttendeePayedForTheEventDto } from '../dto/did-attendee-payed-for-the-event.dto';
 import { TicketsEventTypes } from '../constants/tickets-event-types.constant';
 import { Event } from '../../event/entities/event.entity';
+import { AttendeeTicketsHistorySerializer } from '../serializers/attendee-tickets-history.serializer';
 
 @Injectable()
 export class PaymentAttendeeService {
@@ -36,14 +37,21 @@ export class PaymentAttendeeService {
     );
   }
 
-  async getAttendeeTicketsHistory(attendeeID: number) {
-    return this.dataSource
+  async getAttendeeTicketsHistory(attendeeID: number): Promise<any> {
+    const result = await this.dataSource
       .getRepository(AttendeesTickets)
-      .createQueryBuilder('attendeeTickets')
-      .where('attendeeTickets.attendee = :attendeeID', {
+      .createQueryBuilder('attendee_tickets')
+      .where('attendee_tickets.attendee = :attendeeID', {
         attendeeID: attendeeID,
       })
-      .getMany();
+      .leftJoinAndSelect(
+        Event,
+        'event',
+        `event.id = CAST(JSONB_EXTRACT_PATH_TEXT(attendee_tickets.data, 'event_id') AS BIGINT)`,
+      )
+      .getRawMany();
+
+    return AttendeeTicketsHistorySerializer.serializeList(result);
   }
 
   async didAttendeePayedForTheEvent(dto: DidAttendeePayedForTheEventDto) {
