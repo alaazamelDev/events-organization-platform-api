@@ -24,7 +24,7 @@ export class FeedService {
   async getEventsOfFollowedOrganizations(
     user: AuthUserType,
     query: GenericFilter,
-  ) {
+  ): Promise<[Event[], number]> {
     // get the attendee id.
     const attendeeId: number = await this.dataSource
       .getRepository(Attendee)
@@ -70,6 +70,7 @@ export class FeedService {
       });
 
     let events: Event[] = [];
+    let count: number = 0;
     if (followedOrganizationIds.length > 0) {
       // Query the upcoming events for organizations
       // that attendee is following & not being blocked by them.
@@ -88,6 +89,9 @@ export class FeedService {
         .getRawMany()
         .then((events) => events.map((ev) => +ev.event_id));
 
+      // get the total count
+      count = eventIds.length;
+
       // slice the array of ids
       eventIds = eventIds.slice(
         (query.page - 1) * query.pageSize,
@@ -103,7 +107,7 @@ export class FeedService {
       });
     }
 
-    return events;
+    return [events, count];
   }
 
   async getSoonEvents(query: GenericFilter) {
@@ -168,7 +172,8 @@ export class FeedService {
 
   public async getEvents(filters: EventQueryFilter) {
     // get the upcoming events
-    const events = await this.getFutureEvents();
+    const events = await this.getAllRawEvents();
+    // const events = await this.getFutureEvents();
 
     // get event ids that match the given locations
     const addressIds: number[] = filters.addresses?.map((add) => +add) ?? [];
@@ -179,25 +184,45 @@ export class FeedService {
       return matchingLocationEvents.includes(+event.event_id);
     }
 
+    function _filterByTitle(event: any): boolean {
+      const query: string | undefined = filters.search?.trim().toLowerCase();
+
+      // if empty or not specified...
+      if (!query || query.length == 0) return true;
+
+      // otherwise, match with title or description.
+      const eventTitleLower: string = event.event_title.toLowerCase();
+      const eventDescLower: string = event.event_description.toLowerCase();
+
+      // check for matching
+      const isTitleMatching: boolean = eventTitleLower.includes(query);
+      const isDescMatching: boolean = eventDescLower.includes(query);
+
+      return isTitleMatching || isDescMatching;
+    }
+
     function _sortByPopularity(ev1: any, ev2: any) {
       return filters.most_popular ? ev1.rank - ev2.rank : ev2.rank - ev1.rank;
     }
 
     // filter to get only events that match the given address
     const filteredEvents = events
+      .filter(_filterByTitle)
       .filter(_filterAddress)
       .filter((event) =>
         this._filterDateRange(filters.start_date, filters.end_date, event),
       );
 
     const unsortedResult = await this.getEventsWithRank(filteredEvents);
+    const count = unsortedResult.length;
     const sortedResult = unsortedResult
       .sort(_sortByPopularity)
       .slice(
         (filters.page - 1) * filters.pageSize,
         filters.page * filters.pageSize,
       );
-    return this.lazyLoadAdditionalData(sortedResult);
+    const processedEvents = await this.lazyLoadAdditionalData(sortedResult);
+    return [processedEvents, count];
   }
 
   private async getEventsIdsInGivenAddresses(addressIds: number[]) {
@@ -236,6 +261,18 @@ export class FeedService {
       .addSelect('MIN(ed.dayDate)', 'start_day')
       .orderBy('start_day')
       .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
+      .getRawMany();
+  }
+
+  private async getAllRawEvents() {
+    return await this.dataSource
+      .getRepository(Event)
+      .createQueryBuilder('event')
+      .innerJoin('event.days', 'ed')
+      .groupBy('event.id')
+      .addSelect('MIN(ed.dayDate)', 'start_day')
+      .orderBy('start_day')
+      // .having('MIN(ed.dayDate) >= :nowDATE', { nowDATE: new Date() })
       .getRawMany();
   }
 

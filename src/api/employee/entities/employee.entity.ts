@@ -40,6 +40,9 @@ export class Employee extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @RelationId((employee: Employee) => employee.user, 'user_id')
+  userId?: number;
+
   @OneToMany(
     () => EmployeePermission,
     (employeePermission) => employeePermission.employee,

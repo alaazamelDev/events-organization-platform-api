@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
+  RelationId,
 } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { User } from '../../user/entities/user.entity';
@@ -22,6 +23,9 @@ export class Attendee extends BaseEntity {
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @RelationId((attendee: Attendee) => attendee.user, 'user_id')
+  userId?: number;
 
   @Column({
     name: 'first_name',
