@@ -21,13 +21,17 @@ export class FeedController {
   ) {}
 
   @Get('events')
-  getEvents(
+  async getEvents(
     @Query() query: EventQueryFilter,
     @Query('addresses', ArrayParamPipe) addresses?: string[],
   ) {
     // Assign the transformed addresses to the DTO
     query.addresses = addresses;
-    return this.feedService.getEvents(query);
+    const result = await this.feedService.getEvents(query);
+    return {
+      data: result[0],
+      count: result[1],
+    };
   }
 
   @Get('soonEvents')
@@ -52,8 +56,11 @@ export class FeedController {
     @User() user: AuthUserType,
     @Query() query: GenericFilter,
   ) {
-    const events: Event[] =
+    const result: [Event[], number] =
       await this.feedService.getEventsOfFollowedOrganizations(user, query);
-    return EventSerializer.serializeList(this.fileUtilityService, events);
+    return {
+      data: EventSerializer.serializeList(this.fileUtilityService, result[0]),
+      count: result[1],
+    };
   }
 }

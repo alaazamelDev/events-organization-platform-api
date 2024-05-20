@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   ForbiddenException,
@@ -184,14 +183,7 @@ export class OrganizationController {
 
   @Get(':id')
   @UseGuards(AccessTokenGuard)
-  async findOne(@Param('id') id: string, @Req() req: any) {
-    const userData = req.user;
-    const userId = userData.sub;
-    const isBlocked = await this.attendeeService.isAttendeeBlocked(+id, userId);
-    if (isBlocked) {
-      throw new ForbiddenException('The attendee is blocked...');
-    }
-
+  async findOne(@Param('id') id: string) {
     return this.organizationService.findOne(+id);
   }
 

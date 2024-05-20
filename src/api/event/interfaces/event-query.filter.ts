@@ -2,7 +2,7 @@ import { GenericFilter } from '../../../common/interfaces/query.interface';
 import { Transform } from 'class-transformer';
 import { IsDateFormat } from '../../../common/decorators/is-date-format.decorator';
 import { DEFAULT_DB_DATE_FORMAT } from '../../../common/constants/constants';
-import { IsBoolean, IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class EventQueryFilter extends GenericFilter {
   @IsOptional()
@@ -23,4 +23,8 @@ export class EventQueryFilter extends GenericFilter {
   )
   @IsBoolean()
   most_popular: boolean = true;
+
+  @IsOptional()
+  @IsString()
+  search: string | undefined;
 }
