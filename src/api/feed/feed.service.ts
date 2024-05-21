@@ -181,6 +181,7 @@ export class FeedService {
       await this.getEventsIdsInGivenAddresses(addressIds);
 
     function _filterAddress(event: any): boolean {
+      if (!filters.addresses || filters.addresses.length == 0) return true;
       return matchingLocationEvents.includes(+event.event_id);
     }
 
