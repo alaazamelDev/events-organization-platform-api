@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Event } from '../event/entities/event.entity';
+import { Event } from '../../event/entities/event.entity';
 import { DataSource, In, MoreThan } from 'typeorm';
-import { GenericFilter } from '../../common/interfaces/query.interface';
-import { Organization } from '../organization/entities/organization.entity';
-import { AttendeeEvent } from '../attend-event/entities/attendee-event.entity';
-import { AttendeeEventStatus } from '../attend-event/enums/attendee-event-status.enum';
-import { AuthUserType } from '../../common/types/auth-user.type';
-import { Attendee } from '../attendee/entities/attendee.entity';
-import { FollowingAttendee } from '../organization/entities/following-attendee.entity';
-import { BlockedAttendee } from '../organization/entities/blocked-attendee.entity';
-import { EventQueryFilter } from '../event/interfaces/event-query.filter';
+import { GenericFilter } from '../../../common/interfaces/query.interface';
+import { Organization } from '../../organization/entities/organization.entity';
+import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity';
+import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-status.enum';
+import { AuthUserType } from '../../../common/types/auth-user.type';
+import { Attendee } from '../../attendee/entities/attendee.entity';
+import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
+import { BlockedAttendee } from '../../organization/entities/blocked-attendee.entity';
+import { EventQueryFilter } from '../../event/interfaces/event-query.filter';
 import * as moment from 'moment';
-import { OrganizationSerializer } from '../organization/serializers/organization.serializer';
-import { FileUtilityService } from '../../config/files/utility/file-utility.service';
+import { OrganizationSerializer } from '../../organization/serializers/organization.serializer';
+import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
 
 @Injectable()
 export class FeedService {

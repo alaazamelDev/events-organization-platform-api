@@ -1,5 +1,5 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { FeedService } from './feed.service';
+import { FeedService } from './services/feed.service';
 import { GenericFilter } from '../../common/interfaces/query.interface';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { RoleGuard } from '../../common/guards/role/role.guard';
@@ -12,13 +12,31 @@ import { FileUtilityService } from '../../config/files/utility/file-utility.serv
 import { Event } from '../event/entities/event.entity';
 import { ArrayParamPipe } from '../../common/pipes/array-param.pipe';
 import { EventQueryFilter } from '../event/interfaces/event-query.filter';
+import { FeedCategoriesService } from './services/feed-categories.service';
 
 @Controller('feed')
 export class FeedController {
   constructor(
     private readonly feedService: FeedService,
     private readonly fileUtilityService: FileUtilityService,
+    private readonly feedCategoriesService: FeedCategoriesService,
   ) {}
+
+  @Get('categories')
+  async getCategories() {
+    return this.feedCategoriesService.getAllCategories();
+  }
+
+  @Get('event/categories')
+  async getEventsByCategories(
+    @Query() query: GenericFilter,
+    @Query('categories') categories: string[] = [],
+  ) {
+    return this.feedCategoriesService.getEventsWithSpecifiedCategories(
+      query,
+      typeof categories === 'string' ? [categories] : categories,
+    );
+  }
 
   @Get('events')
   async getEvents(
