@@ -3,19 +3,26 @@ import { UserRole } from '../../userRole/entities/user_role.entity';
 import { Attendee } from '../../attendee/entities/attendee.entity';
 import * as moment from 'moment';
 import { DEFAULT_DB_DATETIME_FORMAT } from '../../../common/constants/constants';
+import { AttendeeDetailsSerializer } from '../../attendee/serializers/attendee-details.serializer';
+import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
 
 export class BlockedUserSerializer {
-  static serialize(data?: BlockedUser) {
+  static serialize(
+    data?: BlockedUser,
+    fileUtilityService?: FileUtilityService,
+  ) {
     if (!data) return undefined;
-    const roleId = data?.userRoleId!;
+    const roleId = +data?.userRoleId!;
     let payload;
+    let key: string = 'user';
     switch (roleId) {
       case +UserRole.ATTENDEE:
+        key = 'attendee';
         const attendee: Attendee = data.user.attendee!;
-        payload = {
-          attendee_id: attendee.id,
-          full_name: attendee.firstName.concat(' ', attendee.lastName),
-        };
+        payload = AttendeeDetailsSerializer.serialize(
+          attendee,
+          fileUtilityService,
+        );
         break;
       // TODO: IMPLEMENT OTHER CASES
       default:
@@ -24,13 +31,16 @@ export class BlockedUserSerializer {
     return !payload
       ? undefined
       : {
-          payload: payload,
+          [key]: payload,
           blocked_at: moment(data.createdAt).format(DEFAULT_DB_DATETIME_FORMAT),
         };
   }
 
-  static serializeList(data?: BlockedUser[]) {
-    if (!data) return undefined;
-    return data.map((item) => this.serialize(item));
+  static serializeList(
+    data?: BlockedUser[],
+    fileUtilityService?: FileUtilityService,
+  ) {
+    if (!data) return [];
+    return data.map((item) => this.serialize(item, fileUtilityService));
   }
 }

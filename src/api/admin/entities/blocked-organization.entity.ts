@@ -4,7 +4,7 @@ import { Entity, JoinColumn, OneToOne, RelationId } from 'typeorm';
 
 @Entity('blocked_organizations')
 export class BlockedOrganization extends BaseEntity {
-  @OneToOne(() => Organization, { eager: true, onDelete: 'CASCADE' })
+  @OneToOne(() => Organization, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
 

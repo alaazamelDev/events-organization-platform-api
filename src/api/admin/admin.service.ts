@@ -22,23 +22,25 @@ export class AdminService {
 
     return repo.findAndCount({
       where: { userRole: { id: UserRole.ATTENDEE } },
+      relations: { user: { attendee: true } },
+      loadEagerRelations: true,
       skip: (query.page - 1) * query.pageSize,
       take: query.pageSize,
-      loadRelationIds: true,
-      loadEagerRelations: true,
     });
   }
+
   public async getListOfBlockedOrganizations(query: GenericFilter) {
     // get the repository
     const repo = this.dataSource.getRepository(BlockedOrganization);
 
     return repo.findAndCount({
+      relations: { organization: true },
       skip: (query.page - 1) * query.pageSize,
       take: query.pageSize,
-      loadRelationIds: true,
       loadEagerRelations: true,
     });
   }
+
   public async blockAttendee(attendeeId: number) {
     const userId = await this.dataSource
       .getRepository(Attendee)
