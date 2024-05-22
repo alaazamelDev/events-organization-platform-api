@@ -6,7 +6,6 @@ import { UserRole } from '../../userRole/entities/user_role.entity';
 @Entity('blocked_users')
 export class BlockedUser extends BaseEntity {
   @OneToOne(() => User, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })

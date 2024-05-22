@@ -19,11 +19,15 @@ import { BlockedUser } from './entities/blocked-user.entity';
 import { BlockedUserSerializer } from './serializers/blocked-user.serializer';
 import { BlockedOrganization } from './entities/blocked-organization.entity';
 import { BlockedOrganizationSerializer } from './serializers/blocked-organization.serializer';
+import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 
 @Controller('admin')
 @UseGuards(AccessTokenGuard, RoleGuard)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly fileUtilityService: FileUtilityService,
+  ) {}
 
   @Post('/attendee/:id')
   @HttpCode(HttpStatus.OK)
@@ -35,7 +39,7 @@ export class AdminController {
   @Post('/organization/:id')
   @HttpCode(HttpStatus.OK)
   @Roles(UserRoleEnum.ADMIN)
-  public async blockOrganization(@Param('id', ParseIntPipe) id: number) {
+  public async blockOrganization(@Param('id') id: number) {
     return this.adminService.blockOrganization(id);
   }
 
@@ -46,7 +50,10 @@ export class AdminController {
       await this.adminService.getListOfBlockedAttendees(query);
 
     return {
-      data: BlockedUserSerializer.serializeList(result[0]),
+      data: BlockedUserSerializer.serializeList(
+        result[0],
+        this.fileUtilityService,
+      ),
       count: result[1],
     };
   }
@@ -57,7 +64,10 @@ export class AdminController {
     const result: [BlockedOrganization[], number] =
       await this.adminService.getListOfBlockedOrganizations(query);
     return {
-      data: BlockedOrganizationSerializer.serializeList(result[0]),
+      data: BlockedOrganizationSerializer.serializeList(
+        result[0],
+        this.fileUtilityService,
+      ),
       count: result[1],
     };
   }
