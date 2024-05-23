@@ -25,6 +25,6 @@ export class DynamicFormsValidationRulesService {
   }
 
   async removeValidationRule(id: number) {
-    return await this.validationRuleRepository.softDelete(id);
+    return await this.validationRuleRepository.delete(id);
   }
 }

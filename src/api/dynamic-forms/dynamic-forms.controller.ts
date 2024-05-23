@@ -8,6 +8,7 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { DynamicFormsService } from './services/dynamic-forms.service';
 import { CreateFormDto } from './dto/create-form/create-form.dto';
@@ -29,6 +30,8 @@ import { AddOptionDto } from './dto/update-form/add-option.dto';
 import { UpdateOptionNameDto } from './dto/update-form/update-option-name.dto';
 import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { Request } from 'express';
+import { ValidationRuleAlreadyExistInterceptor } from './interceptors/validation-rule-already-exist.interceptor';
+import { ValidationRuleDoesNotExistInterceptor } from './interceptors/validation-rule-does-not-exist.interceptor';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -142,6 +145,7 @@ export class DynamicFormsController {
   }
 
   @Post('validationRule')
+  @UseInterceptors(ValidationRuleAlreadyExistInterceptor)
   addValidationRule(@Body() validationRuleDto: AddValidationRuleDto) {
     return this.dynamicFormsValidationRulesService.addValidationRule(
       validationRuleDto,
@@ -159,6 +163,7 @@ export class DynamicFormsController {
   }
 
   @Delete('validationRule/:id')
+  @UseInterceptors(ValidationRuleDoesNotExistInterceptor)
   deleteValidationRule(@Param('id') id: string) {
     return this.dynamicFormsValidationRulesService.removeValidationRule(+id);
   }

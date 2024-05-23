@@ -80,6 +80,7 @@ export class DynamicFormsService {
           fields: {
             options: true,
             fieldType: { fieldTypeOperators: { query_operator: true } },
+            validationRules: true,
           },
         },
       },
