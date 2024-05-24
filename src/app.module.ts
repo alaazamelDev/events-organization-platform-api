@@ -47,6 +47,7 @@ import { FeedModule } from './api/feed/feed.module';
 import { ChatModule } from './api/chat/chat.module';
 import { IsNotExistConstraint } from './common/validators/is_not_exist_constraint';
 import { FeaturedEventsModule } from './api/featured-events/featured-events.module';
+import { SeedingModule } from './api/seeding/seeding.module';
 
 @Module({
   imports: [
@@ -112,6 +113,7 @@ import { FeaturedEventsModule } from './api/featured-events/featured-events.modu
     }),
     PaymentModule,
     FeaturedEventsModule,
+    SeedingModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint, IsNotExistConstraint],
   controllers: [HealthController],

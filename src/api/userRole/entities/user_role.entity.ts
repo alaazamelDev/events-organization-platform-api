@@ -19,15 +19,6 @@ export class UserRole extends BaseEntity {
   @OneToMany(() => User, (user) => user.userRole)
   users!: User[];
 
-  @Exclude()
-  updatedAt: Date;
-
-  @Exclude()
-  deletedAt: Date;
-
-  @Exclude()
-  createdAt: Date;
-
   // add the new relation. (user role menu items)
   @OneToMany(() => UserRoleMenuItem, (item) => item.userRole)
   roleMenuItems: UserRoleMenuItem[];

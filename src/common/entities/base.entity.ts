@@ -28,5 +28,5 @@ export abstract class BaseEntity {
     name: 'deleted_at',
     nullable: true,
   })
-  deletedAt!: Date;
+  deletedAt!: Date | null;
 }

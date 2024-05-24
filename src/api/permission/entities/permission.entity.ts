@@ -14,13 +14,4 @@ export class Permission extends BaseEntity {
     (employeePermission) => employeePermission.permission,
   )
   employees: EmployeePermission[];
-
-  @Exclude()
-  deletedAt: Date;
-
-  @Exclude()
-  createdAt: Date;
-
-  @Exclude()
-  updatedAt: Date;
 }
