@@ -8,15 +8,13 @@ export class SenderSerializer {
     if (!data) return null;
 
     // get the id.
-    let userId: number | undefined;
+    let userId: number = data.id;
     let username: string | undefined;
     let isOrganizer: boolean = false;
     let avatar: string | undefined;
 
     switch (+data.userRoleId) {
       case +UserRole.ATTENDEE:
-        userId = data.attendee?.id;
-
         const attendeeFirstname: string | undefined = data.attendee?.firstName;
         const attendeeLastname: string | undefined = data.attendee?.lastName;
 
@@ -35,8 +33,6 @@ export class SenderSerializer {
         isOrganizer = false;
         break;
       case +UserRole.EMPLOYEE:
-        userId = data.employee?.id;
-
         const empFirstname: string | undefined = data.employee?.first_name;
         const empLastname: string | undefined = data.employee?.last_name;
 

@@ -123,7 +123,7 @@ export class ChatGateway
       );
 
     // broadcast the message to the same group.
-    client.broadcast.emit(`group-${data.group_id}`, {
+    this.server.emit(`group-${data.group_id}`, {
       message: GroupMessageSerializer.serialize(
         this.fileUtilityService,
         stored!,
