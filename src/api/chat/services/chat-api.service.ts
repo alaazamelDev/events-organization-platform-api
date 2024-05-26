@@ -74,6 +74,7 @@ export class ChatApiService {
       .select([
         'attendee_event.attendee_id AS attendee_id',
         'events.id AS event_id',
+        'events.coverPictureUrl AS event_cover',
         'cg.id AS chat_group_id',
         'cg.group_title AS group_title',
         'COALESCE(group_counts.group_members, 0) AS group_members_count',
