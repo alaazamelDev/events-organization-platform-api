@@ -189,6 +189,7 @@ export class ChatApiService {
         total: messages[1],
         current_page: params.page,
         page_size: params.pageSize,
+        last_page: Math.ceil(messages[1] / params.pageSize),
       },
     };
   }
