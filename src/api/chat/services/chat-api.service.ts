@@ -42,7 +42,7 @@ export class ChatApiService {
       .groupBy('ev.id')
       .select([
         'ev.id as event_id',
-        'ev.coverPictureUrl',
+        'ev.coverPictureUrl as event_cover',
         'COUNT(*) as group_members',
       ]); // Use the alias here
 
