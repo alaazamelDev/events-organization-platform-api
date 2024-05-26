@@ -40,7 +40,11 @@ export class ChatApiService {
       .where('ae.status = :status')
       .setParameters({ status: AttendeeEventStatus.accepted })
       .groupBy('ev.id')
-      .select(['ev.id as event_id', 'COUNT(*) as group_members']); // Use the alias here
+      .select([
+        'ev.id as event_id',
+        'ev.coverPictureUrl',
+        'COUNT(*) as group_members',
+      ]); // Use the alias here
 
     return await queryBuilder
       .from(ChatGroup, 'cg')
