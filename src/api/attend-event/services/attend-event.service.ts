@@ -34,13 +34,13 @@ export class AttendEventService {
       },
     });
 
-    const attendEvent = this.attendeeEventRepository.create({
-      event: event,
-      attendee: attendee,
-      status: event.directRegister
-        ? AttendeeEventStatus.accepted
-        : AttendeeEventStatus.waiting,
-    });
+    const attendEvent = this.attendeeEventRepository.create();
+
+    attendEvent.attendee = attendee;
+    attendEvent.event = event;
+    attendEvent.status = event.directRegister
+      ? AttendeeEventStatus.accepted
+      : AttendeeEventStatus.waiting;
 
     await queryRunner.manager.save(attendEvent);
 
