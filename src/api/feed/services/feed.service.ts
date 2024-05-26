@@ -172,7 +172,9 @@ export class FeedService {
     };
   }
 
-  public async getEvents(filters: EventQueryFilter) {
+  public async getEvents(
+    filters: EventQueryFilter,
+  ): Promise<[Event[], number]> {
     // get the upcoming events
     const events = await this.getAllRawEvents();
     // const events = await this.getFutureEvents();
@@ -225,7 +227,9 @@ export class FeedService {
         filters.page * filters.pageSize,
       );
     const processedEvents = await this.lazyLoadAdditionalData(sortedResult);
-    return [processedEvents, count];
+    const completeEvents =
+      await this.loadCompleteEventsInOrder(processedEvents);
+    return [completeEvents, count];
   }
 
   private async getEventsIdsInGivenAddresses(addressIds: number[]) {
@@ -333,6 +337,15 @@ export class FeedService {
     }
 
     return true;
+  }
+
+  private async loadCompleteEventsInOrder(events: any[]) {
+    // load all events
+    const allEvents = await this.dataSource.getRepository(Event).find();
+
+    return events.map((event) => {
+      return allEvents.find((ev) => +ev.id == +event.event_id)!;
+    });
   }
 
   private async lazyLoadAdditionalData(events: any[]) {

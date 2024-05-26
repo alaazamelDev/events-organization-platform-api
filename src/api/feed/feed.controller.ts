@@ -47,7 +47,7 @@ export class FeedController {
     query.addresses = addresses;
     const result = await this.feedService.getEvents(query);
     return {
-      data: result[0],
+      data: EventSerializer.serializeList(this.fileUtilityService, result[0]),
       count: result[1],
     };
   }
