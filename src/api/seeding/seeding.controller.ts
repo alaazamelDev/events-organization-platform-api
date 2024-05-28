@@ -25,4 +25,9 @@ export class SeedingController {
     await this.seedingService.seedChatReactions();
     await this.seedingService.seedFeaturedEventsTypes();
   }
+
+  @Get('admin')
+  async seedAdmin() {
+    await this.seedingService.seedAdmin();
+  }
 }
