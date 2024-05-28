@@ -17,6 +17,9 @@ import { Address } from '../address/entities/address.entity';
 import { Reaction } from '../chat/entities/reaction.entity';
 import { FieldTypeOperatorsEntity } from '../dynamic-forms/entities/field-type-operators.entity';
 import { FeaturedEventType } from '../featured-events/entities/featured-event-type.entity';
+import { hash } from 'bcrypt';
+import { Admin } from '../admin/entities/admin.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class SeedingService {
@@ -691,5 +694,30 @@ export class SeedingService {
         conflictPaths: ['id'],
         upsertType: 'on-duplicate-key-update',
       });
+  }
+
+  async seedAdmin() {
+    const user = this.dataSource.getRepository(User).create();
+
+    user.username = 'admin';
+    user.email = 'admin@hotmail.com';
+    user.password = await hash('admin', 10);
+    user.userRole = { id: 1 } as UserRole;
+
+    await this.dataSource.getRepository(User).upsert(user, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+
+    const admin = this.dataSource.getRepository(Admin).create();
+
+    admin.user = user;
+    admin.firstName = 'admin';
+    admin.lastName = 'admin';
+
+    await this.dataSource.getRepository(Admin).upsert(admin, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
   }
 }
