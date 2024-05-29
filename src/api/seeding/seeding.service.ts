@@ -20,6 +20,7 @@ import { FeaturedEventType } from '../featured-events/entities/featured-event-ty
 import { DefinedDataEntity } from '../gamification/entities/data-definition/defined-data.entity';
 import { OperatorEntity } from '../gamification/entities/data-definition/operator.entity';
 import { DefinedDataOperatorsEntity } from '../gamification/entities/data-definition/defined-data-operators.entity';
+import { RewardTypeEntity } from '../gamification/entities/rewards/reward-type.entity';
 
 @Injectable()
 export class SeedingService {
@@ -701,7 +702,12 @@ export class SeedingService {
       'ALTER SEQUENCE g_defined_data_id_seq RESTART WITH 1;',
     );
 
-    const definedData = [{ id: 1, name: 'Fill Form' }];
+    const definedData = [
+      { id: 1, name: 'Fill Form' },
+      { id: 2, name: 'Send Message' },
+      { id: 3, name: 'Buy Package' },
+      { id: 4, name: 'Consumed Tickets' },
+    ];
 
     await this.dataSource.getRepository(DefinedDataEntity).upsert(definedData, {
       conflictPaths: ['id'],
@@ -716,7 +722,7 @@ export class SeedingService {
 
     const operatorsData = [
       { id: 1, name: 'Equal' },
-      { id: 1, name: 'Greater' },
+      { id: 2, name: 'Greater' },
     ];
 
     await this.dataSource.getRepository(OperatorEntity).upsert(operatorsData, {
@@ -733,11 +739,35 @@ export class SeedingService {
     const definedDataOperatorsData = [
       { id: 1, defined_data_id: 1, operator_id: 1 },
       { id: 2, defined_data_id: 1, operator_id: 2 },
+      { id: 3, defined_data_id: 2, operator_id: 1 },
+      { id: 4, defined_data_id: 2, operator_id: 2 },
+      { id: 5, defined_data_id: 3, operator_id: 1 },
+      { id: 6, defined_data_id: 3, operator_id: 2 },
+      { id: 7, defined_data_id: 4, operator_id: 1 },
+      { id: 8, defined_data_id: 4, operator_id: 2 },
     ];
 
     await this.dataSource
       .getRepository(DefinedDataOperatorsEntity)
       .upsert(definedDataOperatorsData, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
+  }
+
+  async seedGamificationRewardTypes() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_reward_types_id_seq RESTART WITH 1;',
+    );
+
+    const rewardTypesData = [
+      { id: 1, name: 'Points' },
+      { id: 2, name: 'Badge' },
+    ];
+
+    await this.dataSource
+      .getRepository(RewardTypeEntity)
+      .upsert(rewardTypesData, {
         conflictPaths: ['id'],
         upsertType: 'on-duplicate-key-update',
       });

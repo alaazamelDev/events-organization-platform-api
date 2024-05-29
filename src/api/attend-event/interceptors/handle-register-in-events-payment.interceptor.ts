@@ -15,6 +15,7 @@ import { Attendee } from '../../attendee/entities/attendee.entity';
 import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
 import { AttendEventDto } from '../dto/attend-event.dto';
 import { OrganizationsTickets } from '../../payment/entities/organizations-tickets.entity';
+import { Organization } from '../../organization/entities/organization.entity';
 
 @Injectable()
 export class HandleRegisterInEventsPaymentInterceptor
@@ -60,12 +61,12 @@ export class HandleRegisterInEventsPaymentInterceptor
       const ticketsEvent = this.attendeesTickets.create({
         event: { id: TicketsEventTypes.CONSUME } as TicketEventType,
         data: { event_id: event.id },
-        attendee: attendee,
+        attendee: { id: attendee.id } as Attendee,
         value: -1 * event.fees,
       });
 
       const organizationTickets = this.organizationsTickets.create({
-        organization: event.organization,
+        organization: { id: event.organization.id } as Organization,
         value: event.fees,
         data: { event_id: event.id, attendee_id: attendee.id },
       });

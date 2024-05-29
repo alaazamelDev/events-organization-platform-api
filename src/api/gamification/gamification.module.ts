@@ -15,6 +15,12 @@ import { AttendeePointsEntity } from './entities/rewards-attendee/attendee-point
 import { AttendeeBadgeEntity } from './entities/rewards-attendee/attendee-badge.entity';
 import { GamificationService } from './services/gamification.service';
 import { GamificationController } from './cotrollers/gamification.controller';
+import { DoesOperatorSupportDefinedDataConstraint } from './validators/does_operator_support_defined_data_constraint';
+import { GamificationRewardsService } from './services/gamification-rewards.service';
+import { GamificationRewardsController } from './cotrollers/gamification-rewards.controller';
+import { IsRewardAlreadyAssignedConstraint } from './validators/is_reward_already_assigned_constraint';
+import { GamificationRulesController } from './cotrollers/gamification-rules.controller';
+import { GamificationRulesService } from './services/gamification-rules.service';
 
 @Module({
   imports: [
@@ -34,7 +40,17 @@ import { GamificationController } from './cotrollers/gamification.controller';
       AttendeeBadgeEntity,
     ]),
   ],
-  providers: [GamificationService],
-  controllers: [GamificationController],
+  providers: [
+    GamificationService,
+    GamificationRewardsService,
+    GamificationRulesService,
+    DoesOperatorSupportDefinedDataConstraint,
+    IsRewardAlreadyAssignedConstraint,
+  ],
+  controllers: [
+    GamificationController,
+    GamificationRewardsController,
+    GamificationRulesController,
+  ],
 })
 export class GamificationModule {}

@@ -5,9 +5,6 @@ import { AttendeeBadgeEntity } from '../rewards-attendee/attendee-badge.entity';
 
 @Entity({ name: 'g_badges' })
 export class BadgeEntity extends BaseEntity {
-  @Column()
-  name: string;
-
   @Column({ type: 'jsonb' })
   shape: {};
 

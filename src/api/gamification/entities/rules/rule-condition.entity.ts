@@ -19,7 +19,7 @@ export class RuleConditionEntity extends BaseEntity {
   rule: RuleEntity;
 
   @Column()
-  value: string;
+  value: number;
 
   @Column({ type: 'timestamp', nullable: true })
   time: Date | null;

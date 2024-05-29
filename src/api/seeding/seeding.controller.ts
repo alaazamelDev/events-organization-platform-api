@@ -27,5 +27,6 @@ export class SeedingController {
     await this.seedingService.seedGamificationDefinedData();
     await this.seedingService.seedGamificationOperators();
     await this.seedingService.seedGamificationDefinedDataOperators();
+    await this.seedingService.seedGamificationRewardTypes();
   }
 }
