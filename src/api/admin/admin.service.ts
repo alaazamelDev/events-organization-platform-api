@@ -41,6 +41,20 @@ export class AdminService {
     });
   }
 
+  public async isAttendeeBlocked(attendeeId: number) {
+    return await this.dataSource
+      .getRepository(BlockedUser)
+      .createQueryBuilder('bu')
+      .innerJoin('bu.userRole', 'ur')
+      .innerJoin('bu.user', 'user')
+      .innerJoin('user.attendee', 'attendee')
+      .where('attendee.id = :attendeeId')
+      .andWhere('ur.id = :roleId')
+      .setParameter('roleId', UserRole.ATTENDEE)
+      .setParameter('attendeeId', attendeeId)
+      .getExists();
+  }
+
   public async blockAttendee(attendeeId: number) {
     const userId = await this.dataSource
       .getRepository(Attendee)

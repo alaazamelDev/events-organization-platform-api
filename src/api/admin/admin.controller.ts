@@ -29,6 +29,12 @@ export class AdminController {
     private readonly fileUtilityService: FileUtilityService,
   ) {}
 
+  @Get('/attendee/is-blocked/:id')
+  @Roles(UserRoleEnum.ADMIN)
+  public async isAttendeeBlocked(@Param('id', ParseIntPipe) id: number) {
+    return await this.adminService.isAttendeeBlocked(id);
+  }
+
   @Post('/attendee/:id')
   @HttpCode(HttpStatus.OK)
   @Roles(UserRoleEnum.ADMIN)
