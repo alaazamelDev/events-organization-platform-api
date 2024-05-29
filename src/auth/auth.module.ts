@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { UserModule } from '../api';
+import { AdminModule, UserModule } from '../api';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthController } from './auth.controller';
@@ -27,6 +27,7 @@ import { FileUtilityModule } from '../config/files/utility/file-utility.module';
       global: true,
     } as JwtModuleAsyncOptions),
     FileUtilityModule,
+    AdminModule,
   ],
   exports: [AuthService],
   providers: [

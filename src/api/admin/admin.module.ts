@@ -14,5 +14,6 @@ import { FileUtilityModule } from '../../config/files/utility/file-utility.modul
   ],
   controllers: [AdminController],
   providers: [AdminService],
+  exports: [AdminService],
 })
 export class AdminModule {}

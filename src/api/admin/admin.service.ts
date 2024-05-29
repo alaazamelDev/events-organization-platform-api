@@ -41,6 +41,73 @@ export class AdminService {
     });
   }
 
+  public async unblockAttendee(attendeeId: number) {
+    // check if exist
+    const blockedAttendee = await this.isAttendeeBlocked(attendeeId);
+    const isExist: boolean = !!blockedAttendee;
+    if (!isExist) {
+      throw new BadRequestException('attendee is not blocked');
+    }
+
+    // delete it.
+    const deleteResult = (
+      await this.dataSource
+        .createQueryBuilder()
+        .delete()
+        .from(BlockedUser)
+        .where('user_id = :uId')
+        .andWhere('user_role_id = :roleId')
+        .setParameter('uId', blockedAttendee.user_id)
+        .setParameter('roleId', UserRole.ATTENDEE)
+        .execute()
+    ).affected;
+    return deleteResult != undefined && deleteResult > 0;
+  }
+
+  public async unblockOrganization(organizationId: number) {
+    // check if exist
+    const blockedOrganization =
+      await this.isOrganizationBlocked(organizationId);
+    const isExist: boolean = !!blockedOrganization;
+    if (!isExist) {
+      throw new BadRequestException('organization is not blocked');
+    }
+
+    // delete it.
+    const deleteResult = (
+      await this.dataSource
+        .createQueryBuilder()
+        .delete()
+        .from(BlockedOrganization)
+        .where('organization_id = :oId')
+        .setParameter('oId', blockedOrganization?.organizationId)
+        .execute()
+    ).affected;
+    return deleteResult != undefined && deleteResult > 0;
+  }
+
+  public async isAttendeeBlocked(attendeeId: number) {
+    return await this.dataSource
+      .getRepository(BlockedUser)
+      .createQueryBuilder('bu')
+      .innerJoin('bu.userRole', 'ur')
+      .innerJoin('bu.user', 'user')
+      .innerJoin('user.attendee', 'attendee')
+      .where('attendee.id = :attendeeId')
+      .andWhere('ur.id = :roleId')
+      .setParameter('roleId', UserRole.ATTENDEE)
+      .setParameter('attendeeId', attendeeId)
+      .select(['attendee.id as attendee_id', 'user.id as user_id'])
+      .getRawOne();
+  }
+
+  public async isOrganizationBlocked(organizationId: number) {
+    return await this.dataSource.getRepository(BlockedOrganization).findOne({
+      where: { organization: { id: organizationId } },
+      loadRelationIds: true,
+    });
+  }
+
   public async blockAttendee(attendeeId: number) {
     const userId = await this.dataSource
       .getRepository(Attendee)

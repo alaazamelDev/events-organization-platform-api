@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -28,6 +29,31 @@ export class AdminController {
     private readonly adminService: AdminService,
     private readonly fileUtilityService: FileUtilityService,
   ) {}
+
+  @Get('/attendee/is-blocked/:id')
+  @Roles(UserRoleEnum.ADMIN)
+  public async isAttendeeBlocked(@Param('id', ParseIntPipe) id: number) {
+    const result = await this.adminService.isAttendeeBlocked(id);
+    return !!result;
+  }
+
+  @Get('/organization/is-blocked/:id')
+  @Roles(UserRoleEnum.ADMIN)
+  public async isOrganizationBlocked(@Param('id', ParseIntPipe) id: number) {
+    return !!(await this.adminService.isOrganizationBlocked(id));
+  }
+
+  @Delete('/attendee/unblock/:id')
+  @Roles(UserRoleEnum.ADMIN)
+  public async unBlockAttendee(@Param('id', ParseIntPipe) id: number) {
+    return await this.adminService.unblockAttendee(id);
+  }
+
+  @Delete('/organization/unblock/:id')
+  @Roles(UserRoleEnum.ADMIN)
+  public async unBlockOrganization(@Param('id', ParseIntPipe) id: number) {
+    return await this.adminService.unblockOrganization(id);
+  }
 
   @Post('/attendee/:id')
   @HttpCode(HttpStatus.OK)
