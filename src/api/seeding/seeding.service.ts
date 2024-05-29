@@ -17,6 +17,9 @@ import { Address } from '../address/entities/address.entity';
 import { Reaction } from '../chat/entities/reaction.entity';
 import { FieldTypeOperatorsEntity } from '../dynamic-forms/entities/field-type-operators.entity';
 import { FeaturedEventType } from '../featured-events/entities/featured-event-type.entity';
+import { DefinedDataEntity } from '../gamification/entities/data-definition/defined-data.entity';
+import { OperatorEntity } from '../gamification/entities/data-definition/operator.entity';
+import { DefinedDataOperatorsEntity } from '../gamification/entities/data-definition/defined-data-operators.entity';
 
 @Injectable()
 export class SeedingService {
@@ -688,6 +691,53 @@ export class SeedingService {
     await this.dataSource
       .getRepository(FeaturedEventType)
       .upsert(featuredEventsData, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
+  }
+
+  async seedGamificationDefinedData() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_defined_data_id_seq RESTART WITH 1;',
+    );
+
+    const definedData = [{ id: 1, name: 'Fill Form' }];
+
+    await this.dataSource.getRepository(DefinedDataEntity).upsert(definedData, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+  }
+
+  async seedGamificationOperators() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_operators_id_seq RESTART WITH 1;',
+    );
+
+    const operatorsData = [
+      { id: 1, name: 'Equal' },
+      { id: 1, name: 'Greater' },
+    ];
+
+    await this.dataSource.getRepository(OperatorEntity).upsert(operatorsData, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+  }
+
+  async seedGamificationDefinedDataOperators() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_data_operators_id_seq RESTART WITH 1;',
+    );
+
+    const definedDataOperatorsData = [
+      { id: 1, defined_data_id: 1, operator_id: 1 },
+      { id: 2, defined_data_id: 1, operator_id: 2 },
+    ];
+
+    await this.dataSource
+      .getRepository(DefinedDataOperatorsEntity)
+      .upsert(definedDataOperatorsData, {
         conflictPaths: ['id'],
         upsertType: 'on-duplicate-key-update',
       });
