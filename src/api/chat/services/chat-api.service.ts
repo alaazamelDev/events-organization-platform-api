@@ -169,12 +169,15 @@ export class ChatApiService {
     const messages = await this.dataSource
       .getRepository(GroupMessage)
       .createQueryBuilder('gm')
-      .where('chat_group_id = :groupId')
+      .where('gm.chat_group_id = :groupId')
       .setParameter('groupId', payload.group_id)
       .orderBy('gm.createdAt', 'DESC')
       .skip((params.page - 1) * params.pageSize)
       .take(params.pageSize)
-      .setFindOptions({ loadEagerRelations: true })
+      .setFindOptions({
+        loadEagerRelations: true,
+        relations: { repliedMessage: true },
+      })
       .getManyAndCount();
 
     return {

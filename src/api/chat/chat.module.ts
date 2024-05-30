@@ -30,5 +30,6 @@ import { JwtConfigModule } from '../../config/secrets/jwt/config.module';
   ],
   providers: [ChatService, ChatApiService, ChatGateway],
   controllers: [ChatController],
+  exports: [ChatGateway],
 })
 export class ChatModule {}

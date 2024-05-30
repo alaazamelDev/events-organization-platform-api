@@ -14,11 +14,14 @@ import { MessageReaction } from './message-reaction.entity';
 
 @Entity('group_messages')
 export class GroupMessage extends BaseEntity {
-  @ManyToOne(() => ChatGroup, (type) => type.messages, { cascade: true })
+  @ManyToOne(() => ChatGroup, (type) => type.messages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'chat_group_id' })
   group: ChatGroup;
 
-  @RelationId((groupMessage: GroupMessage) => groupMessage.group, 'group_id')
+  @RelationId(
+    (groupMessage: GroupMessage) => groupMessage.group,
+    'chat_group_id',
+  )
   groupId?: number;
 
   @Column({
@@ -28,7 +31,7 @@ export class GroupMessage extends BaseEntity {
   })
   content: string;
 
-  @ManyToOne(() => User, { cascade: true, eager: true })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 
@@ -45,4 +48,8 @@ export class GroupMessage extends BaseEntity {
 
   @OneToMany(() => MessageReaction, (type) => type.message, { eager: true })
   reactions: MessageReaction[];
+
+  @ManyToOne(() => GroupMessage, { nullable: true })
+  @JoinColumn({ name: 'replied_message_id' })
+  repliedMessage?: GroupMessage;
 }

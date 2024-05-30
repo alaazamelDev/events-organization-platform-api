@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
+  RelationId,
 } from 'typeorm';
 import { Organization } from '../../organization/entities/organization.entity';
 import { Address } from '../../address/entities/address.entity';
@@ -163,6 +164,9 @@ export class Event extends BaseEntity {
 
   @OneToOne(() => ChatGroup, (group) => group.event, { nullable: true })
   chatGroup?: ChatGroup;
+
+  @RelationId((event: Event) => event.chatGroup)
+  chatGroupId?: number;
 
   @Column({ type: 'bigint', nullable: true })
   fees: number | null;
