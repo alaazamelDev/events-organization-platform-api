@@ -21,6 +21,10 @@ import { GamificationRewardsController } from './cotrollers/gamification-rewards
 import { IsRewardAlreadyAssignedConstraint } from './validators/is_reward_already_assigned_constraint';
 import { GamificationRulesController } from './cotrollers/gamification-rules.controller';
 import { GamificationRulesService } from './services/gamification-rules.service';
+import { MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint } from './validators/multiple_conditions_on_the_same_defined_data_in_one_rule_constraint';
+import { GamificationConditionsService } from './services/gamification-conditions.service';
+import { GamificationRulesConditionsController } from './cotrollers/gamification-rules-conditions.controller';
+import { IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint } from './validators/is_defined_data_condition_already_exist_in_the_same_rule_constraint';
 
 @Module({
   imports: [
@@ -44,13 +48,17 @@ import { GamificationRulesService } from './services/gamification-rules.service'
     GamificationService,
     GamificationRewardsService,
     GamificationRulesService,
+    GamificationConditionsService,
     DoesOperatorSupportDefinedDataConstraint,
     IsRewardAlreadyAssignedConstraint,
+    MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint,
+    IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint,
   ],
   controllers: [
     GamificationController,
     GamificationRewardsController,
     GamificationRulesController,
+    GamificationRulesConditionsController,
   ],
 })
 export class GamificationModule {}

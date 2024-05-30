@@ -1,15 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, QueryRunner } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateRuleDto } from '../dto/create-rule.dto';
 import { RuleEntity } from '../entities/rules/rule.entity';
-import { AssignRewardToRuleDto } from '../dto/assign-reward-to-rule.dto';
-import { RewardEntity } from '../entities/rewards/reward.entity';
-import { CreateRuleConditionDto } from '../dto/create-rule-condition.dto';
-import { RuleConditionEntity } from '../entities/rules/rule-condition.entity';
+import { UpdateRuleDto } from '../dto/update-rule.dto';
+import { GamificationConditionsService } from './gamification-conditions.service';
+import { GamificationRewardsService } from './gamification-rewards.service';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class GamificationRulesService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @InjectRepository(RuleEntity)
+    private readonly ruleRepository: Repository<RuleEntity>,
+    private readonly gamificationConditionsService: GamificationConditionsService,
+    private readonly gamificationRewardsService: GamificationRewardsService,
+  ) {}
+
+  async getRules() {
+    return this.ruleRepository.find({
+      relations: {
+        conditions: { operator: true, definedData: true },
+        rewards: { type: true },
+      },
+    });
+  }
 
   async createRule(createRuleDto: CreateRuleDto, queryRunner: QueryRunner) {
     const rule = queryRunner.manager
@@ -20,46 +35,45 @@ export class GamificationRulesService {
 
     await Promise.all(
       createRuleDto.rewards.map(async (reward) =>
-        this.assignRewardsToRule(rule.id, reward, queryRunner),
+        this.gamificationRewardsService.assignRewardToRule(
+          rule.id,
+          reward,
+          queryRunner,
+        ),
       ),
     );
 
     await Promise.all(
       createRuleDto.conditions.map(
         async (condition) =>
-          await this.createCondition(rule.id, condition, queryRunner),
+          await this.gamificationConditionsService.createCondition(
+            rule.id,
+            condition,
+            queryRunner,
+          ),
       ),
     );
 
     return rule;
   }
 
-  private async assignRewardsToRule(
-    rule_id: number,
-    reward: AssignRewardToRuleDto,
-    queryRunner: QueryRunner,
-  ) {
-    await queryRunner.manager
-      .createQueryBuilder()
-      .update(RewardEntity)
-      .set({ rule: { id: rule_id } as RuleEntity })
-      .where('id = :id', { id: reward.reward_id })
-      .execute();
-  }
+  async updateRule(updateRuleDto: UpdateRuleDto) {
+    const rule = await this.dataSource
+      .getRepository(RuleEntity)
+      .createQueryBuilder('rule')
+      .where('rule.id = :id', { id: updateRuleDto.rule_id })
+      .getOneOrFail();
 
-  private async createCondition(
-    rule_id: number,
-    createRuleConditionDto: CreateRuleConditionDto,
-    queryRunner: QueryRunner,
-  ) {
-    const condition = queryRunner.manager
-      .getRepository(RuleConditionEntity)
-      .create({
-        rule: { id: rule_id } as RuleEntity,
-        value: createRuleConditionDto.value,
-        time: new Date(createRuleConditionDto.time),
-      });
+    if (updateRuleDto.name) {
+      rule.name = updateRuleDto.name;
+    }
 
-    await queryRunner.manager.save(condition);
+    if (updateRuleDto.enabled !== undefined) {
+      rule.enabled = updateRuleDto.enabled;
+    }
+
+    await this.dataSource.manager.save(rule, { reload: true });
+
+    return rule;
   }
 }

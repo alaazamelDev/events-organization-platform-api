@@ -12,6 +12,9 @@ export class BadgeEntity extends BaseEntity {
   @JoinColumn({ name: 'reward_id' })
   reward: RewardEntity;
 
+  @Column({ name: 'reward_id' })
+  reward_id: number;
+
   @OneToMany(
     () => AttendeeBadgeEntity,
     (attendeeBadgeEntity) => attendeeBadgeEntity.badge,

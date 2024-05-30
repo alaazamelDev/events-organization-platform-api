@@ -10,4 +10,7 @@ export class PointsEntity extends BaseEntity {
   @OneToOne(() => RewardEntity)
   @JoinColumn({ name: 'reward_id' })
   reward: RewardEntity;
+
+  @Column({ name: 'reward_id' })
+  reward_id: number;
 }

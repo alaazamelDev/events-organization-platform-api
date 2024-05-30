@@ -1,7 +1,7 @@
 import {
+  ValidationArguments,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  ValidationArguments,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
 import { CreateRuleConditionDto } from '../dto/create-rule-condition.dto';
@@ -21,7 +21,7 @@ export class DoesOperatorSupportDefinedDataConstraint
     const data_id = object.defined_data_id;
     const operator_id = object.operator_id;
 
-    const result = this.entityManager
+    return this.entityManager
       .getRepository(DefinedDataOperatorsEntity)
       .createQueryBuilder('data_operator')
       .where('data_operator.defined_data_id = :dataID', { dataID: data_id })
@@ -29,10 +29,6 @@ export class DoesOperatorSupportDefinedDataConstraint
         operatorID: operator_id,
       })
       .getExists();
-
-    console.log(result);
-
-    return false;
   }
 
   defaultMessage(_args: ValidationArguments) {
