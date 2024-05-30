@@ -9,7 +9,7 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from './entities/organization.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, IsNull, Not, Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { UserRole } from '../userRole/entities/user_role.entity';
 import { Employee } from '../employee/entities/employee.entity';
@@ -24,7 +24,6 @@ import { AddressOrganization } from './entities/address_organization.entity';
 import { Address } from '../address/entities/address.entity';
 import { AddOrganizationAddressDto } from './dto/add-organization-address.dto';
 import { DeleteOrganizationAddressDto } from './dto/delete-organization-address.dto';
-import { AllOrganizationsAdminSerializer } from './serializers/all_organizations_admin.serializer';
 import { hash } from 'bcrypt';
 import { BlockedAttendee } from './entities/blocked-attendee.entity';
 import { BlockedAttendeeSerializer } from './serializers/blocked-attendee.serializer';
@@ -34,6 +33,7 @@ import { Event } from '../event/entities/event.entity';
 import { OrganizationsTickets } from '../payment/entities/organizations-tickets.entity';
 import { Attendee } from '../attendee/entities/attendee.entity';
 import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
+import { ChatGateway } from '../chat/gateways/chat.gateway';
 
 @Injectable()
 export class OrganizationService {
@@ -52,6 +52,7 @@ export class OrganizationService {
     private readonly addressOrganizationRepository: Repository<AddressOrganization>,
     private readonly dataSource: DataSource,
     private readonly fileUtilityService: FileUtilityService,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   async checkIfAttendeeIsBlocked(organizationId: number, attendeeId: number) {
@@ -535,6 +536,29 @@ export class OrganizationService {
     });
     await this.dataSource.manager.save(BlockedAttendee, created);
 
+    // kick user off the chat rooms.
+    const eventChatGroups: { group_id: number }[] =
+      await this.getListOfOrganizationEventChatGroups(employee.organization.id);
+
+    const userId: number | undefined = await this.getAttendeeUserId(
+      payload.attendee_id,
+    );
+    console.log('User Id = ' + userId);
+    if (userId == undefined) {
+      return true;
+    }
+
+    // emit kicking-off event
+    eventChatGroups.forEach((item) => {
+      const payload = {
+        group_id: item.group_id,
+        channel: `group-${item.group_id}`,
+      };
+
+      // emit the event
+      this.chatGateway.emitUserKickedOffEvent(userId, payload);
+    });
+
     return true;
   }
 
@@ -562,5 +586,38 @@ export class OrganizationService {
     await this.dataSource.manager.delete(BlockedAttendee, { id: isBlocked.id });
 
     return true;
+  }
+
+  private async getListOfOrganizationEventChatGroups(
+    organizationId: number,
+  ): Promise<{ group_id: number }[]> {
+    return this.dataSource
+      .getRepository(Event)
+      .find({
+        where: {
+          organization: { id: organizationId },
+          isChattingEnabled: true,
+          chatGroup: Not(IsNull()),
+        },
+        loadEagerRelations: true,
+        relations: { chatGroup: true },
+        select: { chatGroup: { id: true } },
+      })
+      .then((events) => events.map((ev) => ({ group_id: ev.chatGroupId! })));
+  }
+
+  private async getAttendeeUserId(attendeeId: number) {
+    return this.dataSource
+      .getRepository(Attendee)
+      .findOne({
+        select: { user: { id: true } },
+        where: { id: attendeeId },
+        loadEagerRelations: false,
+        loadRelationIds: true,
+      })
+      .then((at) => {
+        if (!at) return undefined;
+        return at.userId;
+      });
   }
 }

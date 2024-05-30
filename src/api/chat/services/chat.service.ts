@@ -11,6 +11,8 @@ import { Employee } from '../../employee/entities/employee.entity';
 import { GroupMessageType } from '../types/group-message.type';
 import { GroupMessage } from '../entities/group-message.entity';
 import { ChatGroup } from '../entities/chat-group.entity';
+import { MessageReactionType } from '../types/message-reaction.type';
+import { MessageReaction } from '../entities/message-reaction.entity';
 
 @Injectable()
 export class ChatService {
@@ -133,15 +135,62 @@ export class ChatService {
       senderType: payload.senderType,
       group: { id: payload.group_id },
       sender: { id: payload.sender_id },
+      repliedMessage: payload.reply_to ? { id: +payload.reply_to } : undefined,
     });
 
     // store it.
     const stored = await repository.save(created);
+    console.log(stored);
 
     // load fully detailed message.
-    return await repository.findOne({
-      where: { id: stored.id },
-      relations: { sender: true, reactions: { reactedBy: true } },
+    return this.loadCompleteMessage(stored.id);
+  }
+
+  async storeReaction(payload: MessageReactionType) {
+    // create the new reaction...
+    const messageReactionRepository =
+      this.dataSource.getRepository(MessageReaction);
+
+    // if user is already reacted. remove reaction...
+    const existingReaction = await messageReactionRepository.findOne({
+      where: {
+        reaction: { id: payload.reaction_id },
+        reactedBy: { id: payload.reactor_id },
+        message: { id: payload.message_id },
+      },
+    });
+
+    // this reaction is already exist...
+    if (existingReaction) {
+      // remove the reaction...
+      await messageReactionRepository.delete(existingReaction.id);
+
+      // return the complete message...
+      return this.loadCompleteMessage(payload.message_id);
+    }
+
+    const created = messageReactionRepository.create({
+      message: { id: payload.message_id },
+      reaction: { id: payload.reaction_id },
+      reactedBy: { id: payload.reactor_id },
+    });
+
+    // save it
+    await messageReactionRepository.save(created);
+
+    // load the complete message.
+    return this.loadCompleteMessage(payload.message_id);
+  }
+
+  private async loadCompleteMessage(messageId: number) {
+    const groupMessageRepository = this.dataSource.getRepository(GroupMessage);
+    return await groupMessageRepository.findOne({
+      where: { id: messageId },
+      relations: {
+        sender: true,
+        repliedMessage: true,
+        reactions: { reactedBy: true },
+      },
       loadEagerRelations: true,
     });
   }

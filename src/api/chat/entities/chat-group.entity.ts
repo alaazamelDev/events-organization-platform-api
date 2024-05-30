@@ -23,11 +23,12 @@ export class ChatGroup extends BaseEntity {
   groupTitle: string;
 
   // Relations
-  @OneToOne(() => Event, { cascade: true })
+  @OneToOne(() => Event, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
   @OneToMany(() => GroupMessage, (type) => type.group)
+  @JoinColumn({ name: 'chat_group_id' })
   messages: GroupMessage[];
 
   memberCount?: number;

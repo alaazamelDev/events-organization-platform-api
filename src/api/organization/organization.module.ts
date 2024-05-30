@@ -17,6 +17,7 @@ import { EmployeeModule } from '../employee/employee.module';
 import { AttendeeModule } from '../attendee/attendee.module';
 import { FollowingAttendee } from './entities/following-attendee.entity';
 import { FileUtilityModule } from '../../config/files/utility/file-utility.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FileUtilityModule } from '../../config/files/utility/file-utility.modul
       BlockedAttendee,
       FollowingAttendee,
     ]),
+    ChatModule,
     EmployeeModule,
     AttendeeModule,
     FileUtilityModule,

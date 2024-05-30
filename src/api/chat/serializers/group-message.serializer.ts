@@ -9,7 +9,7 @@ export class GroupMessageSerializer {
   static serialize(
     fileUtilityService: FileUtilityService,
     data?: GroupMessage,
-  ) {
+  ): any {
     if (!data) return null;
     return {
       message_id: data.id,
@@ -20,6 +20,12 @@ export class GroupMessageSerializer {
         fileUtilityService,
         data.reactions,
       ),
+      replied_message: data.repliedMessage
+        ? {
+            message_id: data.repliedMessage.id,
+            message_content: data.repliedMessage.content,
+          }
+        : null,
     };
   }
 
