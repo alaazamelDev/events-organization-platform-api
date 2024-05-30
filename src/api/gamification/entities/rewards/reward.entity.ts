@@ -10,7 +10,7 @@ export class RewardEntity extends BaseEntity {
 
   @ManyToOne(() => RuleEntity)
   @JoinColumn({ name: 'rule_id' })
-  rule: RuleEntity;
+  rule: RuleEntity | null;
 
   @ManyToOne(() => RewardTypeEntity)
   @JoinColumn({ name: 'type_id' })

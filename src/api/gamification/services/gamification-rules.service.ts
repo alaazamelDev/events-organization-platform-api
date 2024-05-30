@@ -6,6 +6,9 @@ import { UpdateRuleDto } from '../dto/update-rule.dto';
 import { GamificationConditionsService } from './gamification-conditions.service';
 import { GamificationRewardsService } from './gamification-rewards.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AssignRewardToRuleDto } from '../dto/assign-reward-to-rule.dto';
+import { RewardEntity } from '../entities/rewards/reward.entity';
+import { UnAssignRewardToRuleDto } from '../dto/un-assign-reward-to-rule.dto';
 
 @Injectable()
 export class GamificationRulesService {
@@ -13,6 +16,8 @@ export class GamificationRulesService {
     private readonly dataSource: DataSource,
     @InjectRepository(RuleEntity)
     private readonly ruleRepository: Repository<RuleEntity>,
+    @InjectRepository(RewardEntity)
+    private readonly rewardRepository: Repository<RewardEntity>,
     private readonly gamificationConditionsService: GamificationConditionsService,
     private readonly gamificationRewardsService: GamificationRewardsService,
   ) {}
@@ -75,5 +80,32 @@ export class GamificationRulesService {
     await this.dataSource.manager.save(rule, { reload: true });
 
     return rule;
+  }
+
+  async assignRewardToRule(
+    ruleID: number,
+    assignRewardToRuleDto: AssignRewardToRuleDto,
+  ) {
+    const reward = await this.rewardRepository.findOneOrFail({
+      where: { id: assignRewardToRuleDto.reward_id },
+    });
+
+    reward.rule = { id: ruleID } as RuleEntity;
+
+    await this.rewardRepository.save(reward, { reload: true });
+
+    return reward;
+  }
+
+  async unAssignRewardToRule(unAssignRewardToRuleDto: UnAssignRewardToRuleDto) {
+    const reward = await this.rewardRepository.findOneOrFail({
+      where: { id: unAssignRewardToRuleDto.reward_id },
+    });
+
+    reward.rule = null;
+
+    await this.rewardRepository.save(reward, { reload: true });
+
+    return reward;
   }
 }
