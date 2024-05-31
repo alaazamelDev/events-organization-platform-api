@@ -7,4 +7,6 @@ export class UpdateBadgeRewardDto extends PartialType(CreateBadgeRewardDto) {
   @IsNotEmpty()
   @IsExist({ tableName: 'g_badges', column: 'id' })
   badge_id: number;
+
+  [key: string]: any;
 }

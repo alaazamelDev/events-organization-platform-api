@@ -25,7 +25,11 @@ export class GamificationRewardsService {
   ) {}
 
   async getBadges() {
-    return this.badgeRepository.find({ relations: { reward: true } });
+    return this.badgeRepository.find({
+      relations: {
+        reward: { rule: { conditions: { operator: true, definedData: true } } },
+      },
+    });
   }
 
   async createPoints(
@@ -63,6 +67,8 @@ export class GamificationRewardsService {
     const badge = queryRunner.manager.getRepository(BadgeEntity).create({
       reward: { id: reward.id } as RewardEntity,
       shape: JSON.parse(<string>createBadgeRewardDto.shape),
+      visibility: createBadgeRewardDto.visibility,
+      anonymous: createBadgeRewardDto.anonymous,
     });
 
     await queryRunner.manager.save(badge, { reload: true });
@@ -145,11 +151,23 @@ export class GamificationRewardsService {
     badge: BadgeEntity,
     queryRunner: QueryRunner,
   ) {
-    if (dto.shape) {
-      badge.shape = dto.shape;
-
-      await queryRunner.manager.save(badge);
+    for (const [key, value] of Object.entries(dto)) {
+      if (value !== undefined) {
+        badge[key] = value;
+      }
     }
+
+    // if (dto.anonymous !== undefined) {
+    //   badge.anonymous = dto.anonymous;
+    // }
+    //
+    // if (dto.visibility !== undefined) {
+    //   badge.visibility = dto.visibility;
+    // }
+    // if (dto.shape) {
+    //   badge.shape = dto.shape;
+    // }
+    await queryRunner.manager.save(badge);
 
     return badge;
   }

@@ -8,6 +8,12 @@ export class BadgeEntity extends BaseEntity {
   @Column({ type: 'jsonb' })
   shape: {};
 
+  @Column()
+  visibility: boolean;
+
+  @Column()
+  anonymous: boolean;
+
   @OneToOne(() => RewardEntity)
   @JoinColumn({ name: 'reward_id' })
   reward: RewardEntity;
@@ -20,4 +26,6 @@ export class BadgeEntity extends BaseEntity {
     (attendeeBadgeEntity) => attendeeBadgeEntity.badge,
   )
   attendees: AttendeeBadgeEntity[];
+
+  [key: string]: any;
 }
