@@ -16,6 +16,9 @@ import { AttendeeEvent } from '../../attend-event/entities/attendee-event.entity
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 import { FollowingAttendee } from '../../organization/entities/following-attendee.entity';
 import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
+import { InsertedDataEntity } from '../../gamification/entities/data-insertion/inserted-data.entity';
+import { AttendeeBadgeEntity } from '../../gamification/entities/rewards-attendee/attendee-badge.entity';
+import { AttendeePointsEntity } from '../../gamification/entities/rewards-attendee/attendee-points.entity';
 
 @Entity('attendees')
 export class Attendee extends BaseEntity {
@@ -112,4 +115,22 @@ export class Attendee extends BaseEntity {
     (attendeeTickets) => attendeeTickets.attendee,
   )
   ticketsEvents: AttendeesTickets[];
+
+  @OneToMany(
+    () => InsertedDataEntity,
+    (insertedDataEntity) => insertedDataEntity.attendee,
+  )
+  insertedData: InsertedDataEntity[];
+
+  @OneToMany(
+    () => AttendeeBadgeEntity,
+    (attendeeBadgeEntity) => attendeeBadgeEntity.attendee,
+  )
+  badges: AttendeeBadgeEntity[];
+
+  @OneToMany(
+    () => AttendeePointsEntity,
+    (attendeePointsEntity) => attendeePointsEntity.attendee,
+  )
+  points: AttendeePointsEntity[];
 }

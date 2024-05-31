@@ -48,6 +48,7 @@ import { ChatModule } from './api/chat/chat.module';
 import { IsNotExistConstraint } from './common/validators/is_not_exist_constraint';
 import { FeaturedEventsModule } from './api/featured-events/featured-events.module';
 import { SeedingModule } from './api/seeding/seeding.module';
+import { GamificationModule } from './api/gamification/gamification.module';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { SeedingModule } from './api/seeding/seeding.module';
     PaymentModule,
     FeaturedEventsModule,
     SeedingModule,
+    GamificationModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint, IsNotExistConstraint],
   controllers: [HealthController],

@@ -41,4 +41,7 @@ export class AttendeesTickets {
   )
   @JoinColumn({ name: 'event_type_id' })
   event: TicketEventType;
+
+  @Column({ name: 'event_type_id' })
+  event_type_id: number;
 }

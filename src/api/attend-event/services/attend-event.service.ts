@@ -36,8 +36,8 @@ export class AttendEventService {
 
     const attendEvent = this.attendeeEventRepository.create();
 
-    attendEvent.attendee = attendee;
-    attendEvent.event = event;
+    attendEvent.attendee = { id: attendee.id } as Attendee;
+    attendEvent.event = { id: event.id } as Event;
     attendEvent.status = event.directRegister
       ? AttendeeEventStatus.accepted
       : AttendeeEventStatus.waiting;
