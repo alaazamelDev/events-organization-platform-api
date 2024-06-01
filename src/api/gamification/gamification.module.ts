@@ -25,6 +25,13 @@ import { MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint } from './val
 import { GamificationConditionsService } from './services/gamification-conditions.service';
 import { GamificationRulesConditionsController } from './cotrollers/gamification-rules-conditions.controller';
 import { IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint } from './validators/is_defined_data_condition_already_exist_in_the_same_rule_constraint';
+import { EvaluateRules } from './rules-evaluation/evaluate-rules';
+import { InsertDataSubscriber } from './events-subscribers/insert-data.subscriber';
+import { FillFormSubscriber } from './events-subscribers/fill-form.subscriber';
+import { BuyPackageSubscriber } from './events-subscribers/buy-package.subscriber';
+import { ConsumeTicketsSubscriber } from './events-subscribers/consume-tickets.subscriber';
+import { SendMessageSubscriber } from './events-subscribers/send-message.subscriber';
+import { OperatorService } from './rules-evaluation/operator.service';
 
 @Module({
   imports: [
@@ -53,6 +60,16 @@ import { IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint } from './val
     IsRewardAlreadyAssignedConstraint,
     MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint,
     IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint,
+
+    // Subscribers
+    InsertDataSubscriber,
+    BuyPackageSubscriber,
+    ConsumeTicketsSubscriber,
+    FillFormSubscriber,
+    SendMessageSubscriber,
+
+    EvaluateRules,
+    OperatorService,
   ],
   controllers: [
     GamificationController,

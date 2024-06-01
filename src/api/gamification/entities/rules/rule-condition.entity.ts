@@ -18,6 +18,15 @@ export class RuleConditionEntity extends BaseEntity {
   @JoinColumn({ name: 'rule_id' })
   rule: RuleEntity;
 
+  @Column({ name: 'defined_data_id' })
+  defined_data_id: number;
+
+  @Column({ name: 'operator_id' })
+  operator_id: number;
+
+  @Column({ name: 'rule_id' })
+  rule_id: number;
+
   @Column()
   value: number;
 

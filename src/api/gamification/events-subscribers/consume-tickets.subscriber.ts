@@ -1,17 +1,18 @@
-import {
-  EntitySubscriberInterface,
-  EventSubscriber,
-  InsertEvent,
-} from 'typeorm';
+import { DataSource, EntitySubscriberInterface, InsertEvent } from 'typeorm';
 import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
 import { TicketsEventTypes } from '../../payment/constants/tickets-event-types.constant';
 import { InsertedDataEntity } from '../entities/data-insertion/inserted-data.entity';
 import { DefinedDataEnum } from '../constants/defined-data.constant';
+import { Injectable } from '@nestjs/common';
 
-@EventSubscriber()
+@Injectable()
 export class ConsumeTicketsSubscriber
   implements EntitySubscriberInterface<AttendeesTickets>
 {
+  constructor(private readonly dataSource: DataSource) {
+    this.dataSource.subscribers.push(this);
+  }
+
   listenTo(): Function | string {
     return AttendeesTickets;
   }

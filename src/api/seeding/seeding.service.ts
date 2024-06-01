@@ -751,6 +751,7 @@ export class SeedingService {
     const operatorsData = [
       { id: 1, name: 'Equal' },
       { id: 2, name: 'Greater' },
+      { id: 3, name: 'Smaller' },
     ];
 
     await this.dataSource.getRepository(OperatorEntity).upsert(operatorsData, {

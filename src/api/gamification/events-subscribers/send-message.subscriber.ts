@@ -1,17 +1,18 @@
-import {
-  EntitySubscriberInterface,
-  EventSubscriber,
-  InsertEvent,
-} from 'typeorm';
+import { DataSource, EntitySubscriberInterface, InsertEvent } from 'typeorm';
 import { GroupMessage } from '../../chat/entities/group-message.entity';
 import { Attendee } from '../../attendee/entities/attendee.entity';
 import { InsertedDataEntity } from '../entities/data-insertion/inserted-data.entity';
 import { DefinedDataEnum } from '../constants/defined-data.constant';
+import { Injectable } from '@nestjs/common';
 
-@EventSubscriber()
+@Injectable()
 export class SendMessageSubscriber
   implements EntitySubscriberInterface<GroupMessage>
 {
+  constructor(private readonly dataSource: DataSource) {
+    this.dataSource.subscribers.push(this);
+  }
+
   listenTo() {
     return GroupMessage;
   }

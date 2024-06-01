@@ -2,7 +2,6 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../../common/entities/base.entity';
 import { DefinedDataEntity } from '../data-definition/defined-data.entity';
 import { Attendee } from '../../../attendee/entities/attendee.entity';
-import { RewardedDataEntity } from '../rules/rewarded-data.entity';
 
 @Entity({ name: 'g_inserted_data' })
 export class InsertedDataEntity extends BaseEntity {
@@ -16,12 +15,6 @@ export class InsertedDataEntity extends BaseEntity {
   @ManyToOne(() => Attendee, (attendee) => attendee.insertedData)
   @JoinColumn({ name: 'attendee_id' })
   attendee: Attendee;
-
-  @OneToMany(
-    () => RewardedDataEntity,
-    (rewardedDataEntity) => rewardedDataEntity.insertedData,
-  )
-  rewardedRules: RewardedDataEntity[];
 
   @Column({ name: 'defined_data_id' })
   defined_data_id: number;

@@ -1,16 +1,17 @@
-import {
-  EntitySubscriberInterface,
-  EventSubscriber,
-  InsertEvent,
-} from 'typeorm';
+import { DataSource, EntitySubscriberInterface, InsertEvent } from 'typeorm';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 import { InsertedDataEntity } from '../entities/data-insertion/inserted-data.entity';
 import { DefinedDataEnum } from '../constants/defined-data.constant';
+import { Injectable } from '@nestjs/common';
 
-@EventSubscriber()
+@Injectable()
 export class FillFormSubscriber
   implements EntitySubscriberInterface<FilledForm>
 {
+  constructor(private readonly dataSource: DataSource) {
+    this.dataSource.subscribers.push(this);
+  }
+
   listenTo() {
     return FilledForm;
   }

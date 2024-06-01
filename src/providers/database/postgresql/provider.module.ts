@@ -6,6 +6,7 @@ import { DBConfigService } from '../../../config/database/postgresql/config.serv
 import { FillFormSubscriber } from '../../../api/gamification/events-subscribers/fill-form.subscriber';
 import { SendMessageSubscriber } from '../../../api/gamification/events-subscribers/send-message.subscriber';
 import { ConsumeTicketsSubscriber } from '../../../api/gamification/events-subscribers/consume-tickets.subscriber';
+import { InsertDataSubscriber } from '../../../api/gamification/events-subscribers/insert-data.subscriber';
 
 @Module({
   imports: [
@@ -24,11 +25,6 @@ import { ConsumeTicketsSubscriber } from '../../../api/gamification/events-subsc
           database: dbConfigService.database,
           autoLoadEntities: true,
           synchronize: true,
-          subscribers: [
-            FillFormSubscriber,
-            SendMessageSubscriber,
-            ConsumeTicketsSubscriber,
-          ],
         };
       },
       inject: [DBConfigService],
