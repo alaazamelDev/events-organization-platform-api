@@ -1,6 +1,5 @@
 import { BaseEntity } from '../../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { InsertedDataEntity } from '../data-insertion/inserted-data.entity';
 import { RuleEntity } from './rule.entity';
 import { DefinedDataEntity } from '../data-definition/defined-data.entity';
 import { Attendee } from '../../../attendee/entities/attendee.entity';
