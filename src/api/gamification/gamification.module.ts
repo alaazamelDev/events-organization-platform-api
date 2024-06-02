@@ -32,6 +32,9 @@ import { BuyPackageSubscriber } from './events-subscribers/buy-package.subscribe
 import { ConsumeTicketsSubscriber } from './events-subscribers/consume-tickets.subscriber';
 import { SendMessageSubscriber } from './events-subscribers/send-message.subscriber';
 import { OperatorService } from './rules-evaluation/operator.service';
+import { GamificationRewardedDataService } from './services/gamification-rewarded-data.service';
+import { GamificationInsertedDataService } from './services/gamification-inserted-data.service';
+import { AwardService } from './rules-evaluation/award.service';
 
 @Module({
   imports: [
@@ -56,6 +59,8 @@ import { OperatorService } from './rules-evaluation/operator.service';
     GamificationRewardsService,
     GamificationRulesService,
     GamificationConditionsService,
+    GamificationRewardedDataService,
+    GamificationInsertedDataService,
     DoesOperatorSupportDefinedDataConstraint,
     IsRewardAlreadyAssignedConstraint,
     MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint,
@@ -70,6 +75,7 @@ import { OperatorService } from './rules-evaluation/operator.service';
 
     EvaluateRules,
     OperatorService,
+    AwardService,
   ],
   controllers: [
     GamificationController,

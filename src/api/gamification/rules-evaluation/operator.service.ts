@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { OperatorsEnum } from '../constants/operators.constant';
 import { OperatorStrategy } from './operators-strategies/operator.strategy.interface';
 import { EqualStrategy } from './operators-strategies/equal.strategy';
+import { GreaterStrategy } from './operators-strategies/greater.strategy';
+import { SmallerStrategy } from './operators-strategies/smaller.strategy';
 
 @Injectable()
 export class OperatorService {
@@ -10,6 +12,8 @@ export class OperatorService {
   constructor() {
     this.strategies = {
       [OperatorsEnum.Equal]: new EqualStrategy(),
+      [OperatorsEnum.Greater]: new GreaterStrategy(),
+      [OperatorsEnum.Smaller]: new SmallerStrategy(),
     };
   }
 

@@ -15,7 +15,7 @@ export class RuleEntity extends BaseEntity {
   conditions: RuleConditionEntity[];
 
   @OneToMany(() => RewardEntity, (rewardEntity) => rewardEntity.rule)
-  rewards: RewardEntity;
+  rewards: RewardEntity[];
 
   @Column({ default: true })
   enabled: boolean;

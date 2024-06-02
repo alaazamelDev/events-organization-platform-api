@@ -108,4 +108,14 @@ export class GamificationRulesService {
 
     return reward;
   }
+
+  async getEnabledRules() {
+    return await this.dataSource.getRepository(RuleEntity).find({
+      where: { enabled: true },
+      relations: {
+        conditions: { operator: true, definedData: true },
+        rewards: true,
+      },
+    });
+  }
 }
