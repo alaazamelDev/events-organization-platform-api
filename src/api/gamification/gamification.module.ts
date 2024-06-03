@@ -25,7 +25,7 @@ import { MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint } from './val
 import { GamificationConditionsService } from './services/gamification-conditions.service';
 import { GamificationRulesConditionsController } from './cotrollers/gamification-rules-conditions.controller';
 import { IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint } from './validators/is_defined_data_condition_already_exist_in_the_same_rule_constraint';
-import { EvaluateRules } from './rules-evaluation/evaluate-rules';
+import { ExecuteRules } from './rules-evaluation/execute-rules';
 import { InsertDataSubscriber } from './events-subscribers/insert-data.subscriber';
 import { FillFormSubscriber } from './events-subscribers/fill-form.subscriber';
 import { BuyPackageSubscriber } from './events-subscribers/buy-package.subscriber';
@@ -35,6 +35,7 @@ import { OperatorService } from './rules-evaluation/operator.service';
 import { GamificationRewardedDataService } from './services/gamification-rewarded-data.service';
 import { GamificationInsertedDataService } from './services/gamification-inserted-data.service';
 import { AwardService } from './rules-evaluation/award.service';
+import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './validators/are_conditions_contains_at_least_one_equal_operator_constraint';
 
 @Module({
   imports: [
@@ -61,10 +62,13 @@ import { AwardService } from './rules-evaluation/award.service';
     GamificationConditionsService,
     GamificationRewardedDataService,
     GamificationInsertedDataService,
+
+    // Validators
     DoesOperatorSupportDefinedDataConstraint,
     IsRewardAlreadyAssignedConstraint,
     MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint,
     IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint,
+    AreConditionsContainsAtLeastOneEqualOperatorConstraint,
 
     // Subscribers
     InsertDataSubscriber,
@@ -73,7 +77,7 @@ import { AwardService } from './rules-evaluation/award.service';
     FillFormSubscriber,
     SendMessageSubscriber,
 
-    EvaluateRules,
+    ExecuteRules,
     OperatorService,
     AwardService,
   ],

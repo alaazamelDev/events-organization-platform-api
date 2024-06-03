@@ -11,7 +11,7 @@ import { AwardService } from './award.service';
 import { RewardedDataEntity } from '../entities/rules/rewarded-data.entity';
 
 @Injectable()
-export class EvaluateRules {
+export class ExecuteRules {
   constructor(
     private readonly dataSource: DataSource,
     private readonly operatorService: OperatorService,
@@ -33,37 +33,56 @@ export class EvaluateRules {
         rules.map(async (rule) => {
           const is_rule_true = await this.getRuleResult(rule, attendee_id);
 
-          // if rule is ok, then give the rewards to the attendee
-          // and insert new record inside rewarded data table
           console.log('rule result', is_rule_true);
+          // if rule is ok, then give the rewards to the attendee
+
+          // insert new record inside rewarded data table
           if (is_rule_true) {
-            await Promise.all(
-              rule.rewards.map(async (reward) => {
-                const rewarded = await this.awardService
-                  .getStrategy(reward.type_id)
-                  .award(reward, attendee_id);
-
-                await queryRunner.manager.save(rewarded);
-              }),
+            const max_value_condition = rule.conditions.reduce((res, obj) =>
+              obj.value > res.value ? obj : res,
             );
 
-            await Promise.all(
-              rule.conditions.map(async (cond) => {
-                if (cond.operator.name === OperatorsEnum.Equal) {
-                  // TODO, work on value
-                  const rewarded_data = this.dataSource
-                    .getRepository(RewardedDataEntity)
-                    .create({
-                      rule_id: rule.id,
-                      defined_data_id: cond.defined_data_id,
-                      attendee_id: attendee_id,
-                      value: cond.value,
-                    });
+            const data = await this.gamificationInsertedDataService
+              .getInsertedData(
+                attendee_id,
+                max_value_condition.defined_data_id,
+                max_value_condition.time,
+              )
+              .then((res) => res.reduce((acc, obj) => acc + obj.value, 0));
 
-                  await queryRunner.manager.save(rewarded_data);
-                }
-              }),
-            );
+            const to_gain = Math.floor(data / max_value_condition.value);
+            const reminder = Math.floor(data % max_value_condition.value);
+
+            console.log(to_gain);
+            console.log(reminder);
+
+            // await Promise.all(
+            //   rule.rewards.map(async (reward) => {
+            //     const rewarded = await this.awardService
+            //       .getStrategy(reward.type_id)
+            //       .award(reward, attendee_id);
+            //
+            //     await queryRunner.manager.save(rewarded);
+            //   }),
+            // );
+
+            // await Promise.all(
+            //   rule.conditions.map(async (cond) => {
+            //     if (cond.operator.name === OperatorsEnum.Equal) {
+            //       // TODO, work on value
+            //       const rewarded_data = this.dataSource
+            //         .getRepository(RewardedDataEntity)
+            //         .create({
+            //           rule_id: rule.id,
+            //           defined_data_id: cond.defined_data_id,
+            //           attendee_id: attendee_id,
+            //           value: cond.value,
+            //         });
+            //
+            //       await queryRunner.manager.save(rewarded_data);
+            //     }
+            //   }),
+            // );
           }
         }),
       );

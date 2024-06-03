@@ -1,6 +1,6 @@
 import { DataSource, EntitySubscriberInterface, InsertEvent } from 'typeorm';
 import { InsertedDataEntity } from '../entities/data-insertion/inserted-data.entity';
-import { EvaluateRules } from '../rules-evaluation/evaluate-rules';
+import { ExecuteRules } from '../rules-evaluation/execute-rules';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class InsertDataSubscriber
 {
   constructor(
     private readonly dataSource: DataSource,
-    @Inject(EvaluateRules) private readonly evaluateRules: EvaluateRules,
+    @Inject(ExecuteRules) private readonly evaluateRules: ExecuteRules,
   ) {
     this.dataSource.subscribers.push(this);
   }
