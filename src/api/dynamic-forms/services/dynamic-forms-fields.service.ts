@@ -246,8 +246,6 @@ export class DynamicFormsFieldsService {
       })
       .then((field) => (field ? field.position : 0));
 
-    console.log(lastPosition);
-
     if (position > lastPosition) {
       return lastPosition + 1;
     }

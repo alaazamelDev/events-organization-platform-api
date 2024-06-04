@@ -6,5 +6,6 @@ export interface AwardStrategy {
   award(
     reward: RewardEntity,
     attendee_id: number,
-  ): Promise<AttendeePointsEntity | AttendeeBadgeEntity>;
+    times: number,
+  ): Promise<AttendeePointsEntity | AttendeeBadgeEntity[]>;
 }
