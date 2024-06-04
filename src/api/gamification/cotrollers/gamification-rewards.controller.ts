@@ -26,6 +26,11 @@ export class GamificationRewardsController {
     return this.gamificationRewardsService.getBadges();
   }
 
+  @Get('points')
+  async getPointsRewards() {
+    return this.gamificationRewardsService.getPointsRewards();
+  }
+
   @Post('points')
   @UseInterceptors(TransactionInterceptor)
   async createPoints(

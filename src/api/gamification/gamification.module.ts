@@ -71,7 +71,7 @@ import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './valida
     AreConditionsContainsAtLeastOneEqualOperatorConstraint,
 
     // Subscribers
-    InsertDataSubscriber,
+    // InsertDataSubscriber,
     BuyPackageSubscriber,
     ConsumeTicketsSubscriber,
     FillFormSubscriber,

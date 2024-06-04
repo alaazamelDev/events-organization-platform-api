@@ -32,6 +32,14 @@ export class GamificationRewardsService {
     });
   }
 
+  async getPointsRewards() {
+    return this.pointsRepository.find({
+      relations: {
+        reward: { rule: { conditions: { operator: true, definedData: true } } },
+      },
+    });
+  }
+
   async createPoints(
     createPointsRewardDto: CreatePointsRewardDto,
     queryRunner: QueryRunner,
@@ -72,6 +80,7 @@ export class GamificationRewardsService {
     });
 
     await queryRunner.manager.save(badge, { reload: true });
+    badge.reward = reward;
 
     return badge;
   }
@@ -157,16 +166,6 @@ export class GamificationRewardsService {
       }
     }
 
-    // if (dto.anonymous !== undefined) {
-    //   badge.anonymous = dto.anonymous;
-    // }
-    //
-    // if (dto.visibility !== undefined) {
-    //   badge.visibility = dto.visibility;
-    // }
-    // if (dto.shape) {
-    //   badge.shape = dto.shape;
-    // }
     await queryRunner.manager.save(badge);
 
     return badge;
