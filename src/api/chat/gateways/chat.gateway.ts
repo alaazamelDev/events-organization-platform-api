@@ -74,6 +74,13 @@ export class ChatGateway
     }
   }
 
+  emitMessageDeletedEvent(groupId: number, messageId: number) {
+    const channel: string = `group-${groupId}/deletion`;
+    this.server.emit(channel, {
+      message_id: messageId,
+    });
+  }
+
   @SubscribeMessage('message-sent')
   async handleMessageSent(
     @MessageBody() data: SentMessageDto,
