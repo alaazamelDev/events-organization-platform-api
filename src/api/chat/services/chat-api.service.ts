@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, DeleteResult } from 'typeorm';
 import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-status.enum';
 import { Event } from '../../event/entities/event.entity';
 import { ChatGroup } from '../entities/chat-group.entity';
@@ -25,6 +25,24 @@ export class ChatApiService {
 
   constructor(dataSource: DataSource) {
     this.dataSource = dataSource;
+  }
+
+  async deleteMessage(messageId: number) {
+    const repository = this.dataSource.getRepository(GroupMessage);
+
+    // get the message object
+    const message: GroupMessage = await repository.findOneOrFail({
+      where: { id: messageId },
+      loadRelationIds: { relations: ['group'] },
+    });
+
+    // delete the message
+    const deleted: DeleteResult = await repository.delete(message.id);
+    const isDeleted = deleted.affected != undefined && deleted.affected > 0;
+    return {
+      isDeleted: isDeleted,
+      groupId: message.groupId,
+    };
   }
 
   async getChattingList(attendeeId: number) {

@@ -24,6 +24,7 @@ export class GroupMessageSerializer {
         ? {
             message_id: data.repliedMessage.id,
             message_content: data.repliedMessage.content,
+            sender_username: data.sender.username,
           }
         : null,
     };

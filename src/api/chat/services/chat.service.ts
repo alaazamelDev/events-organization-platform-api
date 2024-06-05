@@ -153,7 +153,6 @@ export class ChatService {
     // if user is already reacted. remove reaction...
     const existingReaction = await messageReactionRepository.findOne({
       where: {
-        reaction: { id: payload.reaction_id },
         reactedBy: { id: payload.reactor_id },
         message: { id: payload.message_id },
       },

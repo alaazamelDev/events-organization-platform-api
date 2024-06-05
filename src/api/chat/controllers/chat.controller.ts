@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
@@ -23,6 +25,8 @@ import { FileUtilityService } from '../../../config/files/utility/file-utility.s
 import { ChatService } from '../services/chat.service';
 import { User } from '../../../common/decorators/user.decorator';
 import { AuthUserType } from '../../../common/types/auth-user.type';
+import { GroupMessageParam } from '../dto/group-message.param';
+import { ChatGateway } from '../gateways/chat.gateway';
 
 @Controller('chat')
 export class ChatController {
@@ -30,17 +34,34 @@ export class ChatController {
   private readonly chatApiService: ChatApiService;
   private readonly chatService: ChatService;
   private readonly fileUtilityService: FileUtilityService;
+  private readonly chatGateway: ChatGateway;
 
   constructor(
     attendeeService: AttendeeService,
     chatApiService: ChatApiService,
     chatService: ChatService,
+    chatGateway: ChatGateway,
     fileUtilityService: FileUtilityService,
   ) {
     this.fileUtilityService = fileUtilityService;
     this.attendeeService = attendeeService;
     this.chatApiService = chatApiService;
     this.chatService = chatService;
+    this.chatGateway = chatGateway;
+  }
+
+  @Delete('delete-message/:id')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  async deleteMessage(@Param() params: GroupMessageParam) {
+    // delete the message
+    const result = await this.chatApiService.deleteMessage(params.id);
+
+    if (result.isDeleted) {
+      // emit an event
+      this.chatGateway.emitMessageDeletedEvent(result.groupId!, params.id);
+    }
+    return result.isDeleted;
   }
 
   @Get('attendee')
