@@ -163,8 +163,8 @@ export class ChatService {
       // remove the reaction...
       await messageReactionRepository.delete(existingReaction.id);
 
-      // return the complete message...
-      return this.loadCompleteMessage(payload.message_id);
+      // // return the complete message...
+      // return this.loadCompleteMessage(payload.message_id);
     }
 
     const created = messageReactionRepository.create({
