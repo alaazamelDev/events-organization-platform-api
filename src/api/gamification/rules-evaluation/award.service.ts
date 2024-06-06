@@ -4,6 +4,7 @@ import { RewardTypesEnum } from '../constants/reward-types.constant';
 import { AwardPointsStrategy } from './award-strategies/award-points.strategy';
 import { AwardBadgeStrategy } from './award-strategies/award-badge.strategy';
 import { DataSource } from 'typeorm';
+import { AwardRedeemablePointsStrategy } from './award-strategies/award-redeemable-points.strategy';
 
 @Injectable()
 export class AwardService {
@@ -11,8 +12,11 @@ export class AwardService {
 
   constructor(private readonly dataSource: DataSource) {
     this.strategies = {
-      [RewardTypesEnum.POINTS]: new AwardPointsStrategy(dataSource),
-      [RewardTypesEnum.BADGE]: new AwardBadgeStrategy(dataSource),
+      [RewardTypesEnum.POINTS]: new AwardPointsStrategy(this.dataSource),
+      [RewardTypesEnum.BADGE]: new AwardBadgeStrategy(this.dataSource),
+      [RewardTypesEnum.REDEEMABLE_POINTS]: new AwardRedeemablePointsStrategy(
+        this.dataSource,
+      ),
     };
   }
 

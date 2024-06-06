@@ -53,8 +53,6 @@ export class GamificationConditionsService {
     return condition;
   }
 
-  async updateCondition() {}
-
   async deleteCondition(condition_id: number) {
     await this.dataSource
       .createQueryBuilder()

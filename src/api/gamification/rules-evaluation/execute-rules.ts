@@ -35,7 +35,7 @@ export class ExecuteRules {
           const is_rule_true = await this.getRuleResult(rule, attendee_id);
 
           if (is_rule_true) {
-            const min_value = await this.howManyTimesRuleIsAchieved(
+            const timesAchieved = await this.howManyTimesRuleIsAchieved(
               rule,
               attendee_id,
             );
@@ -43,14 +43,14 @@ export class ExecuteRules {
             await this.awardAttendee(
               rule.rewards,
               attendee_id,
-              min_value,
+              timesAchieved,
               queryRunner,
             );
 
             await this.recordRewardedData(
               rule,
               attendee_id,
-              min_value,
+              timesAchieved,
               queryRunner,
             );
           }
@@ -165,8 +165,9 @@ export class ExecuteRules {
     queryRunner: QueryRunner,
   ) {
     return await Promise.all(
-      rule.conditions.map(async (cond) => {
-        if (cond.operator.name === OperatorsEnum.Equal) {
+      rule.conditions
+        .filter((condition) => condition.operator.name === OperatorsEnum.Equal)
+        .map(async (cond) => {
           const rewarded_data = this.dataSource
             .getRepository(RewardedDataEntity)
             .create({
@@ -179,10 +180,7 @@ export class ExecuteRules {
           await queryRunner.manager.save(rewarded_data);
 
           return rewarded_data;
-        }
-
-        return null;
-      }),
+        }),
     );
   }
 }

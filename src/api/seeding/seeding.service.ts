@@ -792,6 +792,7 @@ export class SeedingService {
     const rewardTypesData = [
       { id: 1, name: 'Points' },
       { id: 2, name: 'Badge' },
+      { id: 3, name: 'Redeemable Points' },
     ];
 
     await this.dataSource
