@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { RuleEntity } from '../entities/rules/rule.entity';
 import { RuleConditionEntity } from '../entities/rules/rule-condition.entity';
 import { OperatorService } from './operator.service';
@@ -9,6 +9,7 @@ import { GamificationRewardedDataService } from '../services/gamification-reward
 import { GamificationInsertedDataService } from '../services/gamification-inserted-data.service';
 import { AwardService } from './award.service';
 import { RewardedDataEntity } from '../entities/rules/rewarded-data.entity';
+import { RewardEntity } from '../entities/rewards/reward.entity';
 
 @Injectable()
 export class ExecuteRules {
@@ -33,56 +34,25 @@ export class ExecuteRules {
         rules.map(async (rule) => {
           const is_rule_true = await this.getRuleResult(rule, attendee_id);
 
-          console.log('rule result', is_rule_true);
-          // if rule is ok, then give the rewards to the attendee
-
-          // insert new record inside rewarded data table
           if (is_rule_true) {
-            const max_value_condition = rule.conditions.reduce((res, obj) =>
-              obj.value > res.value ? obj : res,
+            const timesAchieved = await this.howManyTimesRuleIsAchieved(
+              rule,
+              attendee_id,
             );
 
-            const data = await this.gamificationInsertedDataService
-              .getInsertedData(
-                attendee_id,
-                max_value_condition.defined_data_id,
-                max_value_condition.time,
-              )
-              .then((res) => res.reduce((acc, obj) => acc + obj.value, 0));
+            await this.awardAttendee(
+              rule.rewards,
+              attendee_id,
+              timesAchieved,
+              queryRunner,
+            );
 
-            const to_gain = Math.floor(data / max_value_condition.value);
-            const reminder = Math.floor(data % max_value_condition.value);
-
-            console.log(to_gain);
-            console.log(reminder);
-
-            // await Promise.all(
-            //   rule.rewards.map(async (reward) => {
-            //     const rewarded = await this.awardService
-            //       .getStrategy(reward.type_id)
-            //       .award(reward, attendee_id);
-            //
-            //     await queryRunner.manager.save(rewarded);
-            //   }),
-            // );
-
-            // await Promise.all(
-            //   rule.conditions.map(async (cond) => {
-            //     if (cond.operator.name === OperatorsEnum.Equal) {
-            //       // TODO, work on value
-            //       const rewarded_data = this.dataSource
-            //         .getRepository(RewardedDataEntity)
-            //         .create({
-            //           rule_id: rule.id,
-            //           defined_data_id: cond.defined_data_id,
-            //           attendee_id: attendee_id,
-            //           value: cond.value,
-            //         });
-            //
-            //       await queryRunner.manager.save(rewarded_data);
-            //     }
-            //   }),
-            // );
+            await this.recordRewardedData(
+              rule,
+              attendee_id,
+              timesAchieved,
+              queryRunner,
+            );
           }
         }),
       );
@@ -133,5 +103,84 @@ export class ExecuteRules {
     return this.operatorService
       .getStrategy(operator_name)
       .evaluate(data, target, rewarded_value);
+  }
+
+  private async howManyTimesRuleIsAchieved(
+    rule: RuleEntity,
+    attendee_id: number,
+  ) {
+    return await Promise.all(
+      rule.conditions.map(async (condition) => {
+        if (condition.operator.name !== OperatorsEnum.Equal) {
+          return Number.MAX_SAFE_INTEGER;
+        }
+
+        const achieved = await this.gamificationInsertedDataService
+          .getInsertedData(
+            attendee_id,
+            condition.defined_data_id,
+            condition.time,
+          )
+          .then((result) => result.reduce((acc, obj) => acc + obj.value, 0));
+
+        const rewarded =
+          await this.gamificationRewardedDataService.getRuleRewardedValue(
+            rule.id,
+            condition.defined_data_id,
+            attendee_id,
+          );
+
+        const actual_value = achieved - rewarded;
+
+        return Math.floor(actual_value / condition.value);
+      }),
+    ).then((result) =>
+      result.reduce((acc, x) => Math.min(acc, x), Number.MAX_SAFE_INTEGER),
+    );
+  }
+
+  private async awardAttendee(
+    rewards: RewardEntity[],
+    attendee_id: number,
+    min_value: number,
+    queryRunner: QueryRunner,
+  ) {
+    return await Promise.all(
+      rewards.map(async (reward) => {
+        const rewarded = await this.awardService
+          .getStrategy(reward.type_id)
+          .award(reward, attendee_id, min_value);
+
+        await queryRunner.manager.save(rewarded);
+
+        return rewarded;
+      }),
+    );
+  }
+
+  private async recordRewardedData(
+    rule: RuleEntity,
+    attendee_id: number,
+    min_value: number,
+    queryRunner: QueryRunner,
+  ) {
+    return await Promise.all(
+      rule.conditions
+        .filter((condition) => condition.operator.name === OperatorsEnum.Equal)
+        .map(async (cond) => {
+          const rewarded_data = this.dataSource
+            .getRepository(RewardedDataEntity)
+            .create({
+              rule_id: rule.id,
+              defined_data_id: cond.defined_data_id,
+              attendee_id: attendee_id,
+              value: cond.value * min_value,
+            });
+
+          await queryRunner.manager.save(rewarded_data);
+
+          return rewarded_data;
+        }),
+    );
   }
 }

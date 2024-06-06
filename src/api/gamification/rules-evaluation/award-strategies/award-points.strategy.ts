@@ -11,6 +11,7 @@ export class AwardPointsStrategy implements AwardStrategy {
   async award(
     reward: RewardEntity,
     attendee_id: number,
+    times: number,
   ): Promise<AttendeePointsEntity> {
     const points = await this.dataSource
       .getRepository(PointsEntity)
@@ -18,10 +19,9 @@ export class AwardPointsStrategy implements AwardStrategy {
       .where('points.reward = :rewardID', { rewardID: reward.id })
       .getOneOrFail();
 
-    // TODO, modify given value
     return this.dataSource.getRepository(AttendeePointsEntity).create({
       attendee: { id: attendee_id } as Attendee,
-      value: points.value,
+      value: points.value * times,
       metaData: {},
     });
   }

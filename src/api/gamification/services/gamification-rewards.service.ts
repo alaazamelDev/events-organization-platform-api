@@ -11,6 +11,9 @@ import { RuleEntity } from '../entities/rules/rule.entity';
 import { UpdatePointsRewardDto } from '../dto/update-points-reward.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateBadgeRewardDto } from '../dto/update-badge-reward.dto';
+import { CreateRedeemablePointsRewardDto } from '../dto/create-redeemable-points-reward.dto';
+import { RedeemablePointsEntity } from '../entities/rewards/redeemable-points.entity';
+import { UpdateRedeemablePointsRewardDto } from '../dto/update-redeemable-points-reward.dto';
 
 @Injectable()
 export class GamificationRewardsService {
@@ -22,6 +25,8 @@ export class GamificationRewardsService {
     private readonly rewardRepository: Repository<RewardEntity>,
     @InjectRepository(BadgeEntity)
     private readonly badgeRepository: Repository<BadgeEntity>,
+    @InjectRepository(RedeemablePointsEntity)
+    private readonly redeemablePointsRepository: Repository<RedeemablePointsEntity>,
   ) {}
 
   async getBadges() {
@@ -34,6 +39,14 @@ export class GamificationRewardsService {
 
   async getPointsRewards() {
     return this.pointsRepository.find({
+      relations: {
+        reward: { rule: { conditions: { operator: true, definedData: true } } },
+      },
+    });
+  }
+
+  async getRedeemablePointsRewards() {
+    return this.redeemablePointsRepository.find({
       relations: {
         reward: { rule: { conditions: { operator: true, definedData: true } } },
       },
@@ -57,6 +70,8 @@ export class GamificationRewardsService {
     });
 
     await queryRunner.manager.save(points);
+
+    points.reward = reward;
 
     return points;
   }
@@ -85,6 +100,31 @@ export class GamificationRewardsService {
     return badge;
   }
 
+  async createRedeemablePoints(
+    createRedeemablePointsRewardDto: CreateRedeemablePointsRewardDto,
+    queryRunner: QueryRunner,
+  ) {
+    const reward = this.createReward(
+      createRedeemablePointsRewardDto.name,
+      RewardTypesEnum.REDEEMABLE_POINTS,
+    );
+
+    await queryRunner.manager.save(reward, { reload: true });
+
+    const redeemable_points = queryRunner.manager
+      .getRepository(RedeemablePointsEntity)
+      .create({
+        reward: { id: reward.id } as RewardEntity,
+        value: createRedeemablePointsRewardDto.value,
+      });
+
+    await queryRunner.manager.save(redeemable_points);
+
+    redeemable_points.reward = reward;
+
+    return redeemable_points;
+  }
+
   async updatePointsReward(
     updatePointsRewardDto: UpdatePointsRewardDto,
     queryRunner: QueryRunner,
@@ -98,14 +138,52 @@ export class GamificationRewardsService {
       where: { id: points_reward.reward_id },
     });
 
-    await this.updateRewardName(updatePointsRewardDto, reward, queryRunner);
+    const updated_reward = await this.updateRewardName(
+      updatePointsRewardDto,
+      reward,
+      queryRunner,
+    );
     await this.updatePointsValue(
       updatePointsRewardDto,
       points_reward,
       queryRunner,
     );
 
+    points_reward.reward = updated_reward;
+
     return points_reward;
+  }
+
+  async updateRedeemablePointsReward(
+    updateRedeemablePointsRewardDto: UpdateRedeemablePointsRewardDto,
+    queryRunner: QueryRunner,
+  ) {
+    const redeemable_points_reward =
+      await this.redeemablePointsRepository.findOneOrFail({
+        where: {
+          id: updateRedeemablePointsRewardDto.reward_redeemable_points_id,
+        },
+        relations: { reward: true },
+      });
+
+    const reward = await this.rewardRepository.findOneOrFail({
+      where: { id: redeemable_points_reward.reward_id },
+    });
+
+    const updated_reward = await this.updateRewardName(
+      updateRedeemablePointsRewardDto,
+      reward,
+      queryRunner,
+    );
+    await this.updateRedeemablePointsValue(
+      updateRedeemablePointsRewardDto,
+      redeemable_points_reward,
+      queryRunner,
+    );
+
+    redeemable_points_reward.reward = updated_reward;
+
+    return redeemable_points_reward;
   }
 
   async updateBadge(
@@ -121,14 +199,23 @@ export class GamificationRewardsService {
       where: { id: badge.reward_id },
     });
 
-    await this.updateRewardName(updateBadgeRewardDto, reward, queryRunner);
+    const update_reward = await this.updateRewardName(
+      updateBadgeRewardDto,
+      reward,
+      queryRunner,
+    );
     await this.updateBadgeShape(updateBadgeRewardDto, badge, queryRunner);
+
+    badge.reward = update_reward;
 
     return badge;
   }
 
   private async updateRewardName(
-    dto: UpdatePointsRewardDto | UpdateBadgeRewardDto,
+    dto:
+      | UpdatePointsRewardDto
+      | UpdateBadgeRewardDto
+      | UpdateRedeemablePointsRewardDto,
     reward: RewardEntity,
     queryRunner: QueryRunner,
   ) {
@@ -144,6 +231,20 @@ export class GamificationRewardsService {
   private async updatePointsValue(
     dto: UpdatePointsRewardDto,
     points: PointsEntity,
+    queryRunner: QueryRunner,
+  ) {
+    if (dto.value) {
+      points.value = dto.value;
+
+      await queryRunner.manager.save(points);
+    }
+
+    return points;
+  }
+
+  private async updateRedeemablePointsValue(
+    dto: UpdateRedeemablePointsRewardDto,
+    points: RedeemablePointsEntity,
     queryRunner: QueryRunner,
   ) {
     if (dto.value) {

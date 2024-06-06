@@ -36,6 +36,9 @@ import { GamificationRewardedDataService } from './services/gamification-rewarde
 import { GamificationInsertedDataService } from './services/gamification-inserted-data.service';
 import { AwardService } from './rules-evaluation/award.service';
 import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './validators/are_conditions_contains_at_least_one_equal_operator_constraint';
+import { RedeemablePointsEntity } from './entities/rewards/redeemable-points.entity';
+import { AttendeeRedeemablePointsEntity } from './entities/rewards-attendee/attendee-redeemable-points.entity';
+import { GamificationAttendeeService } from './services/gamification-attendee.service';
 
 @Module({
   imports: [
@@ -48,11 +51,13 @@ import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './valida
       RewardTypeEntity,
       BadgeEntity,
       PointsEntity,
+      RedeemablePointsEntity,
       RuleEntity,
       RuleConditionEntity,
       RewardedDataEntity,
       AttendeePointsEntity,
       AttendeeBadgeEntity,
+      AttendeeRedeemablePointsEntity,
     ]),
   ],
   providers: [
@@ -62,6 +67,7 @@ import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './valida
     GamificationConditionsService,
     GamificationRewardedDataService,
     GamificationInsertedDataService,
+    GamificationAttendeeService,
 
     // Validators
     DoesOperatorSupportDefinedDataConstraint,

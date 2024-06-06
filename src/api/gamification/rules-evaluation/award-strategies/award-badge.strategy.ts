@@ -11,16 +11,19 @@ export class AwardBadgeStrategy implements AwardStrategy {
   async award(
     reward: RewardEntity,
     attendee_id: number,
-  ): Promise<AttendeeBadgeEntity> {
+    times: number,
+  ): Promise<AttendeeBadgeEntity[]> {
     const badge = await this.dataSource
       .getRepository(BadgeEntity)
       .createQueryBuilder('badge')
       .where('badge.reward = :rewardID', { rewardID: reward.id })
       .getOneOrFail();
 
-    return this.dataSource.getRepository(AttendeeBadgeEntity).create({
-      attendee: { id: attendee_id } as Attendee,
-      badge: { id: badge.id },
-    });
+    return Array(times).fill(
+      this.dataSource.getRepository(AttendeeBadgeEntity).create({
+        attendee: { id: attendee_id } as Attendee,
+        badge: { id: badge.id },
+      }),
+    );
   }
 }

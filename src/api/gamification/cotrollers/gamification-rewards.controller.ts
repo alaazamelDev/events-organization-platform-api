@@ -14,6 +14,8 @@ import { QueryRunner } from 'typeorm';
 import { CreateBadgeRewardDto } from '../dto/create-badge-reward.dto';
 import { UpdatePointsRewardDto } from '../dto/update-points-reward.dto';
 import { UpdateBadgeRewardDto } from '../dto/update-badge-reward.dto';
+import { CreateRedeemablePointsRewardDto } from '../dto/create-redeemable-points-reward.dto';
+import { UpdateRedeemablePointsRewardDto } from '../dto/update-redeemable-points-reward.dto';
 
 @Controller('gamification/rewards')
 export class GamificationRewardsController {
@@ -31,6 +33,11 @@ export class GamificationRewardsController {
     return this.gamificationRewardsService.getPointsRewards();
   }
 
+  @Get('redeemable-points')
+  async getRedeemablePointsRewards() {
+    return this.gamificationRewardsService.getRedeemablePointsRewards();
+  }
+
   @Post('points')
   @UseInterceptors(TransactionInterceptor)
   async createPoints(
@@ -43,6 +50,18 @@ export class GamificationRewardsController {
     );
   }
 
+  @Post('redeemable-points')
+  @UseInterceptors(TransactionInterceptor)
+  async createRedeemablePoints(
+    @Body() createRedeemablePointsRewardDto: CreateRedeemablePointsRewardDto,
+    @QueryRunnerParam() queryRunner: QueryRunner,
+  ) {
+    return this.gamificationRewardsService.createRedeemablePoints(
+      createRedeemablePointsRewardDto,
+      queryRunner,
+    );
+  }
+
   @Put('points')
   @UseInterceptors(TransactionInterceptor)
   async updatePointsReward(
@@ -51,6 +70,18 @@ export class GamificationRewardsController {
   ) {
     return this.gamificationRewardsService.updatePointsReward(
       updatePointsRewardDto,
+      queryRunner,
+    );
+  }
+
+  @Put('redeemable-points')
+  @UseInterceptors(TransactionInterceptor)
+  async updateRedeemablePointsReward(
+    @Body() updateRedeemablePointsRewardDto: UpdateRedeemablePointsRewardDto,
+    @QueryRunnerParam() queryRunner: QueryRunner,
+  ) {
+    return this.gamificationRewardsService.updateRedeemablePointsReward(
+      updateRedeemablePointsRewardDto,
       queryRunner,
     );
   }
