@@ -19,10 +19,10 @@ export class CreateRuleConditionDto {
   @Validate(DoesOperatorSupportDefinedDataConstraint)
   operator_id: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
-  @Min(1)
-  value: number;
+  @Min(0)
+  value: number = 1;
 
   @IsOptional()
   @IsDateString()
