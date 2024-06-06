@@ -21,6 +21,9 @@ export class InsertDataSubscriber
   async afterInsert(event: InsertEvent<InsertedDataEntity>): Promise<any> {
     await event.queryRunner.commitTransaction();
     await event.queryRunner.startTransaction();
-    await this.evaluateRules.executeRules(event.entity.attendee_id);
+    await this.evaluateRules.executeRules(
+      event.entity.attendee_id,
+      event.queryRunner,
+    );
   }
 }

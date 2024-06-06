@@ -23,7 +23,7 @@ export class ConsumeTicketsSubscriber
     if (ticket_event.event_type_id == TicketsEventTypes.CONSUME) {
       await event.queryRunner.manager.getRepository(InsertedDataEntity).insert({
         attendee_id: +ticket_event.attendee.id,
-        defined_data_id: DefinedDataEnum.CONSUMED_TICKETS,
+        defined_data_id: DefinedDataEnum.CONSUME_TICKETS,
         value: +ticket_event.value * -1,
       });
     }
