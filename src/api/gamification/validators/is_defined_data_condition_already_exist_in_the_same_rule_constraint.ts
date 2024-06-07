@@ -4,7 +4,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
-import { AddRuleConditionDto } from '../dto/add-rule-condition.dto';
+import { AddRuleConditionDto } from '../dto/rules/add-rule-condition.dto';
 import { RuleConditionEntity } from '../entities/rules/rule-condition.entity';
 
 @ValidatorConstraint({

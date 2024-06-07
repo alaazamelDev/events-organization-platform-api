@@ -8,8 +8,8 @@ import {
   Min,
   Validate,
 } from 'class-validator';
-import { IsExist } from '../../../common/decorators/is_exist.decorator';
-import { DoesOperatorSupportDefinedDataConstraint } from '../validators/does_operator_support_defined_data_constraint';
+import { IsExist } from '../../../../common/decorators/is_exist.decorator';
+import { DoesOperatorSupportDefinedDataConstraint } from '../../validators/does_operator_support_defined_data_constraint';
 
 export class UpdateRuleConditionDto extends PartialType(
   CreateRuleConditionDto,

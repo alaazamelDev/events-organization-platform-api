@@ -41,6 +41,11 @@ import { AttendeeRedeemablePointsEntity } from './entities/rewards-attendee/atte
 import { GamificationAttendeeService } from './services/gamification-attendee.service';
 import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber';
 import { GamificationAttendeeController } from './cotrollers/gamification-attendee.controller';
+import { PrizeEntity } from './entities/prizes/prize.entity';
+import { PrizeTypeEntity } from './entities/prizes/prize-type.entity';
+import { TicketPrizeEntity } from './entities/prizes/ticket-prize.entity';
+import { GamificationPrizesService } from './services/gamification-prizes.service';
+import { GamificationPrizesController } from './cotrollers/gamification-prizes.controller';
 
 @Module({
   imports: [
@@ -60,6 +65,9 @@ import { GamificationAttendeeController } from './cotrollers/gamification-attend
       AttendeePointsEntity,
       AttendeeBadgeEntity,
       AttendeeRedeemablePointsEntity,
+      PrizeEntity,
+      PrizeTypeEntity,
+      TicketPrizeEntity,
     ]),
   ],
   providers: [
@@ -70,6 +78,7 @@ import { GamificationAttendeeController } from './cotrollers/gamification-attend
     GamificationRewardedDataService,
     GamificationInsertedDataService,
     GamificationAttendeeService,
+    GamificationPrizesService,
 
     // Validators
     DoesOperatorSupportDefinedDataConstraint,
@@ -96,6 +105,7 @@ import { GamificationAttendeeController } from './cotrollers/gamification-attend
     GamificationRulesController,
     GamificationRulesConditionsController,
     GamificationAttendeeController,
+    GamificationPrizesController,
   ],
 })
 export class GamificationModule {}

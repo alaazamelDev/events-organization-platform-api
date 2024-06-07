@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePointsRewardDto } from '../dto/create-points-reward.dto';
+import { CreatePointsRewardDto } from '../dto/rewards/create-points-reward.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { PointsEntity } from '../entities/rewards/points.entity';
-import { CreateBadgeRewardDto } from '../dto/create-badge-reward.dto';
+import { CreateBadgeRewardDto } from '../dto/rewards/create-badge-reward.dto';
 import { RewardEntity } from '../entities/rewards/reward.entity';
 import { RewardTypesEnum } from '../constants/reward-types.constant';
 import { BadgeEntity } from '../entities/rewards/badge.entity';
-import { AssignRewardToRuleDto } from '../dto/assign-reward-to-rule.dto';
+import { AssignRewardToRuleDto } from '../dto/rewards/assign-reward-to-rule.dto';
 import { RuleEntity } from '../entities/rules/rule.entity';
-import { UpdatePointsRewardDto } from '../dto/update-points-reward.dto';
+import { UpdatePointsRewardDto } from '../dto/rewards/update-points-reward.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UpdateBadgeRewardDto } from '../dto/update-badge-reward.dto';
-import { CreateRedeemablePointsRewardDto } from '../dto/create-redeemable-points-reward.dto';
+import { UpdateBadgeRewardDto } from '../dto/rewards/update-badge-reward.dto';
+import { CreateRedeemablePointsRewardDto } from '../dto/rewards/create-redeemable-points-reward.dto';
 import { RedeemablePointsEntity } from '../entities/rewards/redeemable-points.entity';
-import { UpdateRedeemablePointsRewardDto } from '../dto/update-redeemable-points-reward.dto';
+import { UpdateRedeemablePointsRewardDto } from '../dto/rewards/update-redeemable-points-reward.dto';
 
 @Injectable()
 export class GamificationRewardsService {
@@ -204,7 +204,7 @@ export class GamificationRewardsService {
       reward,
       queryRunner,
     );
-    await this.updateBadgeShape(updateBadgeRewardDto, badge, queryRunner);
+    await this.updateBadgeEntity(updateBadgeRewardDto, badge, queryRunner);
 
     badge.reward = update_reward;
 
@@ -256,7 +256,7 @@ export class GamificationRewardsService {
     return points;
   }
 
-  private async updateBadgeShape(
+  private async updateBadgeEntity(
     dto: UpdateBadgeRewardDto,
     badge: BadgeEntity,
     queryRunner: QueryRunner,

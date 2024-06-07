@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
 import { GamificationConditionsService } from '../services/gamification-conditions.service';
-import { AddRuleConditionDto } from '../dto/add-rule-condition.dto';
+import { AddRuleConditionDto } from '../dto/rules/add-rule-condition.dto';
 
 @Controller('gamification/rules/conditions')
 export class GamificationRulesConditionsController {

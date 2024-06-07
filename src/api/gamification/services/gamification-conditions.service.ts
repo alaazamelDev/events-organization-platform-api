@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRuleConditionDto } from '../dto/create-rule-condition.dto';
+import { CreateRuleConditionDto } from '../dto/rules/create-rule-condition.dto';
 import { DataSource, QueryRunner } from 'typeorm';
 import { RuleConditionEntity } from '../entities/rules/rule-condition.entity';
 import { OperatorEntity } from '../entities/data-definition/operator.entity';
 import { DefinedDataEntity } from '../entities/data-definition/defined-data.entity';
 import { RuleEntity } from '../entities/rules/rule.entity';
-import { AddRuleConditionDto } from '../dto/add-rule-condition.dto';
+import { AddRuleConditionDto } from '../dto/rules/add-rule-condition.dto';
 
 @Injectable()
 export class GamificationConditionsService {

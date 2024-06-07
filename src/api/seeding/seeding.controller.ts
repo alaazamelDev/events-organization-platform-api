@@ -28,6 +28,7 @@ export class SeedingController {
     await this.seedingService.seedGamificationOperators();
     await this.seedingService.seedGamificationDefinedDataOperators();
     await this.seedingService.seedGamificationRewardTypes();
+    await this.seedingService.seedGamificationPrizesTypes();
   }
 
   @Get('admin')

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { CreateRuleDto } from '../dto/create-rule.dto';
+import { CreateRuleDto } from '../dto/rules/create-rule.dto';
 import { RuleEntity } from '../entities/rules/rule.entity';
-import { UpdateRuleDto } from '../dto/update-rule.dto';
+import { UpdateRuleDto } from '../dto/rules/update-rule.dto';
 import { GamificationConditionsService } from './gamification-conditions.service';
 import { GamificationRewardsService } from './gamification-rewards.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AssignRewardToRuleDto } from '../dto/assign-reward-to-rule.dto';
+import { AssignRewardToRuleDto } from '../dto/rewards/assign-reward-to-rule.dto';
 import { RewardEntity } from '../entities/rewards/reward.entity';
-import { UnAssignRewardToRuleDto } from '../dto/un-assign-reward-to-rule.dto';
+import { UnAssignRewardToRuleDto } from '../dto/rewards/un-assign-reward-to-rule.dto';
 
 @Injectable()
 export class GamificationRulesService {

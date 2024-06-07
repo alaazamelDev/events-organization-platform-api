@@ -3,7 +3,7 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { CreateRuleDto } from '../dto/create-rule.dto';
+import { CreateRuleDto } from '../dto/rules/create-rule.dto';
 
 @ValidatorConstraint({
   name: 'AreConditionsContainsAtLeastOneEqualOperatorConstraint',

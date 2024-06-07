@@ -24,6 +24,7 @@ import { DefinedDataEntity } from '../gamification/entities/data-definition/defi
 import { OperatorEntity } from '../gamification/entities/data-definition/operator.entity';
 import { DefinedDataOperatorsEntity } from '../gamification/entities/data-definition/defined-data-operators.entity';
 import { RewardTypeEntity } from '../gamification/entities/rewards/reward-type.entity';
+import { PrizeTypeEntity } from '../gamification/entities/prizes/prize-type.entity';
 
 @Injectable()
 export class SeedingService {
@@ -806,6 +807,21 @@ export class SeedingService {
     await this.dataSource
       .getRepository(RewardTypeEntity)
       .upsert(rewardTypesData, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
+  }
+
+  async seedGamificationPrizesTypes() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_prize_types_id_seq RESTART WITH 1;',
+    );
+
+    const prizeTypesData = [{ id: 1, name: 'Tickets' }];
+
+    await this.dataSource
+      .getRepository(PrizeTypeEntity)
+      .upsert(prizeTypesData, {
         conflictPaths: ['id'],
         upsertType: 'on-duplicate-key-update',
       });

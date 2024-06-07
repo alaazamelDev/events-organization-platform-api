@@ -7,15 +7,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { GamificationRewardsService } from '../services/gamification-rewards.service';
-import { CreatePointsRewardDto } from '../dto/create-points-reward.dto';
+import { CreatePointsRewardDto } from '../dto/rewards/create-points-reward.dto';
 import { TransactionInterceptor } from '../../../common/interceptors/transaction/transaction.interceptor';
 import { QueryRunnerParam } from '../../../common/decorators/query-runner-param.decorator';
 import { QueryRunner } from 'typeorm';
-import { CreateBadgeRewardDto } from '../dto/create-badge-reward.dto';
-import { UpdatePointsRewardDto } from '../dto/update-points-reward.dto';
-import { UpdateBadgeRewardDto } from '../dto/update-badge-reward.dto';
-import { CreateRedeemablePointsRewardDto } from '../dto/create-redeemable-points-reward.dto';
-import { UpdateRedeemablePointsRewardDto } from '../dto/update-redeemable-points-reward.dto';
+import { CreateBadgeRewardDto } from '../dto/rewards/create-badge-reward.dto';
+import { UpdatePointsRewardDto } from '../dto/rewards/update-points-reward.dto';
+import { UpdateBadgeRewardDto } from '../dto/rewards/update-badge-reward.dto';
+import { CreateRedeemablePointsRewardDto } from '../dto/rewards/create-redeemable-points-reward.dto';
+import { UpdateRedeemablePointsRewardDto } from '../dto/rewards/update-redeemable-points-reward.dto';
 
 @Controller('gamification/rewards')
 export class GamificationRewardsController {

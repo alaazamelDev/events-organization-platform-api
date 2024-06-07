@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateRedeemablePointsRewardDto } from './create-redeemable-points-reward.dto';
 import { IsNotEmpty } from 'class-validator';
-import { IsExist } from '../../../common/decorators/is_exist.decorator';
+import { IsExist } from '../../../../common/decorators/is_exist.decorator';
 
 export class UpdateRedeemablePointsRewardDto extends PartialType(
   CreateRedeemablePointsRewardDto,

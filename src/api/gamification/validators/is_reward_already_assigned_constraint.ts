@@ -4,7 +4,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
-import { AssignRewardToRuleDto } from '../dto/assign-reward-to-rule.dto';
+import { AssignRewardToRuleDto } from '../dto/rewards/assign-reward-to-rule.dto';
 import { RewardEntity } from '../entities/rewards/reward.entity';
 
 @ValidatorConstraint({
