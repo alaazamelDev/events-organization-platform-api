@@ -22,47 +22,35 @@ export class ExecuteRules {
     private readonly gamificationInsertedDataService: GamificationInsertedDataService,
   ) {}
 
-  async executeRules(attendee_id: number) {
+  async executeRules(attendee_id: number, queryRunner: QueryRunner) {
     const rules = await this.gamificationRulesService.getEnabledRules();
-    const queryRunner = this.dataSource.createQueryRunner();
 
-    try {
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
+    await Promise.all(
+      rules.map(async (rule) => {
+        const is_rule_true = await this.getRuleResult(rule, attendee_id);
 
-      await Promise.all(
-        rules.map(async (rule) => {
-          const is_rule_true = await this.getRuleResult(rule, attendee_id);
+        if (is_rule_true) {
+          const timesAchieved = await this.howManyTimesRuleIsAchieved(
+            rule,
+            attendee_id,
+          );
 
-          if (is_rule_true) {
-            const timesAchieved = await this.howManyTimesRuleIsAchieved(
-              rule,
-              attendee_id,
-            );
+          await this.recordRewardedData(
+            rule,
+            attendee_id,
+            timesAchieved,
+            queryRunner,
+          );
 
-            await this.awardAttendee(
-              rule.rewards,
-              attendee_id,
-              timesAchieved,
-              queryRunner,
-            );
-
-            await this.recordRewardedData(
-              rule,
-              attendee_id,
-              timesAchieved,
-              queryRunner,
-            );
-          }
-        }),
-      );
-
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
+          await this.awardAttendee(
+            rule.rewards,
+            attendee_id,
+            timesAchieved,
+            queryRunner,
+          );
+        }
+      }),
+    );
   }
 
   async getRuleResult(rule: RuleEntity, attendee_id: number): Promise<boolean> {
@@ -110,30 +98,28 @@ export class ExecuteRules {
     attendee_id: number,
   ) {
     return await Promise.all(
-      rule.conditions.map(async (condition) => {
-        if (condition.operator.name !== OperatorsEnum.Equal) {
-          return Number.MAX_SAFE_INTEGER;
-        }
+      rule.conditions
+        .filter((condition) => condition.operator.name === OperatorsEnum.Equal)
+        .map(async (condition) => {
+          const achieved = await this.gamificationInsertedDataService
+            .getInsertedData(
+              attendee_id,
+              condition.defined_data_id,
+              condition.time,
+            )
+            .then((result) => result.reduce((acc, obj) => acc + obj.value, 0));
 
-        const achieved = await this.gamificationInsertedDataService
-          .getInsertedData(
-            attendee_id,
-            condition.defined_data_id,
-            condition.time,
-          )
-          .then((result) => result.reduce((acc, obj) => acc + obj.value, 0));
+          const rewarded =
+            await this.gamificationRewardedDataService.getRuleRewardedValue(
+              rule.id,
+              condition.defined_data_id,
+              attendee_id,
+            );
 
-        const rewarded =
-          await this.gamificationRewardedDataService.getRuleRewardedValue(
-            rule.id,
-            condition.defined_data_id,
-            attendee_id,
-          );
+          const actual_value = achieved - rewarded;
 
-        const actual_value = achieved - rewarded;
-
-        return Math.floor(actual_value / condition.value);
-      }),
+          return Math.floor(actual_value / condition.value);
+        }),
     ).then((result) =>
       result.reduce((acc, x) => Math.min(acc, x), Number.MAX_SAFE_INTEGER),
     );

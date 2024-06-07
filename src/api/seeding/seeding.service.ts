@@ -734,7 +734,8 @@ export class SeedingService {
       { id: 1, name: 'Fill Form' },
       { id: 2, name: 'Send Message' },
       { id: 3, name: 'Buy Package' },
-      { id: 4, name: 'Consumed Tickets' },
+      { id: 4, name: 'Consume Tickets' },
+      { id: 5, name: 'Earn Badge' },
     ];
 
     await this.dataSource.getRepository(DefinedDataEntity).upsert(definedData, {
@@ -768,12 +769,19 @@ export class SeedingService {
     const definedDataOperatorsData = [
       { id: 1, defined_data_id: 1, operator_id: 1 },
       { id: 2, defined_data_id: 1, operator_id: 2 },
-      { id: 3, defined_data_id: 2, operator_id: 1 },
-      { id: 4, defined_data_id: 2, operator_id: 2 },
-      { id: 5, defined_data_id: 3, operator_id: 1 },
-      { id: 6, defined_data_id: 3, operator_id: 2 },
-      { id: 7, defined_data_id: 4, operator_id: 1 },
-      { id: 8, defined_data_id: 4, operator_id: 2 },
+      { id: 3, defined_data_id: 1, operator_id: 3 },
+      { id: 4, defined_data_id: 2, operator_id: 1 },
+      { id: 5, defined_data_id: 2, operator_id: 2 },
+      { id: 6, defined_data_id: 2, operator_id: 3 },
+      { id: 7, defined_data_id: 3, operator_id: 1 },
+      { id: 8, defined_data_id: 3, operator_id: 2 },
+      { id: 9, defined_data_id: 3, operator_id: 3 },
+      { id: 10, defined_data_id: 4, operator_id: 1 },
+      { id: 11, defined_data_id: 4, operator_id: 2 },
+      { id: 12, defined_data_id: 4, operator_id: 3 },
+      { id: 13, defined_data_id: 5, operator_id: 1 },
+      { id: 14, defined_data_id: 5, operator_id: 2 },
+      { id: 15, defined_data_id: 5, operator_id: 3 },
     ];
 
     await this.dataSource
