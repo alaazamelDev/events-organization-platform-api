@@ -40,6 +40,7 @@ import { RedeemablePointsEntity } from './entities/rewards/redeemable-points.ent
 import { AttendeeRedeemablePointsEntity } from './entities/rewards-attendee/attendee-redeemable-points.entity';
 import { GamificationAttendeeService } from './services/gamification-attendee.service';
 import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber';
+import { GamificationAttendeeController } from './cotrollers/gamification-attendee.controller';
 
 @Module({
   imports: [
@@ -78,7 +79,7 @@ import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber'
     AreConditionsContainsAtLeastOneEqualOperatorConstraint,
 
     // Subscribers
-    // InsertDataSubscriber,
+    InsertDataSubscriber,
     BuyPackageSubscriber,
     ConsumeTicketsSubscriber,
     FillFormSubscriber,
@@ -94,6 +95,7 @@ import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber'
     GamificationRewardsController,
     GamificationRulesController,
     GamificationRulesConditionsController,
+    GamificationAttendeeController,
   ],
 })
 export class GamificationModule {}
