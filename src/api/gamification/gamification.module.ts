@@ -78,7 +78,7 @@ import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber'
     AreConditionsContainsAtLeastOneEqualOperatorConstraint,
 
     // Subscribers
-    InsertDataSubscriber,
+    // InsertDataSubscriber,
     BuyPackageSubscriber,
     ConsumeTicketsSubscriber,
     FillFormSubscriber,
