@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { AwardStrategy } from './award-strategies/award.strategy.interface';
+import { AwardStrategy } from '../rules-evaluation/award-strategies/award.strategy.interface';
 import { RewardTypesEnum } from '../constants/reward-types.constant';
-import { AwardPointsStrategy } from './award-strategies/award-points.strategy';
-import { AwardBadgeStrategy } from './award-strategies/award-badge.strategy';
+import { AwardPointsStrategy } from '../rules-evaluation/award-strategies/award-points.strategy';
+import { AwardBadgeStrategy } from '../rules-evaluation/award-strategies/award-badge.strategy';
 import { DataSource } from 'typeorm';
-import { AwardRedeemablePointsStrategy } from './award-strategies/award-redeemable-points.strategy';
+import { AwardRedeemablePointsStrategy } from '../rules-evaluation/award-strategies/award-redeemable-points.strategy';
 
 @Injectable()
 export class AwardService {

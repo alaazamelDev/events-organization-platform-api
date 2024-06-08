@@ -4,9 +4,5 @@ import { IsNotEmpty, Min } from 'class-validator';
 export class CreateTicketsPrizeDto extends CreatePrizeDto {
   @IsNotEmpty()
   @Min(1)
-  rp_value: number;
-
-  @IsNotEmpty()
-  @Min(1)
   tickets_value: number;
 }

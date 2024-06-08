@@ -346,6 +346,13 @@ export class SeedingService {
         deletedAt: null,
         name: 'Consume',
       },
+      {
+        id: 3,
+        createdAt: new Date('2024-04-29 19:43:27.085039'),
+        updatedAt: new Date('2024-04-29 19:43:27.085039'),
+        deletedAt: null,
+        name: 'Redeem',
+      },
     ];
 
     await this.dataSource

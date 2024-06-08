@@ -6,6 +6,10 @@ import { CreateTicketsPrizeDto } from '../dto/prizes/create-tickets-prize.dto';
 import { TicketPrizeEntity } from '../entities/prizes/ticket-prize.entity';
 import { UpdateTicketsPrizeDto } from '../dto/prizes/update-tickets-prize.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedeemPrizeDto } from '../dto/prizes/redeem-prize.dto';
+import { Attendee } from '../../attendee/entities/attendee.entity';
+import { RedeemService } from './redeem.service';
+import { AttendeePrizeEntity } from '../entities/prizes/attendee-prize.entity';
 
 @Injectable()
 export class GamificationPrizesService {
@@ -15,7 +19,43 @@ export class GamificationPrizesService {
     private readonly prizeRepository: Repository<PrizeEntity>,
     @InjectRepository(TicketPrizeEntity)
     private readonly ticketPrizeRepository: Repository<TicketPrizeEntity>,
+    private readonly redeemService: RedeemService,
   ) {}
+
+  async redeemPrize(
+    redeemPrizeDto: RedeemPrizeDto,
+    userID: number,
+    queryRunner: QueryRunner,
+  ) {
+    const attendee = await this.dataSource
+      .getRepository(Attendee)
+      .createQueryBuilder('attendee')
+      .where('attendee.user = :userID', { userID: userID })
+      .getOneOrFail();
+
+    const prize = await this.prizeRepository.findOneOrFail({
+      where: { id: redeemPrizeDto.prize_id },
+    });
+
+    const result = await this.redeemService
+      .getStrategy(prize.type_id)
+      .redeem(prize, attendee.id);
+
+    for (const obj in result) {
+      await queryRunner.manager.save(result[obj]);
+    }
+
+    const attendeePrize = this.dataSource
+      .getRepository(AttendeePrizeEntity)
+      .create({
+        attendee_id: attendee.id,
+        prize_id: prize.id,
+      });
+
+    await queryRunner.manager.save(attendeePrize);
+
+    return 'success';
+  }
 
   async getTicketsPrizes() {
     return await this.ticketPrizeRepository.find({
@@ -29,6 +69,7 @@ export class GamificationPrizesService {
   ) {
     const prize = this.createPrize(
       createTicketsPrizeDto.name,
+      createTicketsPrizeDto.rp_value,
       PrizeTypesEnum.TICKETS,
     );
 
@@ -39,7 +80,6 @@ export class GamificationPrizesService {
       .create({
         prize: { id: prize.id } as PrizeEntity,
         tickets_value: createTicketsPrizeDto.tickets_value,
-        rp_value: createTicketsPrizeDto.rp_value,
       });
 
     await queryRunner.manager.save(ticketsPrize);
@@ -79,9 +119,10 @@ export class GamificationPrizesService {
     return ticketsPrize;
   }
 
-  private createPrize(name: string, type: PrizeTypesEnum) {
+  private createPrize(name: string, rp_value: number, type: PrizeTypesEnum) {
     return this.dataSource.getRepository(PrizeEntity).create({
       name: name,
+      rp_value: rp_value,
       type_id: type,
     });
   }

@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { GamificationPrizesService } from '../services/gamification-prizes.service';
@@ -12,12 +13,39 @@ import { TransactionInterceptor } from '../../../common/interceptors/transaction
 import { QueryRunnerParam } from '../../../common/decorators/query-runner-param.decorator';
 import { QueryRunner } from 'typeorm';
 import { UpdateTicketsPrizeDto } from '../dto/prizes/update-tickets-prize.dto';
+import { RedeemPrizeDto } from '../dto/prizes/redeem-prize.dto';
+import { CheckAttendeeRpBalanceAgainstPrizeInterceptor } from '../interceptors/check-attendee-rp-balance-against-prize.interceptor';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRoleEnum } from '../../userRole/enums/user-role.enum';
+import { AccessTokenGuard } from '../../../auth/guards/access-token.guard';
+import { RoleGuard } from '../../../common/guards/role/role.guard';
+import { User } from '../../../common/decorators/user.decorator';
+import { AuthUserType } from '../../../common/types/auth-user.type';
 
 @Controller('gamification/prizes')
 export class GamificationPrizesController {
   constructor(
     private readonly gamificationPrizesService: GamificationPrizesService,
   ) {}
+
+  @Post('redeem')
+  @Roles(UserRoleEnum.ATTENDEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @UseInterceptors(
+    TransactionInterceptor,
+    CheckAttendeeRpBalanceAgainstPrizeInterceptor,
+  )
+  async redeemPrize(
+    @Body() redeemPrizeDto: RedeemPrizeDto,
+    @User() user: AuthUserType,
+    @QueryRunnerParam() queryRunner: QueryRunner,
+  ) {
+    return this.gamificationPrizesService.redeemPrize(
+      redeemPrizeDto,
+      +user.sub,
+      queryRunner,
+    );
+  }
 
   @Get('tickets-prize')
   async getTicketsPrizes() {

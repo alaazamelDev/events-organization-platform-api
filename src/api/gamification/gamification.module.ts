@@ -31,10 +31,10 @@ import { FillFormSubscriber } from './events-subscribers/fill-form.subscriber';
 import { BuyPackageSubscriber } from './events-subscribers/buy-package.subscriber';
 import { ConsumeTicketsSubscriber } from './events-subscribers/consume-tickets.subscriber';
 import { SendMessageSubscriber } from './events-subscribers/send-message.subscriber';
-import { OperatorService } from './rules-evaluation/operator.service';
+import { OperatorService } from './services/operator.service';
 import { GamificationRewardedDataService } from './services/gamification-rewarded-data.service';
 import { GamificationInsertedDataService } from './services/gamification-inserted-data.service';
-import { AwardService } from './rules-evaluation/award.service';
+import { AwardService } from './services/award.service';
 import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './validators/are_conditions_contains_at_least_one_equal_operator_constraint';
 import { RedeemablePointsEntity } from './entities/rewards/redeemable-points.entity';
 import { AttendeeRedeemablePointsEntity } from './entities/rewards-attendee/attendee-redeemable-points.entity';
@@ -46,6 +46,8 @@ import { PrizeTypeEntity } from './entities/prizes/prize-type.entity';
 import { TicketPrizeEntity } from './entities/prizes/ticket-prize.entity';
 import { GamificationPrizesService } from './services/gamification-prizes.service';
 import { GamificationPrizesController } from './cotrollers/gamification-prizes.controller';
+import { RedeemService } from './services/redeem.service';
+import { AttendeePrizeEntity } from './entities/prizes/attendee-prize.entity';
 
 @Module({
   imports: [
@@ -68,6 +70,7 @@ import { GamificationPrizesController } from './cotrollers/gamification-prizes.c
       PrizeEntity,
       PrizeTypeEntity,
       TicketPrizeEntity,
+      AttendeePrizeEntity,
     ]),
   ],
   providers: [
@@ -98,6 +101,7 @@ import { GamificationPrizesController } from './cotrollers/gamification-prizes.c
     ExecuteRules,
     OperatorService,
     AwardService,
+    RedeemService,
   ],
   controllers: [
     GamificationController,

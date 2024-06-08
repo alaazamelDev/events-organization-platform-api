@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, QueryRunner } from 'typeorm';
 import { RuleEntity } from '../entities/rules/rule.entity';
 import { RuleConditionEntity } from '../entities/rules/rule-condition.entity';
-import { OperatorService } from './operator.service';
+import { OperatorService } from '../services/operator.service';
 import { OperatorsEnum } from '../constants/operators.constant';
 import { GamificationRulesService } from '../services/gamification-rules.service';
 import { GamificationRewardedDataService } from '../services/gamification-rewarded-data.service';
 import { GamificationInsertedDataService } from '../services/gamification-inserted-data.service';
-import { AwardService } from './award.service';
+import { AwardService } from '../services/award.service';
 import { RewardedDataEntity } from '../entities/rules/rewarded-data.entity';
 import { RewardEntity } from '../entities/rewards/reward.entity';
 

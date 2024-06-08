@@ -5,9 +5,6 @@ import { PrizeEntity } from './prize.entity';
 @Entity({ name: 'g_tickets_prizes' })
 export class TicketPrizeEntity extends BaseEntity {
   @Column()
-  rp_value: number;
-
-  @Column()
   tickets_value: number;
 
   @OneToOne(() => PrizeEntity)

@@ -7,6 +7,11 @@ export class GamificationAttendeeController {
     private readonly gamificationAttendeeService: GamificationAttendeeService,
   ) {}
 
+  @Get(':id/prizes')
+  getAttendeePrizes(@Param('id') attendeeID: string) {
+    return this.gamificationAttendeeService.getAttendeePrizes(+attendeeID);
+  }
+
   @Get(':id/badges')
   getAttendeeBadges(@Param('id') attendeeID: string) {
     return this.gamificationAttendeeService.getAttendeeBadges(+attendeeID);

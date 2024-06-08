@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { AttendeeBadgeEntity } from '../entities/rewards-attendee/attendee-badge.entity';
 import { AttendeePointsEntity } from '../entities/rewards-attendee/attendee-points.entity';
 import { AttendeeRedeemablePointsEntity } from '../entities/rewards-attendee/attendee-redeemable-points.entity';
+import { AttendeePrizeEntity } from '../entities/prizes/attendee-prize.entity';
 
 @Injectable()
 export class GamificationAttendeeService {
@@ -78,6 +79,18 @@ export class GamificationAttendeeService {
       .where('attendeePoints.attendee_id = :attendeeID', {
         attendeeID: attendeeID,
       })
+      .getMany();
+  }
+
+  async getAttendeePrizes(attendeeID: number) {
+    return await this.dataSource
+      .getRepository(AttendeePrizeEntity)
+      .createQueryBuilder('attendeePrize')
+      .where('attendeePrize.attendee_id = :attendeeID', {
+        attendeeID: attendeeID,
+      })
+      .leftJoinAndSelect('attendeePrize.prize', 'prize')
+      .leftJoinAndSelect('prize.type', 'type')
       .getMany();
   }
 }

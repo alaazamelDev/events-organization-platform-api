@@ -7,6 +7,9 @@ export class PrizeEntity extends BaseEntity {
   @Column()
   name: string;
 
+  @Column()
+  rp_value: number;
+
   @Column({ default: true })
   enabled: boolean;
 
