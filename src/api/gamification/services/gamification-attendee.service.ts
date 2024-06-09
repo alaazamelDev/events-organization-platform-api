@@ -4,6 +4,8 @@ import { AttendeeBadgeEntity } from '../entities/rewards-attendee/attendee-badge
 import { AttendeePointsEntity } from '../entities/rewards-attendee/attendee-points.entity';
 import { AttendeeRedeemablePointsEntity } from '../entities/rewards-attendee/attendee-redeemable-points.entity';
 import { AttendeePrizeEntity } from '../entities/prizes/attendee-prize.entity';
+import { PrizeTypesEnum } from '../constants/prize-types.constant';
+import { TicketPrizeEntity } from '../entities/prizes/ticket-prize.entity';
 
 @Injectable()
 export class GamificationAttendeeService {
@@ -83,7 +85,7 @@ export class GamificationAttendeeService {
   }
 
   async getAttendeePrizes(attendeeID: number) {
-    return await this.dataSource
+    const prizes = await this.dataSource
       .getRepository(AttendeePrizeEntity)
       .createQueryBuilder('attendeePrize')
       .where('attendeePrize.attendee_id = :attendeeID', {
@@ -92,5 +94,21 @@ export class GamificationAttendeeService {
       .leftJoinAndSelect('attendeePrize.prize', 'prize')
       .leftJoinAndSelect('prize.type', 'type')
       .getMany();
+
+    return await Promise.all(
+      prizes.map(async (prize) => {
+        if (Number(prize.prize.type_id) === Number(PrizeTypesEnum.TICKETS)) {
+          const tickets = await this.dataSource
+            .getRepository(TicketPrizeEntity)
+            .createQueryBuilder()
+            .where('prize_id = :prizeID', { prizeID: prize.prize.id })
+            .getOneOrFail();
+
+          return { ...prize, prize_details: tickets };
+        }
+
+        return prize;
+      }),
+    );
   }
 }

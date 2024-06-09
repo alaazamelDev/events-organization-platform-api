@@ -2,13 +2,13 @@ import {
   RedeemStrategy,
   RedeemTicketsPrizeType,
 } from './redeem.strategy.interface';
-import { PrizeEntity } from '../entities/prizes/prize.entity';
+import { PrizeEntity } from '../../entities/prizes/prize.entity';
 import { DataSource } from 'typeorm';
-import { TicketPrizeEntity } from '../entities/prizes/ticket-prize.entity';
-import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
-import { Attendee } from '../../attendee/entities/attendee.entity';
-import { TicketsEventTypes } from '../../payment/constants/tickets-event-types.constant';
-import { AttendeeRedeemablePointsEntity } from '../entities/rewards-attendee/attendee-redeemable-points.entity';
+import { TicketPrizeEntity } from '../../entities/prizes/ticket-prize.entity';
+import { AttendeesTickets } from '../../../payment/entities/attendees-tickets.entity';
+import { Attendee } from '../../../attendee/entities/attendee.entity';
+import { TicketsEventTypes } from '../../../payment/constants/tickets-event-types.constant';
+import { AttendeeRedeemablePointsEntity } from '../../entities/rewards-attendee/attendee-redeemable-points.entity';
 
 export class RedeemTicketsPrizeStrategy implements RedeemStrategy {
   constructor(private readonly dataSource: DataSource) {}

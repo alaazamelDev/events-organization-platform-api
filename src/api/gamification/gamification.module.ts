@@ -96,7 +96,7 @@ import { AttendeePrizeEntity } from './entities/prizes/attendee-prize.entity';
     ConsumeTicketsSubscriber,
     FillFormSubscriber,
     SendMessageSubscriber,
-    EarnBadgeSubscriber,
+    // EarnBadgeSubscriber,
 
     ExecuteRules,
     OperatorService,

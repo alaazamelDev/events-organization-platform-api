@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { RedeemStrategy } from '../redeem-prize-strategies/redeem.strategy.interface';
+import { RedeemStrategy } from '../strategies/redeem-prize-strategies/redeem.strategy.interface';
 import { PrizeTypesEnum } from '../constants/prize-types.constant';
-import { RedeemTicketsPrizeStrategy } from '../redeem-prize-strategies/redeem-tickets-prize.strategy';
+import { RedeemTicketsPrizeStrategy } from '../strategies/redeem-prize-strategies/redeem-tickets-prize.strategy';
 import { DataSource } from 'typeorm';
 
 @Injectable()

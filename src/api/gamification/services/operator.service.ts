@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OperatorsEnum } from '../constants/operators.constant';
-import { OperatorStrategy } from '../rules-evaluation/operators-strategies/operator.strategy.interface';
-import { EqualStrategy } from '../rules-evaluation/operators-strategies/equal.strategy';
-import { GreaterStrategy } from '../rules-evaluation/operators-strategies/greater.strategy';
-import { SmallerStrategy } from '../rules-evaluation/operators-strategies/smaller.strategy';
+import { OperatorStrategy } from '../strategies/operators-strategies/operator.strategy.interface';
+import { EqualStrategy } from '../strategies/operators-strategies/equal.strategy';
+import { GreaterStrategy } from '../strategies/operators-strategies/greater.strategy';
+import { SmallerStrategy } from '../strategies/operators-strategies/smaller.strategy';
 
 @Injectable()
 export class OperatorService {

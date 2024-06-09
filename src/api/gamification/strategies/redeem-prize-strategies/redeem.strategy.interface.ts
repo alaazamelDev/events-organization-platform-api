@@ -1,6 +1,6 @@
-import { PrizeEntity } from '../entities/prizes/prize.entity';
-import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
-import { AttendeeRedeemablePointsEntity } from '../entities/rewards-attendee/attendee-redeemable-points.entity';
+import { PrizeEntity } from '../../entities/prizes/prize.entity';
+import { AttendeesTickets } from '../../../payment/entities/attendees-tickets.entity';
+import { AttendeeRedeemablePointsEntity } from '../../entities/rewards-attendee/attendee-redeemable-points.entity';
 
 export type RedeemTicketsPrizeType = {
   attendeeTickets: AttendeesTickets;
