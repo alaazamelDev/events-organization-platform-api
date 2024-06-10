@@ -82,6 +82,7 @@ export class GamificationPrizesService {
     const prize = this.createPrize(
       createTicketsPrizeDto.name,
       createTicketsPrizeDto.rp_value,
+      createTicketsPrizeDto.rank,
       PrizeTypesEnum.TICKETS,
     );
 
@@ -151,11 +152,17 @@ export class GamificationPrizesService {
     );
   }
 
-  private createPrize(name: string, rp_value: number, type: PrizeTypesEnum) {
+  private createPrize(
+    name: string,
+    rp_value: number,
+    rank: number,
+    type: PrizeTypesEnum,
+  ) {
     return this.dataSource.getRepository(PrizeEntity).create({
       name: name,
       rp_value: rp_value,
       type_id: type,
+      rank: rank,
     });
   }
 

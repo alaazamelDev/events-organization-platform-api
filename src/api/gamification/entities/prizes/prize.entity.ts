@@ -13,6 +13,9 @@ export class PrizeEntity extends BaseEntity {
   @Column({ default: true })
   enabled: boolean;
 
+  @Column()
+  rank: number;
+
   @ManyToOne(() => PrizeTypeEntity)
   @JoinColumn({ name: 'type_id' })
   type: PrizeTypeEntity;
