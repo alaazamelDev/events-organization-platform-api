@@ -166,6 +166,9 @@ export class ChatService {
 
       // // return the complete message...
       // return this.loadCompleteMessage(payload.message_id);
+      if (existingReaction.reactionId == payload.reaction_id) {
+        return this.loadCompleteMessage(payload.message_id);
+      }
     }
 
     const created = messageReactionRepository.create({
