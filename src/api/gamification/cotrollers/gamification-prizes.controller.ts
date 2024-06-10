@@ -28,6 +28,11 @@ export class GamificationPrizesController {
     private readonly gamificationPrizesService: GamificationPrizesService,
   ) {}
 
+  @Get()
+  async getPrizes() {
+    return await this.gamificationPrizesService.getPrizes();
+  }
+
   @Post('redeem')
   @Roles(UserRoleEnum.ATTENDEE)
   @UseGuards(AccessTokenGuard, RoleGuard)

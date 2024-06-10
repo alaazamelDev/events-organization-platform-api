@@ -1,6 +1,6 @@
 import {
-  BadRequestException,
   CallHandler,
+  ConflictException,
   ExecutionContext,
   Injectable,
   NestInterceptor,
@@ -26,12 +26,20 @@ export class CheckAttendeeRpBalanceAgainstPrizeInterceptor
     const body = request.body as RedeemPrizeDto;
     const userID = request.user.sub;
 
-    const prize_rp = await this.dataSource
-      .getRepository(PrizeEntity)
-      .createQueryBuilder('prize')
-      .where('prize.id = :prizeID', { prizeID: body.prize_id })
-      .getOneOrFail()
-      .then((prize) => prize.rp_value);
+    const prizes = await Promise.all(
+      body.prizes.map(async (prize) => {
+        return await this.dataSource
+          .getRepository(PrizeEntity)
+          .createQueryBuilder('prize')
+          .where('prize.id = :prizeID', { prizeID: prize.prize_id })
+          .getOneOrFail();
+      }),
+    );
+
+    const total_prizes_rp = prizes.reduce(
+      (acc, prize) => acc + Number(prize.rp_value),
+      0,
+    );
 
     const attendee = await this.dataSource
       .getRepository(Attendee)
@@ -48,8 +56,8 @@ export class CheckAttendeeRpBalanceAgainstPrizeInterceptor
       .getRawOne()
       .then((result) => (result ? result.rp : 0));
 
-    if (Number(prize_rp) > Number(attendee_rp)) {
-      throw new BadRequestException(
+    if (Number(total_prizes_rp) > Number(attendee_rp)) {
+      throw new ConflictException(
         'Attendee RP balance does not cover the prize RP',
       );
     }
