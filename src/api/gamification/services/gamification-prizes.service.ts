@@ -33,26 +33,38 @@ export class GamificationPrizesService {
       .where('attendee.user = :userID', { userID: userID })
       .getOneOrFail();
 
-    const prize = await this.prizeRepository.findOneOrFail({
-      where: { id: redeemPrizeDto.prize_id },
+    const prizes = await Promise.all(
+      redeemPrizeDto.prizes.map(async (prize) => {
+        return await this.prizeRepository.findOneOrFail({
+          where: { id: prize.prize_id },
+        });
+      }),
+    );
+
+    const results = await Promise.all(
+      prizes.map(async (prize) => {
+        return await this.redeemService
+          .getStrategy(prize.type_id)
+          .redeem(prize, attendee.id);
+      }),
+    );
+
+    await Promise.all(
+      results.map(async (result) => {
+        for (const obj in result) {
+          await queryRunner.manager.save(result[obj]);
+        }
+      }),
+    );
+
+    const attendeePrizes = redeemPrizeDto.prizes.map((prize) => {
+      return this.dataSource.getRepository(AttendeePrizeEntity).create({
+        attendee_id: attendee.id,
+        prize_id: prize.prize_id,
+      });
     });
 
-    const result = await this.redeemService
-      .getStrategy(prize.type_id)
-      .redeem(prize, attendee.id);
-
-    for (const obj in result) {
-      await queryRunner.manager.save(result[obj]);
-    }
-
-    const attendeePrize = this.dataSource
-      .getRepository(AttendeePrizeEntity)
-      .create({
-        attendee_id: attendee.id,
-        prize_id: prize.id,
-      });
-
-    await queryRunner.manager.save(attendeePrize);
+    await queryRunner.manager.save(attendeePrizes);
 
     return 'success';
   }
@@ -117,6 +129,26 @@ export class GamificationPrizesService {
     ticketsPrize.prize = updated_prize;
 
     return ticketsPrize;
+  }
+
+  async getPrizes() {
+    const prizes = await this.prizeRepository.find();
+
+    return await Promise.all(
+      prizes.map(async (prize) => {
+        if (Number(prize.type_id) === Number(PrizeTypesEnum.TICKETS)) {
+          const tickets = await this.dataSource
+            .getRepository(TicketPrizeEntity)
+            .createQueryBuilder()
+            .where('prize_id = :prizeID', { prizeID: prize.id })
+            .getOneOrFail();
+
+          return { ...prize, prize_details: tickets };
+        }
+
+        return prize;
+      }),
+    );
   }
 
   private createPrize(name: string, rp_value: number, type: PrizeTypesEnum) {

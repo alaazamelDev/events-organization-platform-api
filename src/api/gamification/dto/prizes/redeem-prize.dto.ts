@@ -1,8 +1,11 @@
-import { IsNotEmpty } from 'class-validator';
-import { IsExist } from '../../../../common/decorators/is_exist.decorator';
+import { ArrayMinSize, IsNotEmpty, ValidateNested } from 'class-validator';
+import { SelectedPrizesDto } from './selected-prizes.dto';
+import { Type } from 'class-transformer';
 
 export class RedeemPrizeDto {
   @IsNotEmpty()
-  @IsExist({ tableName: 'g_prizes', column: 'id' })
-  prize_id: number;
+  @Type(() => SelectedPrizesDto)
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  prizes: SelectedPrizesDto[];
 }
