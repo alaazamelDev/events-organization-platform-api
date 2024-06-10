@@ -24,7 +24,7 @@ import {
   DEFAULT_DATE_FORMAT,
   DEFAULT_DB_DATE_FORMAT,
 } from '../../../common/constants/constants';
-import { DidAttendeeFillEventFormDto } from '../dto/did-attendee-fill-event-form.dto';
+import { AttendeeEventInfoDto } from '../dto/attendee-event-info.dto';
 import { Event } from '../../event/entities/event.entity';
 import { FilledForm } from '../../dynamic-forms/entities/filled-form.entity';
 import { AttendeeEventStatus } from '../../attend-event/enums/attendee-event-status.enum';
@@ -383,7 +383,8 @@ export class AttendeeService {
       .getOneOrFail();
   }
 
-  async didAttendeeFilledEventForm(dto: DidAttendeeFillEventFormDto) {
+  async attendeeEventInfo(dto: AttendeeEventInfoDto) {
+    const result: any = {};
     return await this.dataSource
       .getRepository(Event)
       .createQueryBuilder('event')
@@ -402,12 +403,33 @@ export class AttendeeService {
             .andWhere('filledForm.event = :eventID', { eventID: event.id })
             .getOne();
 
-          if (!filledForm) {
-            return false;
-          }
+          !filledForm
+            ? (result['filled_form'] = false)
+            : (result['filled_form'] = true);
+        } else {
+          result['filled_form'] = null;
         }
 
-        return true;
+        const attended = await this.dataSource
+          .getRepository(AttendeeEvent)
+          .createQueryBuilder('attendEvent')
+          .where('attendEvent.attendee = :attendeeID', {
+            attendeeID: dto.attendee_id,
+          })
+          .andWhere('attendEvent.event = :eventID', { eventID: event.id })
+          .getOne();
+
+        attended
+          ? (result['registered'] = attended.status)
+          : (result['registered'] = null);
+
+        if (event.fees) {
+          result['payed'] = true;
+        } else {
+          result['payed'] = null;
+        }
+
+        return result;
       });
   }
 

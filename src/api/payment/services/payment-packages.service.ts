@@ -41,7 +41,6 @@ export class PaymentPackagesService {
   }
 
   async updatePackage(updatePackageDto: UpdatePackageDto) {
-    console.log(UpdatePackageDto.toObject(updatePackageDto));
     return await this.stripe.products.update(
       updatePackageDto.package_id,
       UpdatePackageDto.toObject(updatePackageDto),
@@ -49,7 +48,6 @@ export class PaymentPackagesService {
   }
 
   async addPriceToPackage(addPriceToPackageDto: AddPriceToPackageDto) {
-    console.log(addPriceToPackageDto);
     return await this.stripe.prices.create({
       product: addPriceToPackageDto.package_id,
       currency: 'usd',

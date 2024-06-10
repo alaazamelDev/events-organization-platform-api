@@ -25,5 +25,15 @@ export class SeedingController {
     await this.seedingService.seedChatReactions();
     await this.seedingService.seedFeaturedEventsTypes();
     await this.seedingService.seedAbuseTypes();
+    await this.seedingService.seedGamificationDefinedData();
+    await this.seedingService.seedGamificationOperators();
+    await this.seedingService.seedGamificationDefinedDataOperators();
+    await this.seedingService.seedGamificationRewardTypes();
+    await this.seedingService.seedGamificationPrizesTypes();
+  }
+
+  @Get('admin')
+  async seedAdmin() {
+    await this.seedingService.seedAdmin();
   }
 }

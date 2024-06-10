@@ -18,6 +18,14 @@ import { Reaction } from '../chat/entities/reaction.entity';
 import { FieldTypeOperatorsEntity } from '../dynamic-forms/entities/field-type-operators.entity';
 import { FeaturedEventType } from '../featured-events/entities/featured-event-type.entity';
 import { AbuseType } from '../abuse-type/entities/abuse-type.entity';
+import { hash } from 'bcrypt';
+import { Admin } from '../admin/entities/admin.entity';
+import { User } from '../user/entities/user.entity';
+import { DefinedDataEntity } from '../gamification/entities/data-definition/defined-data.entity';
+import { OperatorEntity } from '../gamification/entities/data-definition/operator.entity';
+import { DefinedDataOperatorsEntity } from '../gamification/entities/data-definition/defined-data-operators.entity';
+import { RewardTypeEntity } from '../gamification/entities/rewards/reward-type.entity';
+import { PrizeTypeEntity } from '../gamification/entities/prizes/prize-type.entity';
 
 @Injectable()
 export class SeedingService {
@@ -409,6 +417,13 @@ export class SeedingService {
         deletedAt: null,
         name: 'Consume',
       },
+      {
+        id: 3,
+        createdAt: new Date('2024-04-29 19:43:27.085039'),
+        updatedAt: new Date('2024-04-29 19:43:27.085039'),
+        deletedAt: null,
+        name: 'Redeem',
+      },
     ];
 
     await this.dataSource
@@ -759,6 +774,132 @@ export class SeedingService {
     await this.dataSource
       .getRepository(FeaturedEventType)
       .upsert(featuredEventsData, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
+  }
+
+  async seedAdmin() {
+    const user = this.dataSource.getRepository(User).create();
+
+    user.username = 'admin';
+    user.email = 'admin@hotmail.com';
+    user.password = await hash('admin', 10);
+    user.userRole = { id: 1 } as UserRole;
+
+    await this.dataSource.getRepository(User).upsert(user, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+
+    const admin = this.dataSource.getRepository(Admin).create();
+
+    admin.user = user;
+    admin.firstName = 'admin';
+    admin.lastName = 'admin';
+
+    await this.dataSource.getRepository(Admin).upsert(admin, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+  }
+
+  async seedGamificationDefinedData() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_defined_data_id_seq RESTART WITH 1;',
+    );
+
+    const definedData = [
+      { id: 1, name: 'Fill Form' },
+      { id: 2, name: 'Send Message' },
+      { id: 3, name: 'Buy Package' },
+      { id: 4, name: 'Consume Tickets' },
+      // { id: 5, name: 'Earn Badge' },
+    ];
+
+    await this.dataSource.getRepository(DefinedDataEntity).upsert(definedData, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+  }
+
+  async seedGamificationOperators() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_operators_id_seq RESTART WITH 1;',
+    );
+
+    const operatorsData = [
+      { id: 1, name: 'Equal' },
+      { id: 2, name: 'Greater' },
+      { id: 3, name: 'Smaller' },
+    ];
+
+    await this.dataSource.getRepository(OperatorEntity).upsert(operatorsData, {
+      conflictPaths: ['id'],
+      upsertType: 'on-duplicate-key-update',
+    });
+  }
+
+  async seedGamificationDefinedDataOperators() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_data_operators_id_seq RESTART WITH 1;',
+    );
+
+    const definedDataOperatorsData = [
+      { id: 1, defined_data_id: 1, operator_id: 1 },
+      { id: 2, defined_data_id: 1, operator_id: 2 },
+      { id: 3, defined_data_id: 1, operator_id: 3 },
+      { id: 4, defined_data_id: 2, operator_id: 1 },
+      { id: 5, defined_data_id: 2, operator_id: 2 },
+      { id: 6, defined_data_id: 2, operator_id: 3 },
+      { id: 7, defined_data_id: 3, operator_id: 1 },
+      { id: 8, defined_data_id: 3, operator_id: 2 },
+      { id: 9, defined_data_id: 3, operator_id: 3 },
+      { id: 10, defined_data_id: 4, operator_id: 1 },
+      { id: 11, defined_data_id: 4, operator_id: 2 },
+      { id: 12, defined_data_id: 4, operator_id: 3 },
+      // { id: 13, defined_data_id: 5, operator_id: 1 },
+      // { id: 14, defined_data_id: 5, operator_id: 2 },
+      // { id: 15, defined_data_id: 5, operator_id: 3 },
+    ];
+
+    await this.dataSource
+      .getRepository(DefinedDataOperatorsEntity)
+      .upsert(definedDataOperatorsData, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
+  }
+
+  async seedGamificationRewardTypes() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_reward_types_id_seq RESTART WITH 1;',
+    );
+
+    const rewardTypesData = [
+      { id: 1, name: 'Points' },
+      { id: 2, name: 'Badge' },
+      { id: 3, name: 'Redeemable Points' },
+    ];
+
+    await this.dataSource
+      .getRepository(RewardTypeEntity)
+      .upsert(rewardTypesData, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
+  }
+
+  async seedGamificationPrizesTypes() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE g_prize_types_id_seq RESTART WITH 1;',
+    );
+
+    const prizeTypesData = [{ id: 1, name: 'Tickets' }];
+
+    await this.dataSource
+      .getRepository(PrizeTypeEntity)
+      .upsert(prizeTypesData, {
         conflictPaths: ['id'],
         upsertType: 'on-duplicate-key-update',
       });

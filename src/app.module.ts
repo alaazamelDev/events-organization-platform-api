@@ -48,6 +48,7 @@ import { ChatModule } from './api/chat/chat.module';
 import { IsNotExistConstraint } from './common/validators/is_not_exist_constraint';
 import { FeaturedEventsModule } from './api/featured-events/featured-events.module';
 import { SeedingModule } from './api/seeding/seeding.module';
+import { GamificationModule } from './api/gamification/gamification.module';
 import { AbuseTypeModule } from './api/abuse-type/abuse-type.module';
 
 @Module({
@@ -116,6 +117,7 @@ import { AbuseTypeModule } from './api/abuse-type/abuse-type.module';
     FeaturedEventsModule,
     SeedingModule,
     AbuseTypeModule,
+    GamificationModule,
   ],
   providers: [IsUniqueConstraint, IsExistConstraint, IsNotExistConstraint],
   controllers: [HealthController],

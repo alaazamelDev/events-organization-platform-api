@@ -140,7 +140,6 @@ export class ChatService {
 
     // store it.
     const stored = await repository.save(created);
-    console.log(stored);
 
     // load fully detailed message.
     return this.loadCompleteMessage(stored.id);

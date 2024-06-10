@@ -14,6 +14,7 @@ export class ChatListItemSerializer {
     }
     return {
       event_id: data.event_id,
+      event_cover: data.event_cover,
       chat_group_id: data.chat_group_id,
       group_title: data.group_title,
       group_members_count: data.group_members_count,

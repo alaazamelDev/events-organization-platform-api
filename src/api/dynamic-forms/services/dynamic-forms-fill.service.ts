@@ -37,7 +37,7 @@ export class DynamicFormsFillService {
       });
 
       const filledForm = this.filledFormRepository.create({
-        attendee: attendee,
+        attendee: { id: attendee.id } as Attendee,
         form: { id: fillFormDto.form_id } as Form,
         event: { id: fillFormDto.event_id } as Event,
       });
