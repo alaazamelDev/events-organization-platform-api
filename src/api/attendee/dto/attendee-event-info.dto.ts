@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { IsExist } from '../../../common/decorators/is_exist.decorator';
 
-export class DidAttendeeFillEventFormDto {
+export class AttendeeEventInfoDto {
   @IsNotEmpty()
   @IsExist({ tableName: 'events', column: 'id' })
   event_id: number;

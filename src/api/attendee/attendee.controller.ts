@@ -33,7 +33,7 @@ import { OrganizationFollowingDto } from './dto/organization-following.dto';
 import { FollowingAttendeeSerializer } from '../organization/serializers/following-attendee.serializer';
 import { FileUtilityService } from '../../config/files/utility/file-utility.service';
 import { RegisterAttendeeInStripeInterceptor } from '../payment/interceptors/register-attendee.in.stripe.interceptor';
-import { DidAttendeeFillEventFormDto } from './dto/did-attendee-fill-event-form.dto';
+import { AttendeeEventInfoDto } from './dto/attendee-event-info.dto';
 import { User } from '../../common/decorators/user.decorator';
 import { AuthUserType } from '../../common/types/auth-user.type';
 
@@ -302,8 +302,8 @@ export class AttendeeController {
     return this.attendeeService.getAttendeeEvents(+user['sub']);
   }
 
-  @Get('filled-event-form')
-  didAttendeeFilledEventForm(@Query() query: DidAttendeeFillEventFormDto) {
-    return this.attendeeService.didAttendeeFilledEventForm(query);
+  @Get('attendee-event-info')
+  didAttendeeFilledEventForm(@Query() query: AttendeeEventInfoDto) {
+    return this.attendeeService.attendeeEventInfo(query);
   }
 }
