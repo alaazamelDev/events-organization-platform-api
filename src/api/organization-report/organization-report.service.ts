@@ -26,9 +26,9 @@ export class OrganizationReportService {
     });
   }
 
-  findAll(query: OrganizationReportsQuery) {
+  findAll(query: OrganizationReportsQuery, organizationId: number) {
     return this.repository.findAndCount({
-      where: {},
+      where: { organization: { id: organizationId } },
       relations: {
         event: true,
         message: true,

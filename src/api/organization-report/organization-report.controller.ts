@@ -19,10 +19,12 @@ import { RoleGuard } from '../../common/guards/role/role.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../userRole/enums/user-role.enum';
 import { OrganizationReportsQuery } from './filters/organization-reports.query';
+import { EmployeeService } from '../employee/employee.service';
 
 @Controller('organization-report')
 export class OrganizationReportController {
   constructor(
+    private readonly employeeService: EmployeeService,
     private readonly service: OrganizationReportService,
     private readonly fileUtilityService: FileUtilityService,
   ) {}
@@ -30,21 +32,24 @@ export class OrganizationReportController {
   @Get()
   @UseGuards(AccessTokenGuard, RoleGuard)
   @Roles(UserRoleEnum.EMPLOYEE)
-  async findAll(@Query() query: OrganizationReportsQuery) {
-    const result = await this.service.findAll(query);
+  async findAll(
+    @User() user: AuthUserType,
+    @Query() query: OrganizationReportsQuery,
+  ) {
+    const organizationId: number = await this.employeeService
+      .findByUserId(user.sub)
+      .then((emp) => emp?.organizationId!);
 
-    const metadata = {
-      ...query,
-      total: result[1],
-    };
+    // get the result.
+    const result = await this.service.findAll(query, organizationId);
+
+    // prepare the response
+    const metadata = { ...query, total: result[1] };
     const data = OrganizationReportSerializer.serializeList(
       result[0],
       this.fileUtilityService,
     );
-    return {
-      data,
-      metadata,
-    };
+    return { data, metadata };
   }
 
   @Post()
