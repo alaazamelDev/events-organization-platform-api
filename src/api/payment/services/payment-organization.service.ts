@@ -9,6 +9,7 @@ import { OrganizationWithdraw } from '../entities/organization-withdraw.entity';
 import { OrganizationWithdrawStatusEnum } from '../enums/organization-withdraw-status.enum';
 import { Organization } from '../../organization/entities/organization.entity';
 import { ManageOrganizationWithdrawRequestDto } from '../dto/manage-organization-withdraw-request.dto';
+import { OrganizationTicketsHistorySerializer } from '../serializers/organization-tickets-history.serializer';
 
 @Injectable()
 export class PaymentOrganizationService {
@@ -33,7 +34,7 @@ export class PaymentOrganizationService {
   }
 
   async getOrganizationTicketsHistory(organizationID: number) {
-    return this.dataSource
+    const result = await this.dataSource
       .getRepository(OrganizationsTickets)
       .createQueryBuilder('org_tickets')
       .where('org_tickets.organization = :orgID', { orgID: organizationID })
@@ -47,9 +48,16 @@ export class PaymentOrganizationService {
         'attendee',
         `attendee.id = CAST(JSONB_EXTRACT_PATH_TEXT(org_tickets.data, 'attendee_id') AS BIGINT)`,
       )
+      .leftJoinAndSelect(
+        OrganizationWithdraw,
+        'withdraw',
+        `withdraw.id = CAST(JSONB_EXTRACT_PATH_TEXT(org_tickets.data, 'withdraw_id') AS BIGINT)`,
+      )
       .leftJoin('attendee.user', 'user')
       .addSelect(['user.id', 'user.email', 'user.username'])
       .getRawMany();
+
+    return OrganizationTicketsHistorySerializer.serializeList(result);
   }
 
   async organizationWithdrawRequest(

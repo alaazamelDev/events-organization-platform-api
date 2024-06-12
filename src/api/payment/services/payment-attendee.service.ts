@@ -7,6 +7,8 @@ import { DidAttendeePayedForTheEventDto } from '../dto/did-attendee-payed-for-th
 import { TicketsEventTypes } from '../constants/tickets-event-types.constant';
 import { Event } from '../../event/entities/event.entity';
 import { AttendeeTicketsHistorySerializer } from '../serializers/attendee-tickets-history.serializer';
+import { PrizeEntity } from '../../gamification/entities/prizes/prize.entity';
+import { TicketPrizeEntity } from '../../gamification/entities/prizes/ticket-prize.entity';
 
 @Injectable()
 export class PaymentAttendeeService {
@@ -48,6 +50,16 @@ export class PaymentAttendeeService {
         Event,
         'event',
         `event.id = CAST(JSONB_EXTRACT_PATH_TEXT(attendee_tickets.data, 'event_id') AS BIGINT)`,
+      )
+      .leftJoinAndSelect(
+        PrizeEntity,
+        'prize',
+        `prize.id = CAST(JSONB_EXTRACT_PATH_TEXT(attendee_tickets.data, 'prize_id') AS BIGINT)`,
+      )
+      .leftJoinAndSelect(
+        TicketPrizeEntity,
+        'tickets_prize',
+        'tickets_prize.prize_id = prize.id',
       )
       .getRawMany();
 
