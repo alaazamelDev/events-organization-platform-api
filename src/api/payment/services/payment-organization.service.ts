@@ -84,7 +84,7 @@ export class PaymentOrganizationService {
       .getOneOrFail();
 
     withdraw.status = dto.status;
-    await queryRunner.manager.save(withdraw);
+    await queryRunner.manager.save(withdraw, { reload: true });
 
     if (dto.status === OrganizationWithdrawStatusEnum.accepted) {
       const consumed = this.dataSource
@@ -92,7 +92,7 @@ export class PaymentOrganizationService {
         .create({
           organization_id: withdraw.organization_id,
           value: Number(withdraw.amount) * -1,
-          data: { withdraw: true },
+          data: { withdraw_id: withdraw.id },
         });
 
       await queryRunner.manager.save(consumed);
