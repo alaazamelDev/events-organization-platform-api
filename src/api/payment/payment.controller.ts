@@ -58,6 +58,11 @@ export class PaymentController {
     private readonly stripe: Stripe,
   ) {}
 
+  @Get('organization/withdraw/requests')
+  async getWithdrawRequests() {
+    return this.paymentOrganizationService.getWithdrawRequests();
+  }
+
   @Post('organization/withdraw')
   @Roles(UserRoleEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RoleGuard)
