@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { OrganizationsTickets } from '../entities/organizations-tickets.entity';
 import { Event } from '../../event/entities/event.entity';
 import { Attendee } from '../../attendee/entities/attendee.entity';
+import { EmployeeService } from '../../employee/employee.service';
+import { OrganizationWithdrawRequestDto } from '../dto/organization-withdraw-request.dto';
+import { OrganizationWithdraw } from '../entities/organization-withdraw.entity';
+import { OrganizationWithdrawStatusEnum } from '../enums/organization-withdraw-status.enum';
+import { Organization } from '../../organization/entities/organization.entity';
+import { ManageOrganizationWithdrawRequestDto } from '../dto/manage-organization-withdraw-request.dto';
 
 @Injectable()
 export class PaymentOrganizationService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly employeeService: EmployeeService,
+  ) {}
 
   async getOrganizationTicketsBalance(organizationID: number) {
     return (
@@ -41,5 +50,54 @@ export class PaymentOrganizationService {
       .leftJoin('attendee.user', 'user')
       .addSelect(['user.id', 'user.email', 'user.username'])
       .getRawMany();
+  }
+
+  async organizationWithdrawRequest(
+    organizationWithdrawRequestDto: OrganizationWithdrawRequestDto,
+    userID: number,
+  ) {
+    const employee = await this.employeeService.findByUserId(userID);
+
+    const withdraw = this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .create({
+        amount: organizationWithdrawRequestDto.amount,
+        status: OrganizationWithdrawStatusEnum.waiting,
+        organization: { id: employee.organizationId } as Organization,
+      });
+
+    await this.dataSource.manager.save(withdraw);
+
+    return withdraw;
+  }
+
+  async manageOrganizationWithdrawRequest(
+    dto: ManageOrganizationWithdrawRequestDto,
+    queryRunner: QueryRunner,
+  ) {
+    const withdraw = await this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .createQueryBuilder()
+      .where('id = :withdrawID', {
+        withdrawID: dto.withdraw_id,
+      })
+      .getOneOrFail();
+
+    withdraw.status = dto.status;
+    await queryRunner.manager.save(withdraw);
+
+    if (dto.status === OrganizationWithdrawStatusEnum.accepted) {
+      const consumed = this.dataSource
+        .getRepository(OrganizationsTickets)
+        .create({
+          organization_id: withdraw.organization_id,
+          value: Number(withdraw.amount) * -1,
+          data: { withdraw: true },
+        });
+
+      await queryRunner.manager.save(consumed);
+    }
+
+    return withdraw;
   }
 }
