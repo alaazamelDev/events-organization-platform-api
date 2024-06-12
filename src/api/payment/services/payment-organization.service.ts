@@ -100,4 +100,12 @@ export class PaymentOrganizationService {
 
     return withdraw;
   }
+
+  async getWithdrawRequests() {
+    return await this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .createQueryBuilder('organizationWithdraw')
+      .leftJoinAndSelect('organizationWithdraw.organization', 'organization')
+      .getMany();
+  }
 }
