@@ -33,4 +33,7 @@ export class OrganizationsTickets {
   @ManyToOne(() => Organization)
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
+
+  @Column({ name: 'organization_id' })
+  organization_id: number;
 }
