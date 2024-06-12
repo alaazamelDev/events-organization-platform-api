@@ -31,12 +31,17 @@ export class ManageWithdrawStatusConstraint
       .getOneOrFail()
       .then((obj) => obj.status);
 
-    return withdrawStatus !== OrganizationWithdrawStatusEnum.accepted;
+    return (
+      withdrawStatus !== OrganizationWithdrawStatusEnum.accepted &&
+      object.status !== OrganizationWithdrawStatusEnum.waiting
+    );
   }
 
   defaultMessage(validationArguments?: ValidationArguments): string {
     const object =
       validationArguments?.object as ManageOrganizationWithdrawRequestDto;
+    if (object.status === OrganizationWithdrawStatusEnum.waiting)
+      return `the status can not be changed to waiting`;
     return `the status is already accepted and can not be changed to ${object.status}`;
   }
 }
