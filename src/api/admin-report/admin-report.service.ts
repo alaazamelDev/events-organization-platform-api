@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateAdminReportTransformer } from './transformers/create-admin-report.transformer';
 import { CreateAdminReportType } from './types/create-admin-report.type';
 import { AdminReportsQuery } from './filters/admin-reports.query';
+import { AdminReportTypeEnum } from './enums/admin-report-type.enum';
 
 @Injectable()
 export class AdminReportService {
@@ -48,5 +49,15 @@ export class AdminReportService {
     const saved = await this.repository.save(created);
 
     return this.findOne(saved.id);
+  }
+
+  async isReported(userId: number, eventId: number) {
+    return this.repository.exists({
+      where: {
+        event: { id: eventId },
+        reporter: { id: userId },
+        reportType: AdminReportTypeEnum.event,
+      },
+    });
   }
 }

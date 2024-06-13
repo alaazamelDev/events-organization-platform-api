@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -29,7 +30,7 @@ export class AdminReportController {
 
   @Get()
   @UseGuards(AccessTokenGuard, RoleGuard)
-  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.ATTENDEE)
+  @Roles(UserRoleEnum.ADMIN)
   async findAll(@Query() query: AdminReportsQuery) {
     // get the result.
     const result = await this.service.findAll(query);
@@ -54,5 +55,15 @@ export class AdminReportController {
     const completePayload = { ...payload, reporter_id: user.sub };
     const result = await this.service.createReport(completePayload);
     return AdminReportSerializer.serialize(result, this.fileUtilityService);
+  }
+
+  @Get('/is-reported/:event_id')
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @Roles(UserRoleEnum.ATTENDEE)
+  async isReported(
+    @User() user: AuthUserType,
+    @Param('event_id') eventId: number,
+  ) {
+    return this.service.isReported(user.sub, eventId);
   }
 }
