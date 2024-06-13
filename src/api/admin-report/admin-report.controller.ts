@@ -18,7 +18,7 @@ import { User } from '../../common/decorators/user.decorator';
 import { AuthUserType } from '../../common/types/auth-user.type';
 import { CreateAdminReportDto } from './dto/create-admin-report.dto';
 import { AdminReportSerializer } from './serializers/admin-report.serializer';
-import { OrganizationReportsQuery } from '../organization-report/filters/organization-reports.query';
+import { AdminReportsQuery } from './filters/admin-reports.query';
 
 @Controller('admin-report')
 export class AdminReportController {
@@ -30,7 +30,7 @@ export class AdminReportController {
   @Get()
   @UseGuards(AccessTokenGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.ATTENDEE)
-  async findAll(@Query() query: OrganizationReportsQuery) {
+  async findAll(@Query() query: AdminReportsQuery) {
     // get the result.
     const result = await this.service.findAll(query);
 

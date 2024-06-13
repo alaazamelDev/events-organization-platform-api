@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAdminReportTransformer } from './transformers/create-admin-report.transformer';
 import { CreateAdminReportType } from './types/create-admin-report.type';
-import { OrganizationReportsQuery } from '../organization-report/filters/organization-reports.query';
+import { AdminReportsQuery } from './filters/admin-reports.query';
 
 @Injectable()
 export class AdminReportService {
@@ -13,7 +13,7 @@ export class AdminReportService {
     private readonly repository: Repository<AdminReport>,
   ) {}
 
-  async findAll(query: OrganizationReportsQuery) {
+  async findAll(query: AdminReportsQuery) {
     return this.repository.findAndCount({
       relations: {
         event: true,
