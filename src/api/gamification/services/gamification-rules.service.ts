@@ -9,11 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AssignRewardToRuleDto } from '../dto/rewards/assign-reward-to-rule.dto';
 import { RewardEntity } from '../entities/rewards/reward.entity';
 import { UnAssignRewardToRuleDto } from '../dto/rewards/un-assign-reward-to-rule.dto';
-import { BadgeEntity } from '../entities/rewards/badge.entity';
-import { PointsEntity } from '../entities/rewards/points.entity';
-import { RedeemablePointsEntity } from '../entities/rewards/redeemable-points.entity';
-import { RewardTypesEnum } from '../constants/reward-types.constant';
-import { TicketPrizeEntity } from '../entities/prizes/ticket-prize.entity';
 import { GetRulesSerializer } from '../serializers/get-rules.serializer';
 
 @Injectable()
@@ -32,7 +27,7 @@ export class GamificationRulesService {
     const result = await this.ruleRepository.find({
       relations: {
         conditions: { operator: true, definedData: true },
-        rewards: { type: true, badge: true, points: true, rp: true },
+        rewards: { type: true },
       },
     });
 
