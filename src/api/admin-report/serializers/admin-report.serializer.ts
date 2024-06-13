@@ -27,4 +27,11 @@ export class AdminReportSerializer {
         : null,
     };
   }
+
+  static serializeList(
+    data: AdminReport[],
+    fileUtilityService?: FileUtilityService,
+  ) {
+    return data.map((item) => this.serialize(item, fileUtilityService));
+  }
 }

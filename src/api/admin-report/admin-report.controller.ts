@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AdminReportService } from './admin-report.service';
@@ -16,6 +18,7 @@ import { User } from '../../common/decorators/user.decorator';
 import { AuthUserType } from '../../common/types/auth-user.type';
 import { CreateAdminReportDto } from './dto/create-admin-report.dto';
 import { AdminReportSerializer } from './serializers/admin-report.serializer';
+import { OrganizationReportsQuery } from '../organization-report/filters/organization-reports.query';
 
 @Controller('admin-report')
 export class AdminReportController {
@@ -23,6 +26,22 @@ export class AdminReportController {
     private readonly service: AdminReportService,
     private readonly fileUtilityService: FileUtilityService,
   ) {}
+
+  @Get()
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.ATTENDEE)
+  async findAll(@Query() query: OrganizationReportsQuery) {
+    // get the result.
+    const result = await this.service.findAll(query);
+
+    // prepare the response
+    const metadata = { ...query, total: result[1] };
+    const data = AdminReportSerializer.serializeList(
+      result[0],
+      this.fileUtilityService,
+    );
+    return { data, metadata };
+  }
 
   @Post()
   @HttpCode(HttpStatus.OK)
