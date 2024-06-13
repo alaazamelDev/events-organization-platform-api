@@ -68,7 +68,10 @@ export class OrganizationReportService {
 
   async updateStatus(id: number, newStatus: OrganizationReportStatusEnum) {
     // update
-    await this.repository.update(id, { status: newStatus });
+    await this.repository.update(id, {
+      status: newStatus,
+      resolvedAt: new Date(),
+    });
 
     // return the updated entity
     return this.findOne(id);
