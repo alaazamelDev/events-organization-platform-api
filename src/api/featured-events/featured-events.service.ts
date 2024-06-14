@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FeaturedEvent } from './entities/featured-event.entity';
-import { Repository, MoreThanOrEqual } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateFeaturedEventDto } from './dto/create-featured-event.dto';
 import { Event } from '../event/entities/event.entity';
 import { FeaturedEventType } from './entities/featured-event-type.entity';
@@ -15,9 +15,9 @@ export class FeaturedEventsService {
 
   async getFeaturedEvents() {
     return await this.featuredEventRepository.find({
-      where: {
-        endDate: MoreThanOrEqual(new Date()),
-      },
+      // where: {
+      //   endDate: MoreThanOrEqual(new Date()),
+      // },
       relations: { event: { organization: true }, type: true },
     });
   }

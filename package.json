@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@azure/identity": "^3.3.1",
+    "@azure/identity": "^4.2.1",
     "@azure/keyvault-secrets": "^4.7.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
@@ -42,6 +42,7 @@
     "body-parser": "^1.20.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "crypto": "^1.0.1",
     "helmet": "^7.0.0",
     "install": "^0.13.0",
     "joi": "^17.10.2",
@@ -58,7 +59,7 @@
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.2",
     "stripe": "^15.3.0",
-    "typeorm": "^0.3.20",
+    "typeorm": "^0.3.6",
     "typeorm-transactional-cls-hooked": "^0.1.21",
     "uuid": "^9.0.1"
   },

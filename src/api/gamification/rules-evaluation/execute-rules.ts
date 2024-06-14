@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, QueryRunner } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { RuleEntity } from '../entities/rules/rule.entity';
 import { RuleConditionEntity } from '../entities/rules/rule-condition.entity';
 import { OperatorService } from '../services/operator.service';
@@ -14,7 +14,6 @@ import { RewardEntity } from '../entities/rewards/reward.entity';
 @Injectable()
 export class ExecuteRules {
   constructor(
-    private readonly dataSource: DataSource,
     private readonly operatorService: OperatorService,
     private readonly awardService: AwardService,
     private readonly gamificationRulesService: GamificationRulesService,
@@ -25,16 +24,19 @@ export class ExecuteRules {
   async executeRules(attendee_id: number, queryRunner: QueryRunner) {
     const rules = await this.gamificationRulesService.getEnabledRules();
 
-    console.log('helllooooo');
-
     await Promise.all(
       rules.map(async (rule) => {
-        const is_rule_true = await this.getRuleResult(rule, attendee_id);
+        const is_rule_true = await this.getRuleResult(
+          rule,
+          attendee_id,
+          queryRunner,
+        );
 
         if (is_rule_true) {
           const timesAchieved = await this.howManyTimesRuleIsAchieved(
             rule,
             attendee_id,
+            queryRunner,
           );
 
           await this.recordRewardedData(
@@ -55,12 +57,20 @@ export class ExecuteRules {
     );
   }
 
-  async getRuleResult(rule: RuleEntity, attendee_id: number): Promise<boolean> {
+  async getRuleResult(
+    rule: RuleEntity,
+    attendee_id: number,
+    queryRunner: QueryRunner,
+  ): Promise<boolean> {
     const conditions = rule.conditions;
 
     const results = await Promise.all(
       conditions.map(async (condition) => {
-        return await this.evaluateCondition(condition, attendee_id);
+        return await this.evaluateCondition(
+          condition,
+          attendee_id,
+          queryRunner,
+        );
       }),
     );
 
@@ -70,6 +80,7 @@ export class ExecuteRules {
   async evaluateCondition(
     condition: RuleConditionEntity,
     attendee_id: number,
+    queryRunner: QueryRunner,
   ): Promise<boolean> {
     const defined_data_id = condition.defined_data_id;
     const target = condition.value;
@@ -81,6 +92,7 @@ export class ExecuteRules {
       attendee_id,
       defined_data_id,
       time,
+      queryRunner,
     );
 
     const rewarded_value =
@@ -88,6 +100,7 @@ export class ExecuteRules {
         rule_id,
         defined_data_id,
         attendee_id,
+        queryRunner,
       );
 
     return this.operatorService
@@ -98,6 +111,7 @@ export class ExecuteRules {
   private async howManyTimesRuleIsAchieved(
     rule: RuleEntity,
     attendee_id: number,
+    queryRunner: QueryRunner,
   ) {
     return await Promise.all(
       rule.conditions
@@ -108,6 +122,7 @@ export class ExecuteRules {
               attendee_id,
               condition.defined_data_id,
               condition.time,
+              queryRunner,
             )
             .then((result) => result.reduce((acc, obj) => acc + obj.value, 0));
 
@@ -116,6 +131,7 @@ export class ExecuteRules {
               rule.id,
               condition.defined_data_id,
               attendee_id,
+              queryRunner,
             );
 
           const actual_value = achieved - rewarded;
@@ -156,7 +172,7 @@ export class ExecuteRules {
       rule.conditions
         .filter((condition) => condition.operator.name === OperatorsEnum.Equal)
         .map(async (cond) => {
-          const rewarded_data = this.dataSource
+          const rewarded_data = queryRunner.manager
             .getRepository(RewardedDataEntity)
             .create({
               rule_id: rule.id,

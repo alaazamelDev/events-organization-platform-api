@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { RewardedDataEntity } from '../entities/rules/rewarded-data.entity';
 
 @Injectable()
 export class GamificationRewardedDataService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor() {}
 
   async getRuleRewardedValue(
     rule_id: number,
     defined_data_id: number,
     attendee_id: number,
+    queryRunner: QueryRunner,
   ) {
-    return await this.dataSource
+    return await queryRunner.manager
       .getRepository(RewardedDataEntity)
       .createQueryBuilder('data')
       .where('data.attendee = :attendeeID', { attendeeID: attendee_id })
