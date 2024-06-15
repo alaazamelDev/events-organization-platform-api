@@ -3,12 +3,13 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  Scope,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { DataSource } from 'typeorm';
 import { catchError, tap } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class TransactionInterceptor implements NestInterceptor {
   constructor(private readonly dataSource: DataSource) {}
 

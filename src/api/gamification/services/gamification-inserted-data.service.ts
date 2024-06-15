@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { InsertedDataEntity } from '../entities/data-insertion/inserted-data.entity';
 
 @Injectable()
 export class GamificationInsertedDataService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor() {}
 
   async getInsertedData(
     attendee_id: number,
     defined_data_id: number,
     _time: Date | null,
+    queryRunner: QueryRunner,
   ) {
-    const query = this.dataSource
+    const query = queryRunner.manager
       .getRepository(InsertedDataEntity)
       .createQueryBuilder('data')
       .where('data.attendee = :attendeeID', { attendeeID: attendee_id })

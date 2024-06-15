@@ -53,6 +53,7 @@ import { AbuseTypeModule } from './api/abuse-type/abuse-type.module';
 import { OrganizationReportModule } from './api/organization-report/organization-report.module';
 import { AdminReportModule } from './api/admin-report/admin-report.module';
 import { PlatformProblemModule } from './api/platform-problem/platform-problem.module';
+import { GiftCardsModule } from './api/gift-cards/gift-cards.module';
 
 @Module({
   imports: [
@@ -122,6 +123,7 @@ import { PlatformProblemModule } from './api/platform-problem/platform-problem.m
     AbuseTypeModule,
     GamificationModule,
     OrganizationReportModule,
+    GiftCardsModule,
     AdminReportModule,
     PlatformProblemModule,
   ],

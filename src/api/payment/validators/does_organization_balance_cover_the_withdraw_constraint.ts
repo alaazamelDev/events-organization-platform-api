@@ -8,6 +8,7 @@ import { EntityManager } from 'typeorm';
 import { ManageOrganizationWithdrawRequestDto } from '../dto/manage-organization-withdraw-request.dto';
 import { OrganizationWithdraw } from '../entities/organization-withdraw.entity';
 import { OrganizationsTickets } from '../entities/organizations-tickets.entity';
+import { OrganizationWithdrawStatusEnum } from '../enums/organization-withdraw-status.enum';
 
 @ValidatorConstraint({
   name: 'DoesOrganizationBalanceCoverTheWithdrawConstraint',
@@ -41,7 +42,11 @@ export class DoesOrganizationBalanceCoverTheWithdrawConstraint
         result.reduce((acc, obj) => acc + Number(obj.value), 0),
       );
 
-    return organization_balance >= Number(withdraw.amount);
+    if (object.status === OrganizationWithdrawStatusEnum.accepted) {
+      return organization_balance >= Number(withdraw.amount);
+    }
+
+    return true;
   }
 
   defaultMessage(_validationArguments?: ValidationArguments): string {

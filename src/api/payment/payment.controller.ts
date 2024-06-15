@@ -58,6 +58,13 @@ export class PaymentController {
     private readonly stripe: Stripe,
   ) {}
 
+  @Get('organization/:id/withdraw/requests')
+  async getOrganizationWithdrawRequests(@Param('id') orgID: string) {
+    return this.paymentOrganizationService.getOrganizationWithdrawRequests(
+      +orgID,
+    );
+  }
+
   @Get('organization/withdraw/requests')
   async getWithdrawRequests() {
     return this.paymentOrganizationService.getWithdrawRequests();
