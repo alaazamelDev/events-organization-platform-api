@@ -116,4 +116,15 @@ export class PaymentOrganizationService {
       .leftJoinAndSelect('organizationWithdraw.organization', 'organization')
       .getMany();
   }
+
+  async getOrganizationWithdrawRequests(organizationID: number) {
+    return await this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .createQueryBuilder('organizationWithdraw')
+      .where('organizationWithdraw.organization_id = :orgID', {
+        orgID: organizationID,
+      })
+      .leftJoinAndSelect('organizationWithdraw.organization', 'organization')
+      .getMany();
+  }
 }
