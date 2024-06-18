@@ -22,6 +22,7 @@ import { QueryRunner } from 'typeorm';
 import { HandleChangeAttendeeEventStatusPaymentInterceptor } from './interceptors/handle-change-attendee-event-status-payment.interceptor';
 import { User } from '../../common/decorators/user.decorator';
 import { AuthUserType } from '../../common/types/auth-user.type';
+import { GenerateAttendanceQrCodeInterceptor } from './interceptors/generate-attendance-qr-code.interceptor';
 
 @Controller('attend-event')
 export class AttendEventController {
@@ -57,6 +58,7 @@ export class AttendEventController {
   @UseInterceptors(
     TransactionInterceptor,
     HandleChangeAttendeeEventStatusPaymentInterceptor,
+    GenerateAttendanceQrCodeInterceptor,
   )
   changeAttendEventStatus(
     @Body() changeAttendEventStatusDto: ChangeAttendEventStatusDto,
