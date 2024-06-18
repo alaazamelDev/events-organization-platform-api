@@ -23,6 +23,7 @@ import { HandleChangeAttendeeEventStatusPaymentInterceptor } from './interceptor
 import { User } from '../../common/decorators/user.decorator';
 import { AuthUserType } from '../../common/types/auth-user.type';
 import { GenerateAttendanceQrCodeInterceptor } from './interceptors/generate-attendance-qr-code.interceptor';
+import { GenerateAttendanceQrCodeOnDirectRegisterInterceptor } from './interceptors/generate-attendance-qr-code-on-direct-register.interceptor';
 
 @Controller('attend-event')
 export class AttendEventController {
@@ -39,6 +40,7 @@ export class AttendEventController {
     CheckEventFormIfSubmittedInterceptor,
     CheckAttendeeBalanceAgainstEventFeesInterceptor,
     HandleRegisterInEventsPaymentInterceptor,
+    GenerateAttendanceQrCodeOnDirectRegisterInterceptor,
   )
   attendEvent(
     @QueryRunnerParam() queryRunner: QueryRunner,
