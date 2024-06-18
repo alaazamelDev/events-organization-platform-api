@@ -1,12 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { OrganizationsTickets } from '../entities/organizations-tickets.entity';
 import { Event } from '../../event/entities/event.entity';
 import { Attendee } from '../../attendee/entities/attendee.entity';
+import { EmployeeService } from '../../employee/employee.service';
+import { OrganizationWithdrawRequestDto } from '../dto/organization-withdraw-request.dto';
+import { OrganizationWithdraw } from '../entities/organization-withdraw.entity';
+import { OrganizationWithdrawStatusEnum } from '../enums/organization-withdraw-status.enum';
+import { Organization } from '../../organization/entities/organization.entity';
+import { ManageOrganizationWithdrawRequestDto } from '../dto/manage-organization-withdraw-request.dto';
+import { OrganizationTicketsHistorySerializer } from '../serializers/organization-tickets-history.serializer';
 
 @Injectable()
 export class PaymentOrganizationService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly employeeService: EmployeeService,
+  ) {}
 
   async getOrganizationTicketsBalance(organizationID: number) {
     return (
@@ -24,7 +34,7 @@ export class PaymentOrganizationService {
   }
 
   async getOrganizationTicketsHistory(organizationID: number) {
-    return this.dataSource
+    const result = await this.dataSource
       .getRepository(OrganizationsTickets)
       .createQueryBuilder('org_tickets')
       .where('org_tickets.organization = :orgID', { orgID: organizationID })
@@ -38,8 +48,83 @@ export class PaymentOrganizationService {
         'attendee',
         `attendee.id = CAST(JSONB_EXTRACT_PATH_TEXT(org_tickets.data, 'attendee_id') AS BIGINT)`,
       )
+      .leftJoinAndSelect(
+        OrganizationWithdraw,
+        'withdraw',
+        `withdraw.id = CAST(JSONB_EXTRACT_PATH_TEXT(org_tickets.data, 'withdraw_id') AS BIGINT)`,
+      )
       .leftJoin('attendee.user', 'user')
       .addSelect(['user.id', 'user.email', 'user.username'])
       .getRawMany();
+
+    return OrganizationTicketsHistorySerializer.serializeList(result);
+  }
+
+  async organizationWithdrawRequest(
+    organizationWithdrawRequestDto: OrganizationWithdrawRequestDto,
+    userID: number,
+  ) {
+    const employee = await this.employeeService.findByUserId(userID);
+
+    const withdraw = this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .create({
+        amount: organizationWithdrawRequestDto.amount,
+        status: OrganizationWithdrawStatusEnum.waiting,
+        organization: { id: employee.organizationId } as Organization,
+      });
+
+    await this.dataSource.manager.save(withdraw);
+
+    return withdraw;
+  }
+
+  async manageOrganizationWithdrawRequest(
+    dto: ManageOrganizationWithdrawRequestDto,
+    queryRunner: QueryRunner,
+  ) {
+    const withdraw = await this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .createQueryBuilder()
+      .where('id = :withdrawID', {
+        withdrawID: dto.withdraw_id,
+      })
+      .getOneOrFail();
+
+    withdraw.status = dto.status;
+    await queryRunner.manager.save(withdraw, { reload: true });
+
+    if (dto.status === OrganizationWithdrawStatusEnum.accepted) {
+      const consumed = this.dataSource
+        .getRepository(OrganizationsTickets)
+        .create({
+          organization_id: withdraw.organization_id,
+          value: Number(withdraw.amount) * -1,
+          data: { withdraw_id: withdraw.id },
+        });
+
+      await queryRunner.manager.save(consumed);
+    }
+
+    return withdraw;
+  }
+
+  async getWithdrawRequests() {
+    return await this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .createQueryBuilder('organizationWithdraw')
+      .leftJoinAndSelect('organizationWithdraw.organization', 'organization')
+      .getMany();
+  }
+
+  async getOrganizationWithdrawRequests(organizationID: number) {
+    return await this.dataSource
+      .getRepository(OrganizationWithdraw)
+      .createQueryBuilder('organizationWithdraw')
+      .where('organizationWithdraw.organization_id = :orgID', {
+        orgID: organizationID,
+      })
+      .leftJoinAndSelect('organizationWithdraw.organization', 'organization')
+      .getMany();
   }
 }

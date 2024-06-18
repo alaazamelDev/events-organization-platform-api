@@ -1,6 +1,6 @@
 import { omitBy, isNil } from 'lodash';
 
-export class AttendeeTicketsHistorySerializer {
+export class GetRulesSerializer {
   static serialize(history: any) {
     return omitBy(history, isNil);
   }

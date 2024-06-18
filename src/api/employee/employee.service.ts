@@ -21,8 +21,8 @@ export class EmployeeService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findByUserId(userId: number): Promise<Employee | null> {
-    return await this.employeeRepository.findOne({
+  async findByUserId(userId: number): Promise<Employee> {
+    return await this.employeeRepository.findOneOrFail({
       relations: { organization: true, user: true },
       where: { user: { id: userId } },
     });

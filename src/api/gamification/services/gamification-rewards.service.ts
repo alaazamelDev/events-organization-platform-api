@@ -263,7 +263,11 @@ export class GamificationRewardsService {
   ) {
     for (const [key, value] of Object.entries(dto)) {
       if (value !== undefined) {
-        badge[key] = value;
+        if (key === 'shape') {
+          badge[key] = JSON.parse(<string>dto.shape);
+        } else {
+          badge[key] = value;
+        }
       }
     }
 

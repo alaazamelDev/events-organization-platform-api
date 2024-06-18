@@ -39,6 +39,13 @@ import { UpdatePackageDto } from './dto/update-package.dto';
 import { AddPriceToPackageDto } from './dto/add-price-to-package.dto';
 import { PaymentOrganizationService } from './services/payment-organization.service';
 import { DidAttendeePayedForTheEventDto } from './dto/did-attendee-payed-for-the-event.dto';
+import { OrganizationWithdrawRequestDto } from './dto/organization-withdraw-request.dto';
+import { User } from '../../common/decorators/user.decorator';
+import { AuthUserType } from '../../common/types/auth-user.type';
+import { ManageOrganizationWithdrawRequestDto } from './dto/manage-organization-withdraw-request.dto';
+import { TransactionInterceptor } from '../../common/interceptors/transaction/transaction.interceptor';
+import { QueryRunnerParam } from '../../common/decorators/query-runner-param.decorator';
+import { QueryRunner } from 'typeorm';
 
 @Controller('payment')
 export class PaymentController {
@@ -51,10 +58,42 @@ export class PaymentController {
     private readonly stripe: Stripe,
   ) {}
 
-  // @Get('balance')
-  // async getBalance() {
-  //   return this.paymentService.getBalanceTransactions();
-  // }
+  @Get('organization/:id/withdraw/requests')
+  async getOrganizationWithdrawRequests(@Param('id') orgID: string) {
+    return this.paymentOrganizationService.getOrganizationWithdrawRequests(
+      +orgID,
+    );
+  }
+
+  @Get('organization/withdraw/requests')
+  async getWithdrawRequests() {
+    return this.paymentOrganizationService.getWithdrawRequests();
+  }
+
+  @Post('organization/withdraw')
+  @Roles(UserRoleEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  async organizationWithdrawRequest(
+    @Body() organizationWithdrawRequestDto: OrganizationWithdrawRequestDto,
+    @User() user: AuthUserType,
+  ) {
+    return this.paymentOrganizationService.organizationWithdrawRequest(
+      organizationWithdrawRequestDto,
+      +user.sub,
+    );
+  }
+
+  @Post('organization/withdraw/manage')
+  @UseInterceptors(TransactionInterceptor)
+  async manageOrganizationWithdrawRequest(
+    @Body() dto: ManageOrganizationWithdrawRequestDto,
+    @QueryRunnerParam() queryRunner: QueryRunner,
+  ) {
+    return this.paymentOrganizationService.manageOrganizationWithdrawRequest(
+      dto,
+      queryRunner,
+    );
+  }
 
   @Get('packages-history')
   async getPackagesHistory() {
