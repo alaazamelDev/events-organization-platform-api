@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { AttendEventDto } from '../dto/attend-event.dto';
-import { DataSource, QueryRunner } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { Event } from '../../event/entities/event.entity';
 import { QrCodeService } from '../../attendance/services/qrcode.service';
 import { AttendeeService } from '../../attendee/services/attendee.service';
@@ -17,7 +17,6 @@ export class GenerateAttendanceQrCodeOnDirectRegisterInterceptor
   implements NestInterceptor
 {
   constructor(
-    private readonly dataSource: DataSource,
     private readonly qrCodeService: QrCodeService,
     private readonly attendeeService: AttendeeService,
   ) {}
