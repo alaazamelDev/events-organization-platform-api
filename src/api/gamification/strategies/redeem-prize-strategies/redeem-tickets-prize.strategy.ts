@@ -28,7 +28,7 @@ export class RedeemTicketsPrizeStrategy implements RedeemStrategy {
       .create({
         attendee: { id: attendee_id } as Attendee,
         value: ticketsPrize.tickets_value,
-        event_type_id: TicketsEventTypes.REDEEM,
+        event_type_id: TicketsEventTypes.REDEEM_POINTS,
         data: { prize_id: prize.id, rp: prize.rp_value },
       });
 
