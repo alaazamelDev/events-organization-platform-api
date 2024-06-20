@@ -649,7 +649,14 @@ export class SeedingService {
         createdAt: new Date('2024-04-29 19:43:27.085039'),
         updatedAt: new Date('2024-04-29 19:43:27.085039'),
         deletedAt: null,
-        name: 'Redeem',
+        name: 'Redeem Points',
+      },
+      {
+        id: 4,
+        createdAt: new Date('2024-04-29 19:43:27.085039'),
+        updatedAt: new Date('2024-04-29 19:43:27.085039'),
+        deletedAt: null,
+        name: 'Redeem Gift Card',
       },
     ];
 
