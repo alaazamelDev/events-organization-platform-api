@@ -9,6 +9,7 @@ import { SwaggerConfigService } from './config/openapi/swagger/config.service';
 import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
 import { useContainer } from 'class-validator';
 import { TimeoutInterceptor } from './common/interceptors/timeout/timeout.interceptor';
+import * as moment from 'moment-timezone';
 
 const logger = new Logger('MAIN');
 
@@ -37,6 +38,12 @@ async function bootstrap(): Promise<void> {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   });
+
+  // Get the time zone from environment variables
+  const timeZone = process.env.TZ || 'UTC';
+
+  // Set the default time zone globally
+  moment.tz.setDefault(timeZone);
 
   // Sentry.init({
   //   dsn: sentryConfig.dns,

@@ -2,6 +2,7 @@ import { Event } from '../entities/event.entity';
 import { OrganizationSerializer } from '../../organization/serializers/organization.serializer';
 import { AddressSerializer } from '../../address/serializers/address.serializer';
 import { FileUtilityService } from '../../../config/files/utility/file-utility.service';
+import * as moment from 'moment-timezone';
 import { EventAgeGroupSerializer } from './event-age-group.serializer';
 import { EventTagSerializer } from './event-tag.serializer';
 import { EventDaySerializer } from './event-day.serializer';
@@ -9,6 +10,7 @@ import { EventPhotoSerializer } from './event-photo.serializer';
 import { EventAttachmentSerializer } from './event-attachment.serializer';
 import { EventApprovalStatusSerializer } from './event-approval-status.serializer';
 import { ChatGroupSerializer } from '../../chat/serializers/chat-group.serializer';
+import { DEFAULT_DB_DATETIME_FORMAT } from '../../../common/constants/constants';
 
 export class EventSerializer {
   static serialize(
@@ -31,10 +33,10 @@ export class EventSerializer {
       capacity: data.capacity,
       event_type: data.eventType,
       registration_start_date: data.registrationStartDate
-        ? data.registrationStartDate
+        ? moment(data.registrationStartDate).format(DEFAULT_DB_DATETIME_FORMAT)
         : null,
       registration_end_date: data.registrationEndDate
-        ? data.registrationEndDate
+        ? moment(data.registrationEndDate).format(DEFAULT_DB_DATETIME_FORMAT)
         : null,
       age_groups: EventAgeGroupSerializer.serializeList(data.targetedAgrGroups),
       tags: EventTagSerializer.serializeList(data.tags),
