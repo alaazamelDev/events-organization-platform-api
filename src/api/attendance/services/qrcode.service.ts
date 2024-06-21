@@ -56,10 +56,9 @@ export class QrCodeService {
   ): Promise<string> {
     // get the base url...
     const baseUrl: string = this.appConfigService.url + '/api';
-    const attendancePath: string = this.appConfigService.attendancePath;
 
     // Construct the full URL with query parameters
-    const attendanceUrl = `${baseUrl}/${attendancePath}?attendeeId=${attendeeId}&eventId=${eventId}`;
+    const attendanceUrl = `${baseUrl}/attendance/check-attendance?attendeeId=${attendeeId}&eventId=${eventId}`;
 
     // Generate the QR code from the constructed URL
     return this.generateQrCode(attendanceUrl);
