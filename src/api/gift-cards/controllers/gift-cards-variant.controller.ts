@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Put,
@@ -17,6 +18,11 @@ export class GiftCardsVariantController {
   constructor(
     private readonly giftCardVariantService: GiftCardVariantService,
   ) {}
+
+  @Get()
+  async getVariants() {
+    return this.giftCardVariantService.getVariants();
+  }
 
   @Post()
   async createGiftCardVariant(@Body() dto: CreateGiftCardVariantDto) {

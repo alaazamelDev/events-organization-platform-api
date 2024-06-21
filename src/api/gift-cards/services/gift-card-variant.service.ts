@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GiftCardVariantEntity } from '../entities/gift-card-variant.entity';
 import { Repository } from 'typeorm';
 import { UpdateGiftCardVariantDto } from '../dto/update-gift-card-variant.dto';
+import { GetGiftCardsSerializer } from '../serializers/get-gift-cards.serializer';
 
 @Injectable()
 export class GiftCardVariantService {
@@ -11,6 +12,19 @@ export class GiftCardVariantService {
     @InjectRepository(GiftCardVariantEntity)
     private readonly giftCardVariantRepository: Repository<GiftCardVariantEntity>,
   ) {}
+
+  async getVariants() {
+    const result = await this.giftCardVariantRepository.find({
+      relations: { giftCards: true },
+    });
+
+    return result.map((result) => {
+      return {
+        ...result,
+        giftCards: GetGiftCardsSerializer.serializeList(result.giftCards),
+      };
+    });
+  }
 
   async createVariant(dto: CreateGiftCardVariantDto) {
     const variant = this.giftCardVariantRepository.create({
