@@ -4,10 +4,14 @@ import {
   InternalServerErrorException,
   Res,
   MessageEvent,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { Subject } from 'rxjs';
 import { Response } from 'express';
 import { v1 } from 'uuid';
+import { GiftCardService } from '../services/gift-card.service';
+import { PrintGiftCardsDto } from '../dto/print-gift-cards.dto';
 
 @Controller('sse')
 export class GiftCardsSseController {
@@ -17,15 +21,16 @@ export class GiftCardsSseController {
     { close: () => void; subject: Subject<MessageEvent> }
   >();
 
-  @Get()
-  async example(@Res() response: Response) {
-    let validationFailed = false;
+  constructor(private readonly giftCardService: GiftCardService) {}
 
-    /* make some validation */
+  @Post()
+  async example(@Res() response: Response, @Body() dto: PrintGiftCardsDto) {
+    console.log(dto);
+    let validationFailed = false;
 
     if (validationFailed)
       throw new InternalServerErrorException({
-        message: 'Query failed',
+        message: 'Generating Cards Failed',
         error: 100,
         status: 500,
       });
@@ -91,11 +96,25 @@ export class GiftCardsSseController {
     // We can send data using the subject.next(MessageEvent) function.
     // See the sendDataToClient() function below.
 
-    this.sendDataToClient(clientKey, { data: { hadi: 'king' } });
+    const onProgress = (
+      n: number,
+      KEY: string,
+      fileName: string,
+      ack: string,
+    ) => {
+      this.sendDataToClient(KEY, {
+        data: { progress: n, fileName: fileName, ack: ack },
+      });
+      if (fileName.length > 0 || ack === 'No cards matches the given ids') {
+        this.connectedClients?.get(KEY)?.close();
+      }
+    };
+
+    this.giftCardService.printCards(clientKey, onProgress, dto);
   }
 
   /** Send a SSE message to the specified client */
   sendDataToClient(clientId: string, message: MessageEvent) {
-    this.connectedClients.get(clientId)?.subject.next(message);
+    this.connectedClients?.get(clientId)?.subject.next(message);
   }
 }

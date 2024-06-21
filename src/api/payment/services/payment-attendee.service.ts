@@ -9,6 +9,8 @@ import { Event } from '../../event/entities/event.entity';
 import { AttendeeTicketsHistorySerializer } from '../serializers/attendee-tickets-history.serializer';
 import { PrizeEntity } from '../../gamification/entities/prizes/prize.entity';
 import { TicketPrizeEntity } from '../../gamification/entities/prizes/ticket-prize.entity';
+import { GiftCardEntity } from '../../gift-cards/entities/gift-card.entity';
+import { GiftCardVariantEntity } from '../../gift-cards/entities/gift-card-variant.entity';
 
 @Injectable()
 export class PaymentAttendeeService {
@@ -60,6 +62,21 @@ export class PaymentAttendeeService {
         TicketPrizeEntity,
         'tickets_prize',
         'tickets_prize.prize_id = prize.id',
+      )
+      .leftJoin(
+        GiftCardEntity,
+        'gift_card',
+        `gift_card.id = CAST(JSONB_EXTRACT_PATH_TEXT(attendee_tickets.data, 'gift_card_id') AS BIGINT)`,
+      )
+      .addSelect([
+        'gift_card.id',
+        'gift_card.created_at',
+        'gift_card.variant_id',
+      ])
+      .leftJoinAndSelect(
+        GiftCardVariantEntity,
+        'gift_card_variant',
+        'gift_card_variant.id = gift_card.variant_id',
       )
       .getRawMany();
 

@@ -48,8 +48,6 @@ export class GiftCardsPdfService {
       format: 'a4',
     });
 
-    const uid = uuidv1();
-
     const data = `data:image/png;base64,${screenshotBuffer.toString('base64')}`;
 
     pdf.addImage(data, 'PNG', 0, 0, 595.28, 841.89);
@@ -102,17 +100,18 @@ export class GiftCardsPdfService {
   };
 
   downloadCardsAsPDF = async (
-    onProgressChange: any,
+    onProgressChange: (progress: number, fileName: string, ack: string) => void,
     cards: GiftCardEntity[],
   ) => {
-    onProgressChange(0);
+    onProgressChange(0, '', 'In Progress');
+    const numberOfCardsInPage = 10;
 
     const zip = new JSZip();
-    const numPages = Math.ceil(cards.length / 8);
+    const numPages = Math.ceil(cards.length / numberOfCardsInPage);
 
     for (let page = 0; page < numPages; page++) {
-      const startIndex = page * 8;
-      const endIndex = Math.min((page + 1) * 8, cards.length);
+      const startIndex = page * numberOfCardsInPage;
+      const endIndex = Math.min((page + 1) * numberOfCardsInPage, cards.length);
       const cardData = cards.slice(startIndex, endIndex);
 
       const backPromises = cardData.map((card: any) =>
@@ -134,7 +133,9 @@ export class GiftCardsPdfService {
         await zipPage.generateAsync({ type: 'arraybuffer' }),
       );
       const newProgress = ((page + 1) / numPages) * 100;
-      onProgressChange(newProgress);
+      if (newProgress !== 100) {
+        onProgressChange(Math.ceil(newProgress), '', 'In Progress');
+      }
     }
 
     const id = uuidv1();
@@ -146,6 +147,9 @@ export class GiftCardsPdfService {
         // const zipUrl = URL.createObjectURL(zipBlob);
         fs.appendFile(`./cards-${id}.zip`, content, (error) => {
           if (error) console.log(error);
+          else {
+            onProgressChange(100, `cards-${id}.zip`, 'Completed');
+          }
         });
       });
   };
