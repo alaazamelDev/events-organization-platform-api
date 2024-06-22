@@ -9,6 +9,5 @@ export class PrintGiftCardsDto {
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
-  @ArrayMaxSize(100)
   gift_cards_ids: number[];
 }
