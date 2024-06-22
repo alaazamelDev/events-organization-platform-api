@@ -28,7 +28,7 @@ export class GiftCardsController {
     return this.giftCardService.getGiftCards();
   }
 
-  @Get(':fileName')
+  @Get('download/:fileName')
   getCardsFile(
     @Param('fileName') fileName: string,
     @Res() res: any,
