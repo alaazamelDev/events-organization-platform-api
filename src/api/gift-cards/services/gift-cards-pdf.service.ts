@@ -10,7 +10,12 @@ const JSZip = require('jszip');
 @Injectable()
 export class GiftCardsPdfService {
   private generatePDFPage = async (_cards: any, cardElements: any) => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: false,
+      ignoreDefaultArgs: ['--disable-extensions'],
+      args: ['--no-sandbox', '--use-gl=egl', '--disable-setuid-sandbox'],
+      ignoreHTTPSErrors: true,
+    });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 3 });
 
