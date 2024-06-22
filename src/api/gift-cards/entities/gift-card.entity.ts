@@ -1,8 +1,16 @@
-import { AfterLoad, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  AfterLoad,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { GiftCardVariantEntity } from './gift-card-variant.entity';
 
 @Entity({ name: 'gift_cards' })
+@Index('idx_card_variantId', ['variant_id'])
 export class GiftCardEntity extends BaseEntity {
   @Column({ type: 'bytea', nullable: false, unique: true })
   code: Buffer;

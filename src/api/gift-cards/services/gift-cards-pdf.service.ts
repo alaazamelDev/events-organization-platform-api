@@ -10,17 +10,20 @@ const JSZip = require('jszip');
 @Injectable()
 export class GiftCardsPdfService {
   private generatePDFPage = async (_cards: any, cardElements: any) => {
-    const browser = await puppeteer.launch({
-      headless: true,
-      ignoreDefaultArgs: ['--disable-extensions'],
-      args: ['--no-sandbox', '--use-gl=egl', '--disable-setuid-sandbox'],
-      ignoreHTTPSErrors: true,
-    });
+    const browser = await puppeteer
+      .launch
+      //   {
+      //   headless: true,
+      //   ignoreDefaultArgs: ['--disable-extensions'],
+      //   args: ['--no-sandbox', '--use-gl=egl', '--disable-setuid-sandbox'],
+      //   ignoreHTTPSErrors: true,
+      // }
+      ();
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 3 });
-    await page.setUserAgent(
-      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
-    );
+    // await page.setUserAgent(
+    //   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
+    // );
 
     const htmlContent = `
       <html>

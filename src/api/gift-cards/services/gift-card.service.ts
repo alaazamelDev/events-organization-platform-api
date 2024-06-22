@@ -64,7 +64,11 @@ export class GiftCardService {
       .getRepository(GiftCardEntity)
       .createQueryBuilder('card')
       .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
-      .leftJoinAndSelect('card.variant', 'variant')
+      .leftJoinAndSelect(
+        'card.variant',
+        'variant',
+        'variant.id = card.variant_id',
+      )
       .getMany();
 
     if (cards.length === 0) {
