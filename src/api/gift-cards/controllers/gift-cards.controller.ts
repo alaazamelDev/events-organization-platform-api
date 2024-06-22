@@ -33,6 +33,12 @@ export class GiftCardsController {
     @Param('fileName') fileName: string,
     @Res() res: any,
   ): Observable<any> {
+    res.set({
+      'Content-Type': 'application/zip',
+      'Content-Disposition': 'attachment; filename="cards.zip"',
+    });
+
+    res.flushHeaders();
     const filePath = join(process.cwd(), 'uploads/' + fileName);
     const fileStream = createReadStream(filePath);
 
