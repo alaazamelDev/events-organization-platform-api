@@ -11,7 +11,7 @@ const JSZip = require('jszip');
 export class GiftCardsPdfService {
   private generatePDFPage = async (_cards: any, cardElements: any) => {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       ignoreDefaultArgs: ['--disable-extensions'],
       args: ['--no-sandbox', '--use-gl=egl', '--disable-setuid-sandbox'],
       ignoreHTTPSErrors: true,
