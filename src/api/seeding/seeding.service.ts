@@ -859,6 +859,13 @@ export class SeedingService {
         deletedAt: null,
         name: 'Email',
       },
+      {
+        id: 7,
+        createdAt: new Date('2024-04-16 16:36:55.1834'),
+        updatedAt: new Date('2024-04-16 16:36:55.1834'),
+        deletedAt: null,
+        name: 'Whatsapp',
+      },
     ];
 
     await this.dataSource.getRepository(Contact).upsert(contactsData, {

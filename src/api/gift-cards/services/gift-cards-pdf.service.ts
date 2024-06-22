@@ -145,7 +145,7 @@ export class GiftCardsPdfService {
       .then(async (content: Uint8Array) => {
         // const zipBlob = new Blob([content]);
         // const zipUrl = URL.createObjectURL(zipBlob);
-        fs.appendFile(`./cards-${id}.zip`, content, (error) => {
+        fs.appendFile(`uploads/cards-${id}.zip`, content, (error) => {
           if (error) console.log(error);
           else {
             onProgressChange(100, `cards-${id}.zip`, 'Completed');

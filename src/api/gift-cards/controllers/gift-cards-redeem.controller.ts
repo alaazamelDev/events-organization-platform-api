@@ -17,6 +17,7 @@ import { AccessTokenGuard } from '../../../auth/guards/access-token.guard';
 import { RoleGuard } from '../../../common/guards/role/role.guard';
 import { User } from '../../../common/decorators/user.decorator';
 import { AuthUserType } from '../../../common/types/auth-user.type';
+import { GetGiftCardInfoDto } from '../dto/get-gift-card-info.dto';
 
 @Controller('gift-cards/redeem')
 export class GiftCardsRedeemController {
@@ -36,5 +37,11 @@ export class GiftCardsRedeemController {
       +user.sub,
       queryRunner,
     );
+  }
+
+  @Post('card-info')
+  @UseInterceptors(CheckGiftCardCodeValidityInterceptor)
+  async getGiftCardInfo(@Body() dto: GetGiftCardInfoDto) {
+    return this.giftCardRedeemService.getGiftCardInfo(dto);
   }
 }

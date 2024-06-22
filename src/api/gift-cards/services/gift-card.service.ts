@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  MessageEvent,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import * as short_uuid from 'short-uuid';
 import { GenerateGiftCardsDto } from '../dto/generate-gift-cards.dto';
@@ -13,6 +8,7 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { GetGiftCardsSerializer } from '../serializers/get-gift-cards.serializer';
 import { GiftCardsPdfService } from './gift-cards-pdf.service';
 import { PrintGiftCardsDto } from '../dto/print-gift-cards.dto';
+import { ChangeGiftCardsActiveStateDto } from '../dto/change-gift-cards-active-state.dto';
 
 @Injectable()
 export class GiftCardService {
@@ -58,7 +54,7 @@ export class GiftCardService {
   async printCards(
     clientKey: string,
     ON: (n: number, KEY: string, fileName: string, ack: string) => void,
-    _dto: PrintGiftCardsDto,
+    dto: PrintGiftCardsDto,
   ) {
     const onProgress = (progress: number, fileName: string, ack: string) => {
       ON(progress, clientKey, fileName, ack);
@@ -67,7 +63,7 @@ export class GiftCardService {
     const cards = await this.dataSource
       .getRepository(GiftCardEntity)
       .createQueryBuilder('card')
-      // .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
+      .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
       .leftJoinAndSelect('card.variant', 'variant')
       .getMany();
 
@@ -79,5 +75,21 @@ export class GiftCardService {
     await this.giftCardsPdfService.downloadCardsAsPDF(onProgress, cards);
 
     return;
+  }
+
+  async changeGiftCardsActiveState(dto: ChangeGiftCardsActiveStateDto) {
+    const cards = await this.dataSource
+      .getRepository(GiftCardEntity)
+      .createQueryBuilder('card')
+      .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
+      .getMany();
+
+    const result = cards.map((card) => {
+      return { ...card, active: dto.state };
+    }) as GiftCardEntity[];
+
+    await this.giftCardRepository.save(result);
+
+    return GetGiftCardsSerializer.serializeList(result);
   }
 }

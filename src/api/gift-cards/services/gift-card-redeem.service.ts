@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { RedeemGiftCardDto } from '../dto/redeem-gift-card.dto';
-import { QueryRunner, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GiftCardEntity } from '../entities/gift-card.entity';
 import { AttendeeService } from '../../attendee/services/attendee.service';
 import { AttendeesTickets } from '../../payment/entities/attendees-tickets.entity';
 import { TicketsEventTypes } from '../../payment/constants/tickets-event-types.constant';
+import { GetGiftCardInfoDto } from '../dto/get-gift-card-info.dto';
+import { GetGiftCardsSerializer } from '../serializers/get-gift-cards.serializer';
 
 @Injectable()
 export class GiftCardRedeemService {
@@ -15,6 +17,7 @@ export class GiftCardRedeemService {
     @InjectRepository(AttendeesTickets)
     private readonly attendeesTicketsRepository: Repository<AttendeesTickets>,
     private readonly attendeeService: AttendeeService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async redeemGiftCard(
@@ -43,5 +46,18 @@ export class GiftCardRedeemService {
     await queryRunner.manager.save(attendeeTickets);
 
     return 'success';
+  }
+
+  async getGiftCardInfo(dto: GetGiftCardInfoDto) {
+    const code = Buffer.from(dto.code, 'utf8').toString('hex');
+
+    const card = await this.dataSource
+      .getRepository(GiftCardEntity)
+      .createQueryBuilder('gift-card')
+      .where("gift-card.code = decode(:code, 'hex')", { code: code })
+      .leftJoinAndSelect('gift-card.variant', 'variant')
+      .getOneOrFail();
+
+    return GetGiftCardsSerializer.serialize(card);
   }
 }

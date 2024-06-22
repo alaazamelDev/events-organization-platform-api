@@ -6,6 +6,7 @@ import {
   Res,
   UseInterceptors,
   Param,
+  Put,
 } from '@nestjs/common';
 import { GiftCardService } from '../services/gift-card.service';
 import { TransactionInterceptor } from '../../../common/interceptors/transaction/transaction.interceptor';
@@ -16,6 +17,7 @@ import { join } from 'path';
 import * as process from 'process';
 import { Observable, of } from 'rxjs';
 import { createReadStream, unlink } from 'fs';
+import { ChangeGiftCardsActiveStateDto } from '../dto/change-gift-cards-active-state.dto';
 
 @Controller('gift-cards')
 export class GiftCardsController {
@@ -31,7 +33,7 @@ export class GiftCardsController {
     @Param('fileName') fileName: string,
     @Res() res: any,
   ): Observable<any> {
-    const filePath = join(process.cwd(), fileName);
+    const filePath = join(process.cwd(), 'uploads/' + fileName);
     const fileStream = createReadStream(filePath);
 
     fileStream.on('end', () => {
@@ -59,5 +61,10 @@ export class GiftCardsController {
       generateGiftCardsDto,
       queryRunner,
     );
+  }
+
+  @Put('change-active-state')
+  async changeGiftCardsActiveState(@Body() dto: ChangeGiftCardsActiveStateDto) {
+    return this.giftCardService.changeGiftCardsActiveState(dto);
   }
 }
