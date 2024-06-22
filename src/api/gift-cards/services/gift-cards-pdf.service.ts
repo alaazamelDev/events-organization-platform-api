@@ -9,7 +9,7 @@ const JSZip = require('jszip');
 
 @Injectable()
 export class GiftCardsPdfService {
-  private generatePDFPage = async (_cards: any, cardElements: any) => {
+  private generatePDFPage = async (cardElements: any) => {
     const browser = await puppeteer
       .launch
       //   {
@@ -132,8 +132,17 @@ export class GiftCardsPdfService {
         this.getCardHTML(card, true),
       );
 
-      const backBlob = await this.generatePDFPage(cards, backPromises);
-      const frontBlob = await this.generatePDFPage(cards, frontPromises);
+      const backBlob = await this.generatePDFPage(backPromises);
+
+      const progressAfterBackPDFGeneration =
+        ((page * 2 + 1) / (numPages * 2)) * 100;
+      onProgressChange(
+        Math.ceil(progressAfterBackPDFGeneration),
+        '',
+        'In Progress',
+      );
+
+      const frontBlob = await this.generatePDFPage(frontPromises);
 
       const zipPage = new JSZip();
       zipPage.file(`patch_${page + 1}_back.pdf`, backBlob);
@@ -143,10 +152,9 @@ export class GiftCardsPdfService {
         `patch_${page + 1}.zip`,
         await zipPage.generateAsync({ type: 'arraybuffer' }),
       );
-      const newProgress = ((page + 1) / numPages) * 100;
-      if (newProgress !== 100) {
-        onProgressChange(Math.ceil(newProgress), '', 'In Progress');
-      }
+
+      const progressAfterZipping = ((page + 1) / numPages) * 100;
+      onProgressChange(Math.ceil(progressAfterZipping), '', 'In Progress');
     }
 
     const id = uuidv1();

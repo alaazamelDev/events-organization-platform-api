@@ -54,7 +54,7 @@ export class GiftCardService {
   async printCards(
     clientKey: string,
     ON: (n: number, KEY: string, fileName: string, ack: string) => void,
-    dto: PrintGiftCardsDto,
+    _dto: PrintGiftCardsDto,
   ) {
     const onProgress = (progress: number, fileName: string, ack: string) => {
       ON(progress, clientKey, fileName, ack);
@@ -63,7 +63,7 @@ export class GiftCardService {
     const cards = await this.dataSource
       .getRepository(GiftCardEntity)
       .createQueryBuilder('card')
-      .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
+      // .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
       .leftJoinAndSelect(
         'card.variant',
         'variant',
