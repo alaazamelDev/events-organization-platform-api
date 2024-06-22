@@ -36,15 +36,15 @@ export class GiftCardsController {
     const filePath = join(process.cwd(), 'uploads/' + fileName);
     const fileStream = createReadStream(filePath);
 
-    fileStream.on('end', () => {
-      unlink(filePath, (err) => {
-        if (err) {
-          console.error(`Error deleting file ${fileName}:`, err);
-        } else {
-          console.log(`File ${fileName} deleted successfully`);
-        }
-      });
-    });
+    // fileStream.on('end', () => {
+    //   unlink(filePath, (err) => {
+    //     if (err) {
+    //       console.error(`Error deleting file ${fileName}:`, err);
+    //     } else {
+    //       console.log(`File ${fileName} deleted successfully`);
+    //     }
+    //   });
+    // });
 
     fileStream.pipe(res);
 
