@@ -1,9 +1,18 @@
-import { isNil, omitBy } from 'lodash';
 import { GiftCardEntity } from '../entities/gift-card.entity';
 
 export class GetGiftCardsSerializer {
-  static serialize(history: GiftCardEntity) {
-    return omitBy(history, isNil);
+  static serialize(item: GiftCardEntity) {
+    return {
+      id: item.id,
+      redeemed: item.redeemed,
+      variant_id: item.variant_id,
+      variant: item.variant,
+      CODE: item.card_code,
+      active: item.active,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      deletedAt: item.deletedAt,
+    };
   }
 
   static serializeList(data: GiftCardEntity[]) {
@@ -14,6 +23,7 @@ export class GetGiftCardsSerializer {
         variant_id: item.variant_id,
         variant: item.variant,
         CODE: item.card_code,
+        active: item.active,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         deletedAt: item.deletedAt,

@@ -4,7 +4,7 @@ import { GiftCardVariantEntity } from './gift-card-variant.entity';
 
 @Entity({ name: 'gift_cards' })
 export class GiftCardEntity extends BaseEntity {
-  @Column({ type: 'bytea', nullable: false })
+  @Column({ type: 'bytea', nullable: false, unique: true })
   code: Buffer;
 
   @ManyToOne(() => GiftCardVariantEntity)
@@ -16,6 +16,9 @@ export class GiftCardEntity extends BaseEntity {
 
   @Column({ default: false })
   redeemed: boolean = false;
+
+  @Column({ default: true })
+  active: boolean = true;
 
   private CODE: string;
 

@@ -7,6 +7,8 @@ import { GiftCardEntity } from '../entities/gift-card.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { GetGiftCardsSerializer } from '../serializers/get-gift-cards.serializer';
 import { GiftCardsPdfService } from './gift-cards-pdf.service';
+import { PrintGiftCardsDto } from '../dto/print-gift-cards.dto';
+import { ChangeGiftCardsActiveStateDto } from '../dto/change-gift-cards-active-state.dto';
 
 @Injectable()
 export class GiftCardService {
@@ -49,20 +51,45 @@ export class GiftCardService {
     return { short: translator.generate(), original: uuidv4() };
   }
 
-  async printCards() {
+  async printCards(
+    clientKey: string,
+    ON: (n: number, KEY: string, fileName: string, ack: string) => void,
+    dto: PrintGiftCardsDto,
+  ) {
+    const onProgress = (progress: number, fileName: string, ack: string) => {
+      ON(progress, clientKey, fileName, ack);
+    };
+
     const cards = await this.dataSource
       .getRepository(GiftCardEntity)
       .createQueryBuilder('card')
-      // .where('card.id = 47')
+      .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
       .leftJoinAndSelect('card.variant', 'variant')
       .getMany();
 
-    const onProgress = (progress: number) => {
-      console.log(progress);
-    };
+    if (cards.length === 0) {
+      onProgress(0, '', 'No cards matches the given ids');
+      return;
+    }
 
     await this.giftCardsPdfService.downloadCardsAsPDF(onProgress, cards);
 
     return;
+  }
+
+  async changeGiftCardsActiveState(dto: ChangeGiftCardsActiveStateDto) {
+    const cards = await this.dataSource
+      .getRepository(GiftCardEntity)
+      .createQueryBuilder('card')
+      .where('card.id IN (:...cardIds)', { cardIds: dto.gift_cards_ids })
+      .getMany();
+
+    const result = cards.map((card) => {
+      return { ...card, active: dto.state };
+    }) as GiftCardEntity[];
+
+    await this.giftCardRepository.save(result);
+
+    return GetGiftCardsSerializer.serializeList(result);
   }
 }

@@ -32,7 +32,7 @@ import { GiftCardsSseController } from './controllers/gift-cards-sse.controller'
     GiftCardsController,
     GiftCardsVariantController,
     GiftCardsRedeemController,
-    // GiftCardsSseController,
+    GiftCardsSseController,
   ],
   exports: [],
 })

@@ -1,15 +1,11 @@
-import {
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Res,
-  MessageEvent,
-} from '@nestjs/common';
+import { Controller, Res, MessageEvent, Post, Body } from '@nestjs/common';
 import { Subject } from 'rxjs';
 import { Response } from 'express';
 import { v1 } from 'uuid';
+import { GiftCardService } from '../services/gift-card.service';
+import { PrintGiftCardsDto } from '../dto/print-gift-cards.dto';
 
-@Controller('sse')
+@Controller('gift-cards/sse')
 export class GiftCardsSseController {
   /** List of connected clients */
   connectedClients = new Map<
@@ -17,19 +13,10 @@ export class GiftCardsSseController {
     { close: () => void; subject: Subject<MessageEvent> }
   >();
 
-  @Get()
-  async example(@Res() response: Response) {
-    let validationFailed = false;
+  constructor(private readonly giftCardService: GiftCardService) {}
 
-    /* make some validation */
-
-    if (validationFailed)
-      throw new InternalServerErrorException({
-        message: 'Query failed',
-        error: 100,
-        status: 500,
-      });
-
+  @Post('print')
+  async example(@Res() response: Response, @Body() dto: PrintGiftCardsDto) {
     // Create a subject for this client in which we'll push our data
     const subject = new Subject<MessageEvent>();
 
@@ -39,9 +26,6 @@ export class GiftCardsSseController {
       next: (msg: MessageEvent) => {
         // Called when data is pushed to the subject using subject.next()
         // Encode the message as SSE (see https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events)
-
-        // Here's an example of what it could look like, assuming msg.data is an object
-        // If msg.data is not an object, you should adjust accordingly
 
         if (msg.type) response.write(`event: ${msg.type}\n`);
         if (msg.id) response.write(`id: ${msg.id}\n`);
@@ -74,7 +58,7 @@ export class GiftCardsSseController {
       console.log(`Closing connection for client ${clientKey}`);
       subject.complete(); // End the observable stream
       this.connectedClients.delete(clientKey); // Remove client from the list
-      response.end(); // Close connection (unsure if this is really requried, to release the resources)
+      response.end(); // Close connection (unsure if this is really required, to release the resources)
     });
 
     // Send headers to establish SSE connection
@@ -83,19 +67,30 @@ export class GiftCardsSseController {
         'private, no-cache, no-store, must-revalidate, max-age=0, no-transform',
       Connection: 'keep-alive',
       'Content-Type': 'text/event-stream',
+      'Access-Control-Allow-Origin': '*',
     });
 
     response.flushHeaders();
 
-    // From this point, the connection with the client is established.
-    // We can send data using the subject.next(MessageEvent) function.
-    // See the sendDataToClient() function below.
+    const onProgress = (
+      n: number,
+      KEY: string,
+      fileName: string,
+      ack: string,
+    ) => {
+      this.sendDataToClient(KEY, {
+        data: { progress: n, fileName: fileName, ack: ack },
+      });
+      if (fileName.length > 0 || ack === 'No cards matches the given ids') {
+        this.connectedClients?.get(KEY)?.close();
+      }
+    };
 
-    this.sendDataToClient(clientKey, { data: { hadi: 'king' } });
+    this.giftCardService.printCards(clientKey, onProgress, dto);
   }
 
   /** Send a SSE message to the specified client */
   sendDataToClient(clientId: string, message: MessageEvent) {
-    this.connectedClients.get(clientId)?.subject.next(message);
+    this.connectedClients?.get(clientId)?.subject.next(message);
   }
 }
