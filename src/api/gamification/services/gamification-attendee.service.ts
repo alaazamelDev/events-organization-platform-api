@@ -6,6 +6,8 @@ import { AttendeeRedeemablePointsEntity } from '../entities/rewards-attendee/att
 import { AttendeePrizeEntity } from '../entities/prizes/attendee-prize.entity';
 import { PrizeTypesEnum } from '../constants/prize-types.constant';
 import { TicketPrizeEntity } from '../entities/prizes/ticket-prize.entity';
+import { PrizeEntity } from '../entities/prizes/prize.entity';
+import { GetAttendeeRpsHistorySerializer } from '../serializers/get-attendee-rps-history.serializer';
 
 @Injectable()
 export class GamificationAttendeeService {
@@ -75,13 +77,25 @@ export class GamificationAttendeeService {
   }
 
   async getAttendeeRedeemablePointsHistory(attendeeID: number) {
-    return await this.dataSource
+    const result = await this.dataSource
       .getRepository(AttendeeRedeemablePointsEntity)
-      .createQueryBuilder('attendeePoints')
-      .where('attendeePoints.attendee_id = :attendeeID', {
+      .createQueryBuilder('rps')
+      .where('rps.attendee_id = :attendeeID', {
         attendeeID: attendeeID,
       })
-      .getMany();
+      .leftJoinAndSelect(
+        PrizeEntity,
+        'prize',
+        `prize.id = CAST(JSONB_EXTRACT_PATH_TEXT(rps.metaData, 'prize_id') AS BIGINT)`,
+      )
+      .leftJoinAndSelect(
+        TicketPrizeEntity,
+        'ticketsPrize',
+        'ticketsPrize.prize_id = prize.id',
+      )
+      .getRawMany();
+
+    return GetAttendeeRpsHistorySerializer.serializeList(result);
   }
 
   async getAttendeePrizes(attendeeID: number) {

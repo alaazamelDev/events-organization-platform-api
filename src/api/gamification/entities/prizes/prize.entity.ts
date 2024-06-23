@@ -1,6 +1,7 @@
 import { BaseEntity } from '../../../../common/entities/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { PrizeTypeEntity } from './prize-type.entity';
+import { TicketPrizeEntity } from './ticket-prize.entity';
 
 @Entity({ name: 'g_prizes' })
 export class PrizeEntity extends BaseEntity {
@@ -22,6 +23,11 @@ export class PrizeEntity extends BaseEntity {
 
   @Column({ name: 'type_id' })
   type_id: number;
+
+  @OneToOne(() => TicketPrizeEntity, (ticketsPrize) => ticketsPrize.prize, {
+    eager: true,
+  })
+  tickets_prize?: TicketPrizeEntity;
 
   [key: string]: any;
 }

@@ -37,7 +37,7 @@ export class RedeemTicketsPrizeStrategy implements RedeemStrategy {
       .create({
         attendee: { id: attendee_id } as Attendee,
         value: prize.rp_value * -1,
-        metaData: {},
+        metaData: { prize_id: prize.id },
       });
 
     return { attendeeTickets: attendeeTickets, attendeeRP: redeemedRP };
