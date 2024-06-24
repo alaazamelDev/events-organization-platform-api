@@ -3,5 +3,5 @@ export enum DefinedDataEnum {
   SEND_MESSAGE = 2,
   BUY_PACKAGE = 3,
   CONSUME_TICKETS = 4,
-  EARN_BADGE = 5,
+  REDEEM_GIFT_CARD = 5,
 }

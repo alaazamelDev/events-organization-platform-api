@@ -1080,7 +1080,7 @@ export class SeedingService {
       { id: 2, name: 'Send Message' },
       { id: 3, name: 'Buy Package' },
       { id: 4, name: 'Consume Tickets' },
-      // { id: 5, name: 'Earn Badge' },
+      { id: 5, name: 'Redeem Gift Card' },
     ];
 
     await this.dataSource.getRepository(DefinedDataEntity).upsert(definedData, {
@@ -1124,9 +1124,9 @@ export class SeedingService {
       { id: 10, defined_data_id: 4, operator_id: 1 },
       { id: 11, defined_data_id: 4, operator_id: 2 },
       { id: 12, defined_data_id: 4, operator_id: 3 },
-      // { id: 13, defined_data_id: 5, operator_id: 1 },
-      // { id: 14, defined_data_id: 5, operator_id: 2 },
-      // { id: 15, defined_data_id: 5, operator_id: 3 },
+      { id: 13, defined_data_id: 5, operator_id: 1 },
+      { id: 14, defined_data_id: 5, operator_id: 2 },
+      { id: 15, defined_data_id: 5, operator_id: 3 },
     ];
 
     await this.dataSource

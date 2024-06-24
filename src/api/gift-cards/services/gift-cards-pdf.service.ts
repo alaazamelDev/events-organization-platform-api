@@ -20,7 +20,7 @@ export class GiftCardsPdfService {
       // }
       ();
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 3 });
+    await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 6 });
     // await page.setUserAgent(
     //   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
     // );
@@ -75,7 +75,7 @@ export class GiftCardsPdfService {
                     <div style="position: absolute; right: 0.1in; top: 0.12in; width: 100%; font-weight: 600; display: flex; justify-content: flex-end; align-items: flex-start; font-size: 0.19in; ">
                         <div>${cardData.variant.tickets} | Tickets</div>
                     </div>
-                    <div style="font-size: 0.65in; font-family: 'Bangers';">Eventure</div>
+                    <div style="font-size: 0.65in; font-family: 'Bangers';">WEEVENTS</div>
                 </div>
             </div>
         `;
@@ -89,8 +89,8 @@ export class GiftCardsPdfService {
                             <div>Gift Card</div>
                         </div>
                         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0;">
-                            <div>www.eventure.com</div>
-                            <div>support@eventure.com</div>
+                            <div>www.weevents.com</div>
+                            <div>support@weevents.com</div>
                         </div>
                     </div>
                     <div style="font-size: 0.14in;">

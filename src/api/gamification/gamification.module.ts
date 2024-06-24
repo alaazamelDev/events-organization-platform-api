@@ -39,7 +39,6 @@ import { AreConditionsContainsAtLeastOneEqualOperatorConstraint } from './valida
 import { RedeemablePointsEntity } from './entities/rewards/redeemable-points.entity';
 import { AttendeeRedeemablePointsEntity } from './entities/rewards-attendee/attendee-redeemable-points.entity';
 import { GamificationAttendeeService } from './services/gamification-attendee.service';
-import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber';
 import { GamificationAttendeeController } from './cotrollers/gamification-attendee.controller';
 import { PrizeEntity } from './entities/prizes/prize.entity';
 import { PrizeTypeEntity } from './entities/prizes/prize-type.entity';
@@ -48,6 +47,7 @@ import { GamificationPrizesService } from './services/gamification-prizes.servic
 import { GamificationPrizesController } from './cotrollers/gamification-prizes.controller';
 import { RedeemService } from './services/redeem.service';
 import { AttendeePrizeEntity } from './entities/prizes/attendee-prize.entity';
+import { RedeemGiftCardSubscriber } from './events-subscribers/redeem-gift-card.subscriber';
 
 @Module({
   imports: [
@@ -96,7 +96,7 @@ import { AttendeePrizeEntity } from './entities/prizes/attendee-prize.entity';
     ConsumeTicketsSubscriber,
     FillFormSubscriber,
     SendMessageSubscriber,
-    // EarnBadgeSubscriber,
+    RedeemGiftCardSubscriber,
 
     ExecuteRules,
     OperatorService,
