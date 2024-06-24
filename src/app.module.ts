@@ -57,6 +57,7 @@ import { GiftCardsModule } from './api/gift-cards/gift-cards.module';
 import { AttendanceModule } from './api/attendance/attendance.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BlockingInterceptor } from './common/interceptors/blocking/blocking.interceptor';
+import { NotificationModule } from './api/notification/notification.module';
 
 @Module({
   imports: [
@@ -130,6 +131,7 @@ import { BlockingInterceptor } from './common/interceptors/blocking/blocking.int
     AdminReportModule,
     PlatformProblemModule,
     AttendanceModule,
+    NotificationModule,
   ],
   providers: [
     IsUniqueConstraint,
