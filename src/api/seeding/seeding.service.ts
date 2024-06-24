@@ -29,6 +29,7 @@ import { PrizeTypeEntity } from '../gamification/entities/prizes/prize-type.enti
 import { AbuseTypeCategoryEnum } from '../abuse-type/enums/abuse-type-category.enum';
 import { PlatformProblemCategoryEnum } from '../platform-problem/enums/platform-problem-category.enum';
 import { PlatformProblem } from '../platform-problem/entities/platform-problem.entity';
+import { NotificationType } from '../notification/entities/notification-type.entity';
 
 @Injectable()
 export class SeedingService {
@@ -372,6 +373,30 @@ export class SeedingService {
       conflictPaths: ['id'],
       upsertType: 'on-duplicate-key-update',
     });
+  }
+
+  async seedNotificationTypes() {
+    await this.dataSource.query(
+      'ALTER SEQUENCE notification_type_id_seq RESTART WITH 1;',
+    );
+
+    const notificationTypes: NotificationType[] = [
+      {
+        id: 1,
+        icon: '',
+        name: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+    ];
+
+    await this.dataSource
+      .getRepository(NotificationType)
+      .upsert(notificationTypes, {
+        conflictPaths: ['id'],
+        upsertType: 'on-duplicate-key-update',
+      });
   }
 
   async seedApprovalStatus() {
@@ -929,7 +954,7 @@ export class SeedingService {
         updatedAt: new Date('2024-05-02 17:10:18.688896'),
         deletedAt: null,
         label: 'Love',
-        icon: '/assets/love.png',
+        icon: 'solar:like-bold-duotone',
       },
       {
         id: 2,
@@ -937,7 +962,7 @@ export class SeedingService {
         updatedAt: new Date('2024-05-02 17:10:18.688896'),
         deletedAt: null,
         label: 'Like',
-        icon: '/assets/like.png',
+        icon: 'flat-color-icons:like',
       },
       {
         id: 3,
@@ -945,7 +970,7 @@ export class SeedingService {
         updatedAt: new Date('2024-05-02 17:10:18.688896'),
         deletedAt: null,
         label: 'Dislike',
-        icon: '/assets/dislike.png',
+        icon: 'solar:dislike-bold-duotone',
       },
     ];
 

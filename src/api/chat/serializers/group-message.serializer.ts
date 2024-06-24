@@ -36,10 +36,7 @@ export class GroupMessageSerializer {
 
       if (!reactionsMetaData[reactionId]) {
         reactionsMetaData[reactionId] = {
-          reaction: ReactionSerializer.serialize(
-            fileUtilityService,
-            reactionData,
-          ),
+          reaction: ReactionSerializer.serialize(reactionData),
           reacted_users: [],
           no_reactions: 0,
         };

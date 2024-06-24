@@ -16,7 +16,7 @@ export class MessageReactionSerializer {
         fileUtilityService,
         data.reactedBy,
       ),
-      reaction: ReactionSerializer.serialize(fileUtilityService, data.reaction),
+      reaction: ReactionSerializer.serialize(data.reaction),
       reaction_date: moment(data.createdAt).format(DEFAULT_DB_DATETIME_FORMAT),
     };
   }
