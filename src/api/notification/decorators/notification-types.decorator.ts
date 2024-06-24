@@ -1,3 +1,3 @@
 import { Reflector } from '@nestjs/core';
 
-export const NotificationTypes = Reflector.createDecorator<number[]>();
+export const NotificationTypes = Reflector.createDecorator<number>();
