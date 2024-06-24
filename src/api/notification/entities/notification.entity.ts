@@ -26,7 +26,7 @@ export class Notification extends BaseEntity {
 
   @Column({
     name: 'relation_id',
-    type: 'unsigned big int',
+    type: 'bigint',
     nullable: true,
   })
   relationId?: number;
