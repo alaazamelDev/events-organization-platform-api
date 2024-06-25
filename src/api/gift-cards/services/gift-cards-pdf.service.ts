@@ -102,7 +102,9 @@ export class GiftCardsPdfService {
                         </ul>
                     </div>
                     <div style="background-color: #E9C46A; font-size: 0.175in; width: 3.375in; height: 0.3in; display: flex; justify-content: center; align-items: center; color: #264653;">
-                        AL23B-HJK4D-F879Z-XCV12
+                        ${cardData.card_code
+                          .replace(/(.{5})/g, '$1-')
+                          .replace(/-$/, '')}
                     </div>
                 </div>
             </div>
