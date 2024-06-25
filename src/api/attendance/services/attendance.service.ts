@@ -41,10 +41,14 @@ export class AttendanceService {
     }
 
     // otherwise, confirm the attendance...
-    await this.repository.update(data.record_id, {
-      status: AttendanceStatus.attended,
-      checkedBy: { id: data.user_id },
-    });
+    await this.dataSource.getRepository(AttendanceDay).save(
+      {
+        id: data.record_id,
+        status: AttendanceStatus.attended,
+        checkedBy: { id: data.user_id },
+      },
+      { reload: true },
+    );
 
     return this.getAttendanceRecordById(data.record_id);
   }

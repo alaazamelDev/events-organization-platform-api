@@ -8,6 +8,9 @@ export class AttendeePointsEntity extends BaseEntity {
   @JoinColumn({ name: 'attendee_id' })
   attendee: Attendee;
 
+  @Column({ name: 'attendee_id' })
+  attendeeID: number;
+
   @Column()
   value: number;
 

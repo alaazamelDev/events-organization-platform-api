@@ -48,6 +48,10 @@ import { GamificationPrizesController } from './cotrollers/gamification-prizes.c
 import { RedeemService } from './services/redeem.service';
 import { AttendeePrizeEntity } from './entities/prizes/attendee-prize.entity';
 import { RedeemGiftCardSubscriber } from './events-subscribers/redeem-gift-card.subscriber';
+import { AttendEventSubscriber } from './events-subscribers/attend-event.subscriber';
+import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber';
+import { EarnPointsSubscriber } from './events-subscribers/earn-points.subscriber';
+import { DoesDefinedDataTypeConflictWithTheRewardConstraint } from './validators/does_defined_data_type_conflict_with_the_reward_constraint';
 
 @Module({
   imports: [
@@ -89,6 +93,7 @@ import { RedeemGiftCardSubscriber } from './events-subscribers/redeem-gift-card.
     MultipleConditionsOnTheSameDefinedDataInOneRuleConstraint,
     IsDefinedDataConditionAlreadyExistInTheSameRuleConstraint,
     AreConditionsContainsAtLeastOneEqualOperatorConstraint,
+    DoesDefinedDataTypeConflictWithTheRewardConstraint,
 
     // Subscribers
     InsertDataSubscriber,
@@ -97,6 +102,9 @@ import { RedeemGiftCardSubscriber } from './events-subscribers/redeem-gift-card.
     FillFormSubscriber,
     SendMessageSubscriber,
     RedeemGiftCardSubscriber,
+    AttendEventSubscriber,
+    EarnBadgeSubscriber,
+    EarnPointsSubscriber,
 
     ExecuteRules,
     OperatorService,
