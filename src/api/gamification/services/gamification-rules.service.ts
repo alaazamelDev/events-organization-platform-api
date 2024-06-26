@@ -10,6 +10,7 @@ import { AssignRewardToRuleDto } from '../dto/rewards/assign-reward-to-rule.dto'
 import { RewardEntity } from '../entities/rewards/reward.entity';
 import { UnAssignRewardToRuleDto } from '../dto/rewards/un-assign-reward-to-rule.dto';
 import { GetRulesSerializer } from '../serializers/get-rules.serializer';
+import { AttendeeAchievedRulesEntity } from '../entities/rules/attendee-achieved-rules.entity';
 
 @Injectable()
 export class GamificationRulesService {
@@ -19,6 +20,8 @@ export class GamificationRulesService {
     private readonly ruleRepository: Repository<RuleEntity>,
     @InjectRepository(RewardEntity)
     private readonly rewardRepository: Repository<RewardEntity>,
+    @InjectRepository(AttendeeAchievedRulesEntity)
+    private readonly attendeeAchievedRulesRepository: Repository<AttendeeAchievedRulesEntity>,
     private readonly gamificationConditionsService: GamificationConditionsService,
     private readonly gamificationRewardsService: GamificationRewardsService,
   ) {}
@@ -121,13 +124,27 @@ export class GamificationRulesService {
     return reward;
   }
 
-  async getEnabledRules(_attendeeID: number) {
-    return await this.dataSource.getRepository(RuleEntity).find({
+  async getEnabledRulesInRespectToAchievedRulesByAttendee(attendeeID: number) {
+    const rules = await this.dataSource.getRepository(RuleEntity).find({
       where: { enabled: true },
       relations: {
         conditions: { operator: true, definedData: true },
         rewards: true,
       },
     });
+
+    const attendeeAchievedRules =
+      await this.attendeeAchievedRulesRepository.find({
+        where: {
+          attendee_id: attendeeID,
+        },
+      });
+
+    return rules.filter(
+      (rule) =>
+        rule.recurring ||
+        (!rule.recurring &&
+          !attendeeAchievedRules.some((obj) => +obj.rule_id === +rule.id)),
+    );
   }
 }

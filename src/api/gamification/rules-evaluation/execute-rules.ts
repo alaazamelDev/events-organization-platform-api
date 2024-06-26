@@ -24,7 +24,9 @@ export class ExecuteRules {
 
   async executeRules(attendee_id: number, queryRunner: QueryRunner) {
     const rules =
-      await this.gamificationRulesService.getEnabledRules(attendee_id);
+      await this.gamificationRulesService.getEnabledRulesInRespectToAchievedRulesByAttendee(
+        attendee_id,
+      );
 
     await Promise.all(
       rules.map(async (rule) => {
