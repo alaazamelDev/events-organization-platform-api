@@ -1,6 +1,7 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsString,
   Validate,
@@ -34,4 +35,7 @@ export class CreateRuleDto {
   @Type(() => AssignRewardToRuleDto)
   @ValidateNested({ each: true })
   rewards: AssignRewardToRuleDto[];
+
+  @IsBoolean()
+  recurring: boolean;
 }

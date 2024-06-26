@@ -10,6 +10,7 @@ import { GamificationInsertedDataService } from '../services/gamification-insert
 import { AwardService } from '../services/award.service';
 import { RewardedDataEntity } from '../entities/rules/rewarded-data.entity';
 import { RewardEntity } from '../entities/rewards/reward.entity';
+import { AttendeeAchievedRulesEntity } from '../entities/rules/attendee-achieved-rules.entity';
 
 @Injectable()
 export class ExecuteRules {
@@ -22,7 +23,8 @@ export class ExecuteRules {
   ) {}
 
   async executeRules(attendee_id: number, queryRunner: QueryRunner) {
-    const rules = await this.gamificationRulesService.getEnabledRules();
+    const rules =
+      await this.gamificationRulesService.getEnabledRules(attendee_id);
 
     await Promise.all(
       rules.map(async (rule) => {
@@ -52,6 +54,13 @@ export class ExecuteRules {
             timesAchieved,
             queryRunner,
           );
+
+          await queryRunner.manager
+            .getRepository(AttendeeAchievedRulesEntity)
+            .insert({
+              rule_id: rule.id,
+              attendee_id: attendee_id,
+            });
         }
       }),
     );

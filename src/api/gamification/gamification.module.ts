@@ -52,6 +52,7 @@ import { AttendEventSubscriber } from './events-subscribers/attend-event.subscri
 import { EarnBadgeSubscriber } from './events-subscribers/earn-badge.subscriber';
 import { EarnPointsSubscriber } from './events-subscribers/earn-points.subscriber';
 import { DoesDefinedDataTypeConflictWithTheRewardConstraint } from './validators/does_defined_data_type_conflict_with_the_reward_constraint';
+import { AttendeeAchievedRulesEntity } from './entities/rules/attendee-achieved-rules.entity';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { DoesDefinedDataTypeConflictWithTheRewardConstraint } from './validators
       PrizeTypeEntity,
       TicketPrizeEntity,
       AttendeePrizeEntity,
+      AttendeeAchievedRulesEntity,
     ]),
   ],
   providers: [

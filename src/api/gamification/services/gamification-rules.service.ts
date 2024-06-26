@@ -42,7 +42,7 @@ export class GamificationRulesService {
   async createRule(createRuleDto: CreateRuleDto, queryRunner: QueryRunner) {
     const rule = queryRunner.manager
       .getRepository(RuleEntity)
-      .create({ name: createRuleDto.name });
+      .create({ name: createRuleDto.name, recurring: createRuleDto.recurring });
 
     await queryRunner.manager.save(rule, { reload: true });
 
@@ -85,6 +85,10 @@ export class GamificationRulesService {
       rule.enabled = updateRuleDto.enabled;
     }
 
+    if (updateRuleDto.recurring !== undefined) {
+      rule.recurring = updateRuleDto.recurring;
+    }
+
     await this.dataSource.manager.save(rule, { reload: true });
 
     return rule;
@@ -117,7 +121,7 @@ export class GamificationRulesService {
     return reward;
   }
 
-  async getEnabledRules() {
+  async getEnabledRules(_attendeeID: number) {
     return await this.dataSource.getRepository(RuleEntity).find({
       where: { enabled: true },
       relations: {

@@ -13,4 +13,8 @@ export class UpdateRuleDto {
   @IsOptional()
   @IsBoolean()
   enabled: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  recurring: boolean;
 }

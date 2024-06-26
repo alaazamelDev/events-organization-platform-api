@@ -26,9 +26,9 @@ export class DoesDefinedDataTypeConflictWithTheRewardConstraint
 
     const result = await Promise.all(
       conditions.map(async (condition) => {
-        if (condition.defined_data_id === DefinedDataEnum.EARN_POINTS) {
+        if (+condition.defined_data_id === +DefinedDataEnum.EARN_POINTS) {
           return await this.checkFormConflict(rewards, RewardTypesEnum.POINTS);
-        } else if (condition.defined_data_id === DefinedDataEnum.EARN_BADGE) {
+        } else if (+condition.defined_data_id === +DefinedDataEnum.EARN_BADGE) {
           return await this.checkFormConflict(rewards, RewardTypesEnum.BADGE);
         } else {
           return true;
@@ -51,7 +51,7 @@ export class DoesDefinedDataTypeConflictWithTheRewardConstraint
           .where('id = :rewardID', { rewardID: reward.reward_id })
           .getOneOrFail();
 
-        return reward_entity.type_id !== rewardType;
+        return Number(reward_entity.type_id) !== Number(rewardType);
       }),
     );
 

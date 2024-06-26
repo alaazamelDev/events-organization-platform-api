@@ -19,4 +19,7 @@ export class RuleEntity extends BaseEntity {
 
   @Column({ default: true })
   enabled: boolean;
+
+  @Column({ default: true })
+  recurring: boolean;
 }
