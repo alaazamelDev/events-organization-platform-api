@@ -85,7 +85,7 @@ export class GiftCardsPdfService {
                 <div style="background-color: #264653; width: 100%; height: 100%;">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-left: 0.2in; padding-right: 0.2in; padding-top: 0.1in; space-y: 0.1in;">
                         <div style="display: flex; flex-direction: column; gap: 0;">
-                            <div style="font-size: 0.23in; font-family: 'Bangers';">Eventure</div>
+                            <div style="font-size: 0.23in; font-family: 'Bangers';">WEEVENTS</div>
                             <div>Gift Card</div>
                         </div>
                         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0;">
