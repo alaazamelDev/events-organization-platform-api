@@ -382,9 +382,41 @@ export class SeedingService {
 
     const notificationTypes: NotificationType[] = [
       {
-        id: 1,
+        id: NotificationType.EVENT_CREATED,
         icon: '',
-        name: '',
+        name: 'Event Created',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+      {
+        id: NotificationType.ATTENDEE_ACCEPTED,
+        icon: '',
+        name: 'Attendee Accepted',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+      {
+        id: NotificationType.ATTENDEE_REJECTED,
+        icon: '',
+        name: 'Attendee Rejected',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+      {
+        id: NotificationType.GOT_REPLY,
+        icon: '',
+        name: 'Got Reply on Message',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+      {
+        id: NotificationType.GOT_REACTION,
+        icon: '',
+        name: 'Got Reaction on Message',
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: null,

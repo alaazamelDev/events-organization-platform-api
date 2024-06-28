@@ -8,6 +8,7 @@ export class SeedingController {
   @Get()
   async seed() {
     await this.seedingService.seedAgeGroups();
+    await this.seedingService.seedNotificationTypes();
     await this.seedingService.seedApprovalStatus();
     await this.seedingService.seedJobs();
     await this.seedingService.seedCities();

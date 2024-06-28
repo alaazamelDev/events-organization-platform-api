@@ -34,6 +34,7 @@ import { OrganizationsTickets } from '../payment/entities/organizations-tickets.
 import { Attendee } from '../attendee/entities/attendee.entity';
 import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
 import { ChatGateway } from '../chat/gateways/chat.gateway';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class OrganizationService {
@@ -173,14 +174,32 @@ export class OrganizationService {
   }
 
   async findOne(id: number) {
-    const organization = await this.organizationRepository.findOneOrFail({
-      where: { id: id },
-      relations: {
-        addresses: { address: true },
-        contacts: { contact: true },
-        employees: { user: true, permissions: { permission: true } },
-      },
-    });
+    const organization = await this.organizationRepository
+      .findOneOrFail({
+        where: { id: id },
+        relations: {
+          addresses: { address: true },
+          contacts: { contact: true },
+          employees: { user: true, permissions: { permission: true } },
+          events: { days: true, tags: true },
+        },
+      })
+      .then((organization) => {
+        const customOrg = organization;
+        customOrg.events = customOrg.events
+          .map((event: Event) => {
+            return {
+              ...event,
+              starting_date: event.days.sort((a, b) => {
+                return moment(a.dayDate).isBefore(moment(b.dayDate)) ? -1 : 1;
+              })[0]?.dayDate,
+            };
+          })
+          .sort((a, b) => {
+            return moment(b.starting_date).diff(moment(a.starting_date));
+          });
+        return customOrg;
+      });
 
     const followingAttendeesCount = await this.dataSource.manager.count(
       FollowingAttendee,
