@@ -55,8 +55,15 @@ export class UserService {
     return updated.affected != undefined && updated.affected > 0;
   }
 
-  async findOneByEmailOrUsername(username: string): Promise<User | null> {
-    return this.dataSource.manager.getRepository(User).findOne({
+  async findOneByEmailOrUsername(
+    username: string,
+    queryRunner?: QueryRunner,
+  ): Promise<User | null> {
+    const repository =
+      queryRunner?.manager.getRepository(User) ??
+      this.dataSource.manager.getRepository(User);
+
+    return repository.findOne({
       where: [{ username }, { email: username }],
       relations: {
         userRole: true,
@@ -117,7 +124,7 @@ export class UserService {
       await this.userRepository.save(user, { reload: true });
     }
 
-    return user;
+    return (await this.findOneByEmailOrUsername(username, queryRunner))!;
   }
 
   async updateUser(updateUserDto: UpdateUserDto, queryRunner?: QueryRunner) {
