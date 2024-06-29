@@ -377,7 +377,7 @@ export class SeedingService {
 
   async seedNotificationTypes() {
     await this.dataSource.query(
-      'ALTER SEQUENCE notification_type_id_seq RESTART WITH 1;',
+      'ALTER SEQUENCE notification_types_id_seq RESTART WITH 1;',
     );
 
     const notificationTypes: NotificationType[] = [
