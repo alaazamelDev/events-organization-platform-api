@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Req,
   UseGuards,
   UseInterceptors,
@@ -44,6 +45,17 @@ export class DynamicFormsController {
     private readonly dynamicFormsGroupsService: DynamicFormsGroupsService,
   ) {}
 
+  @Post('group/:id')
+  updateFormGroup(
+    @Param('id') id: string,
+    @Body() updateFormGroupDto: UpdateFormGroupDto,
+  ) {
+    return this.dynamicFormsGroupsService.updateFormGroup(
+      +id,
+      updateFormGroupDto,
+    );
+  }
+
   @Get('fieldsTypes')
   getFieldsTypes() {
     return this.dynamicFormsFieldsService.getFieldsTypes();
@@ -75,22 +87,11 @@ export class DynamicFormsController {
     return this.dynamicFormsService.getForm(+id);
   }
 
-  @Patch('field')
+  @Post('field')
   updateFormField(@Body() updateFormFieldDto: UpdateFormFieldDto) {
     return this.dynamicFormsFieldsService.updateFormField(
       updateFormFieldDto.field_id,
       updateFormFieldDto,
-    );
-  }
-
-  @Patch('group/:id')
-  updateFormGroup(
-    @Param('id') id: string,
-    @Body() updateFormGroupDto: UpdateFormGroupDto,
-  ) {
-    return this.dynamicFormsGroupsService.updateFormGroup(
-      +id,
-      updateFormGroupDto,
     );
   }
 
@@ -168,7 +169,7 @@ export class DynamicFormsController {
     return this.dynamicFormsValidationRulesService.removeValidationRule(+id);
   }
 
-  @Patch('field/option')
+  @Put('field/option')
   updateFieldOptionName(@Body() updateOptionNameDto: UpdateOptionNameDto) {
     return this.dynamicFormsFieldsService.updateFieldOptionName(
       updateOptionNameDto,

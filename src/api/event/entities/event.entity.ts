@@ -90,6 +90,7 @@ export class Event extends BaseEntity {
     name: 'direct_register',
     type: 'boolean',
     default: true,
+    nullable: false,
   })
   directRegister: boolean;
 

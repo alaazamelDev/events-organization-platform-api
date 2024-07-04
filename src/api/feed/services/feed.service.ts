@@ -141,7 +141,13 @@ export class FeedService {
       data: await this.dataSource
         .getRepository(Organization)
         .createQueryBuilder('org')
-        .select(['org.id', 'org.name', 'org.description'])
+        .select([
+          'org.id',
+          'org.name',
+          'org.description',
+          'org.main_picture as main_picture',
+          'org.cover_picture as cover_picture',
+        ])
         .addSelect('COUNT(attendee.id) AS attendees_num')
         .addSelect('COUNT(DISTINCT event.id) AS events_num')
         .addSelect('COUNT(DISTINCT following.attendee) AS followers')
@@ -153,7 +159,25 @@ export class FeedService {
         .addOrderBy('attendees_num', 'DESC')
         .offset((query.page - 1) * query.pageSize)
         .limit(query.pageSize)
-        .getRawMany(),
+        .getRawMany()
+        .then((organizations) => {
+          return organizations.map((org) => {
+            const prefix = '/organizations/pictures/';
+            const mainPicture = this.fileUtilityService.getFileUrl(
+              org.main_picture ? prefix + org.main_picture : org.main_picture,
+            );
+            const coverPicture = this.fileUtilityService.getFileUrl(
+              org.cover_picture
+                ? prefix + org.cover_picture
+                : org.cover_picture,
+            );
+            return {
+              ...org,
+              main_picture: mainPicture,
+              cover_picture: coverPicture,
+            };
+          });
+        }),
       count: await this.dataSource.getRepository(Organization).count(),
     };
   }

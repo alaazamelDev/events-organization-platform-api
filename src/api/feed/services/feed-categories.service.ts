@@ -31,6 +31,7 @@ export class FeedCategoriesService {
       .getRepository(Event)
       .createQueryBuilder('event')
       .leftJoinAndSelect('event.tags', 'event_tag')
+      .leftJoinAndSelect('event.organization', 'organization')
       .where(`event.id IN (${subQuery.getQuery()})`)
       .setParameters(subQuery.getParameters())
       .skip((query.page - 1) * query.pageSize)

@@ -53,6 +53,7 @@ export class EventSerializer {
         data.approvalStatuses,
       ),
       is_chatting_enabled: data.isChattingEnabled,
+      direct_register: data.directRegister,
       chat_group: ChatGroupSerializer.serialize(data.chatGroup),
       fees: data.fees,
       form: data.form,
