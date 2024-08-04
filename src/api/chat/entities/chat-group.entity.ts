@@ -7,7 +7,7 @@ import { MessageGroupStatus } from '../enums/message-group-status.enum';
 @Entity('chat_groups')
 export class ChatGroup extends BaseEntity {
   @Column({
-    default: MessageGroupStatus.disabled,
+    default: MessageGroupStatus.enabled,
     enum: MessageGroupStatus,
     name: 'group_status',
     nullable: false,

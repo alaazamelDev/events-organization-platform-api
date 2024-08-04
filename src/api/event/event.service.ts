@@ -65,6 +65,7 @@ export class EventService {
           organization: true,
           chatGroup: includeChatGroup,
           form: true,
+          address: { city: true, state: true },
         },
       })
       .then(async (event: Event | null) => {
@@ -229,9 +230,11 @@ export class EventService {
       let newData;
       if (payload.location) {
         newData = { ...data, location: payload.location };
-      } else {
+      }
+
+      if (payload.address_id) {
         const address = { id: payload.address_id } as Address;
-        newData = { ...data, address };
+        newData = { ...newData, address };
       }
 
       // save the main entity

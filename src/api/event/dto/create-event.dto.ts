@@ -85,7 +85,7 @@ export class CreateEventDto {
   @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
-  direct_register: boolean = true;
+  direct_register: boolean;
 
   @IsOptional()
   @Transform(({ value }) => Number(value))
