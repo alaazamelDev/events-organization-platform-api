@@ -35,6 +35,7 @@ import { Attendee } from '../attendee/entities/attendee.entity';
 import { AttendeesTickets } from '../payment/entities/attendees-tickets.entity';
 import { ChatGateway } from '../chat/gateways/chat.gateway';
 import * as moment from 'moment-timezone';
+import { UserRoleEnum } from "../userRole/enums/user-role.enum";
 
 @Injectable()
 export class OrganizationService {
@@ -117,7 +118,7 @@ export class OrganizationService {
         password: hashedPassword,
       });
 
-      user.userRole = { id: 2 } as UserRole;
+      user.userRole = { id: UserRoleEnum.EMPLOYEE } as UserRole;
 
       await queryRunner.manager.save(user);
 
