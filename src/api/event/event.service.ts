@@ -237,6 +237,8 @@ export class EventService {
         newData = { ...newData, address };
       }
 
+      newData = { ...data, ...newData };
+
       // save the main entity
       const created = queryRunner.manager.create(Event, newData);
       const savedEvent = await queryRunner.manager.save(Event, created);

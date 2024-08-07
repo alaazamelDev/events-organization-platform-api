@@ -33,6 +33,9 @@ import { AccessTokenGuard } from '../../auth/guards/access-token.guard';
 import { Request } from 'express';
 import { ValidationRuleAlreadyExistInterceptor } from './interceptors/validation-rule-already-exist.interceptor';
 import { ValidationRuleDoesNotExistInterceptor } from './interceptors/validation-rule-does-not-exist.interceptor';
+import { TransactionInterceptor } from '../../common/interceptors/transaction/transaction.interceptor';
+import { QueryRunnerParam } from '../../common/decorators/query-runner-param.decorator';
+import { QueryRunner } from 'typeorm';
 
 @Controller('forms')
 export class DynamicFormsController {
@@ -124,8 +127,12 @@ export class DynamicFormsController {
   }
 
   @Delete('deleteGroup/:id')
-  deleteGroup(@Param('id') id: string) {
-    return this.dynamicFormsGroupsService.deleteGroup(+id);
+  @UseInterceptors(TransactionInterceptor)
+  deleteGroup(
+    @Param('id') id: string,
+    @QueryRunnerParam() queryRunner: QueryRunner,
+  ) {
+    return this.dynamicFormsGroupsService.deleteGroup(+id, queryRunner);
   }
 
   @Post('fillForm')

@@ -7,6 +7,7 @@ import { UpdateFormGroupDto } from '../dto/update-form/update-form-group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DynamicFormsFieldsService } from './dynamic-forms-fields.service';
 import { CreateFormGroupDto } from '../dto/create-form/create-form-group.dto';
+import { FormField } from '../entities/form-field.entity';
 
 @Injectable()
 export class DynamicFormsGroupsService {
@@ -127,8 +128,29 @@ export class DynamicFormsGroupsService {
     return group;
   }
 
-  async deleteGroup(id: number) {
-    return await this.formGroupRepository.softDelete({ id });
+  async deleteGroup(id: number, queryRunner: QueryRunner) {
+    const groupFields = await queryRunner.manager
+      .getRepository(FormField)
+      .find({
+        where: { group: { id: id } as FormGroup },
+      });
+
+    await Promise.all(
+      groupFields.map(async (field) => {
+        await queryRunner.manager
+          .createQueryBuilder()
+          .softDelete()
+          .from(FormField)
+          .where('id = :id', { id: field.id })
+          .execute();
+      }),
+    );
+    return await queryRunner.manager
+      .createQueryBuilder()
+      .softDelete()
+      .from(FormGroup)
+      .where('id = :id', { id: id })
+      .execute();
   }
 
   private async getGroupPosition(position: number, form_id: number) {

@@ -111,7 +111,7 @@ export class DynamicFormsQueryService {
         return {
           id: field.id,
           value: field.value,
-          field_id: field.formField.id,
+          field_id: field.formField?.id,
           option_id: field.option?.id ? field.option.id : null,
         };
       }),
