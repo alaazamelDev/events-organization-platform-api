@@ -79,7 +79,6 @@ export class DynamicFormsController {
     return this.dynamicFormsService.createForm(createFormDto);
   }
 
-  //TODO, take the org_id from the employee token whose making the request
   @Get('organization/:id')
   getOrganizationForms(@Param('id') id: string) {
     return this.dynamicFormsService.getOrganizationForms(+id);

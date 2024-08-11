@@ -68,7 +68,7 @@ export class ExecuteRules {
     );
   }
 
-  async getRuleResult(
+  private async getRuleResult(
     rule: RuleEntity,
     attendee_id: number,
     queryRunner: QueryRunner,
@@ -88,7 +88,7 @@ export class ExecuteRules {
     return !results.includes(false);
   }
 
-  async evaluateCondition(
+  private async evaluateCondition(
     condition: RuleConditionEntity,
     attendee_id: number,
     queryRunner: QueryRunner,

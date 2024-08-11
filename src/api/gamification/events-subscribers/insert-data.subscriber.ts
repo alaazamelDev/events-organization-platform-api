@@ -9,7 +9,7 @@ export class InsertDataSubscriber
 {
   constructor(
     private readonly dataSource: DataSource,
-    @Inject(ExecuteRules) private readonly evaluateRules: ExecuteRules,
+    @Inject(ExecuteRules) private readonly executeRules: ExecuteRules,
   ) {
     this.dataSource.subscribers.push(this);
   }
@@ -19,7 +19,7 @@ export class InsertDataSubscriber
   }
 
   async afterInsert(event: InsertEvent<InsertedDataEntity>): Promise<any> {
-    await this.evaluateRules.executeRules(
+    await this.executeRules.executeRules(
       event.entity.attendee_id,
       event.queryRunner,
     );
