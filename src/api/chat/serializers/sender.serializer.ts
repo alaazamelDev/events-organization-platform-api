@@ -27,7 +27,7 @@ export class SenderSerializer {
         }
 
         avatar =
-          fileUtilityService.getFileUrl(data.attendee?.coverPictureUrl) ??
+          fileUtilityService.getFileUrl(data.attendee?.profilePictureUrl) ??
           fileUtilityService.getFileUrl(DEFAULT_AVATAR_IMAGE_URL)!;
 
         isOrganizer = false;
