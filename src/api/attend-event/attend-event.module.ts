@@ -14,6 +14,7 @@ import { IsAttendeeEventStatusSameConstraint } from './validators/is_attendee_ev
 import { OrganizationsTickets } from '../payment/entities/organizations-tickets.entity';
 import { AttendanceModule } from '../attendance/attendance.module';
 import { AttendeeModule } from '../attendee/attendee.module';
+import { IsNewStatusSuitsTheEventConstraint } from './validators/is_new_status_suits_the_event_constraint';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AttendeeModule } from '../attendee/attendee.module';
     IsEventInRegisterPeriodConstraint,
     IsEventCapacityCanHoldConstraint,
     IsAttendeeEventStatusSameConstraint,
+    IsNewStatusSuitsTheEventConstraint,
   ],
 })
 export class AttendEventModule {}
