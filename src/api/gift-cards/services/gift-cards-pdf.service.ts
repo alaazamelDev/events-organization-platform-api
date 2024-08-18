@@ -4,21 +4,25 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { v1 as uuidv1 } from 'uuid';
 import { GiftCardEntity } from '../entities/gift-card.entity';
+import * as process from 'process';
 
 const JSZip = require('jszip');
 
 @Injectable()
 export class GiftCardsPdfService {
   private generatePDFPage = async (cardElements: any) => {
-    const browser = await puppeteer
-      .launch
-      //   {
-      //   headless: true,
-      //   ignoreDefaultArgs: ['--disable-extensions'],
-      //   args: ['--no-sandbox', '--use-gl=egl', '--disable-setuid-sandbox'],
-      //   ignoreHTTPSErrors: true,
-      // }
-      ();
+    const browser = await puppeteer.launch({
+      args: [
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--single-process',
+        '--no-zygote',
+      ],
+      executablePath:
+        process.env.APP_ENV === 'production'
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 6 });
     // await page.setUserAgent(
