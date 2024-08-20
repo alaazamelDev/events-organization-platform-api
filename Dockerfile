@@ -8,4 +8,5 @@ WORKDIR /user/src/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-CMD ["node", "index.js"]
+RUN npm run build
+CMD [ "npm", "run", "start:dev" ]
