@@ -78,6 +78,12 @@ EOP is built on a modern, scalable monolithic architecture:
 
 [Instructions on how to set up and run the project locally]
 
+## Documentation
+
+For complete documentation of the project in Arabic, please refer to the following link:
+
+[Arabic Documentation](https://docs.google.com/document/d/11wISo-6yECRsSM9r-VDqyMZ9qeRxKzFjC7uHLb6saTM/edit?usp=sharing)
+
 ## Contributors
 
 This project was developed as a graduation project for Damascus University by the following team members:
